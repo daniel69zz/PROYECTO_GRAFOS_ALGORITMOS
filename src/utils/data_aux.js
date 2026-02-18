@@ -3,17 +3,17 @@ import { FaHome, FaReadme } from "react-icons/fa";
 
 const linksArray = [
   {
-    label: "Home",
+    label: "Inicio",
     Icon: FaHome,
     to: "/",
   },
   {
-    label: "Algorithms",
+    label: "Algoritmos",
     Icon: FaReadme,
     to: "/algorithm",
   },
   {
-    label: "Graph",
+    label: "Grapho",
     Icon: GrGraphQl,
     to: "/graph",
   },

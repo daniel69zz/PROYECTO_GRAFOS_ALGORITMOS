@@ -1,14 +1,9 @@
 import styled from "styled-components";
 
-export function Nodo({ nodo, seleccionado, onClick, onDoubleClick }) {
+export function Nodo({ nodo, seleccionado, onClick }) {
   const handleClick = (e) => {
     e.stopPropagation();
     onClick();
-  };
-
-  const handleDoubleClick = (e) => {
-    e.stopPropagation();
-    onDoubleClick();
   };
 
   return (
@@ -17,7 +12,6 @@ export function Nodo({ nodo, seleccionado, onClick, onDoubleClick }) {
       nodo={nodo}
       $seleccionado={seleccionado}
       onClick={handleClick}
-      onDoubleClick={handleDoubleClick}
     >
       {nodo.label}
     </Container>

@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { AccordionItem } from "../components/AccordionItem";
 
 export function AlgorithmsPage() {
   return (
@@ -90,8 +91,12 @@ export function AlgorithmsPage() {
       <section>
         <h2>Tipos de algoritmos</h2>
         <ol>
-          <li>
-            <h3>Algoritmos de Búsqueda</h3>
+          <AccordionItem title="Algoritmos de Búsqueda">
+            <p>
+              Los algoritmos de búsqueda localizan uno o varios elementos que
+              presenten una serie de propiedades dentro de una estructura de
+              datos.
+            </p>
             <ul>
               <li>
                 <h4>Busqueda Binaria</h4>
@@ -104,11 +109,41 @@ export function AlgorithmsPage() {
                   allowFullScreen
                 />
               </li>
-            </ul>
-          </li>
 
-          <li>
-            <h3>Algoritmos de ordenamiento</h3>
+              <li>
+                <h4>Depth-First Search (DFS)</h4>
+                <iframe
+                  src="https://www.youtube.com/embed/PMMc4VsIacU"
+                  title="Depth-First Search"
+                  frameborder="0"
+                  height="315"
+                  width="900"
+                  allowFullScreen
+                />
+              </li>
+
+              <li>
+                <h4>Breadth-First Search (BFS)</h4>
+                <iframe
+                  src="https://www.youtube.com/embed/xlVX7dXLS64"
+                  title="Breadth-First Search"
+                  frameborder="0"
+                  height="315"
+                  width="900"
+                  allowFullScreen
+                />
+              </li>
+            </ul>
+          </AccordionItem>
+
+          <AccordionItem title="Algoritmos de ordenamiento">
+            <p>
+              Reorganizan los elementos de un listado según una relación de
+              orden. Las más habituales son el orden numérico y el orden
+              lexicográfico. Un orden eficiente optimiza el uso de algoritmos
+              como los de búsqueda y facilitan la consecución de resultados
+              legibles por personas y no solo máquinas.
+            </p>
             <ul>
               <li>
                 <h4>Quicksort</h4>
@@ -132,10 +167,15 @@ export function AlgorithmsPage() {
                 />
               </li>
             </ul>
-          </li>
+          </AccordionItem>
 
-          <li>
-            <h3>Algoritmos sobre grafos</h3>
+          <AccordionItem title="Algoritmos sobre grafos">
+            <p>
+              Son algoritmos diseñados para trabajar con estructuras llamadas
+              grafos, que modelan relaciones entre entidades. Un grafo está
+              compuesto por vértices (nodos) y aristas (conexiones entre nodos).
+              Se usan cuando el problema puede representarse como una red.
+            </p>
             <ul>
               <li>
                 <h4>Algoritmo de Dijkstra</h4>
@@ -158,8 +198,91 @@ export function AlgorithmsPage() {
                   width="900"
                 />
               </li>
+
+              <li>
+                <h4>Algoritmo de Kruskal</h4>
+                <iframe
+                  src="https://www.youtube.com/embed/lTCDUJw_4GM"
+                  title="Algoritmo de Kruskal"
+                  frameborder="0"
+                  height="380"
+                  width="900"
+                />
+              </li>
             </ul>
-          </li>
+          </AccordionItem>
+
+          <AccordionItem title="Algoritmos de Programación Dinámica">
+            <p>
+              La programación dinámica es un método de resolución de problemas
+              en el que dividimos un problema complejo en subproblemas y
+              calculamos y almacenamos sus soluciones, para que no haga falta
+              volver a calcularlas más adelante para llegar a la solución del
+              problema. La programación dinámica reduce el tiempo de ejecución
+              de un algoritmo al optimizar la recursión. Eso sí, para poder
+              aplicarse a un problema, éste debe tener subestructuras óptimas y
+              subproblemas superpuestos. Es decir, que en él se puedan usar
+              soluciones óptimas de subproblemas para encontrar la solución
+              óptima del problema en su conjunto y que el problema se pueda
+              dividir en subproblemas que se reutilizan para ofrecer el
+              resultado global.
+            </p>
+            <ul>
+              <li>
+                <h4>La Serie de Fibonacci</h4>
+                <iframe
+                  src="https://www.youtube.com/embed/EEqTaMeDVKo"
+                  title="Fibonacci"
+                  frameborder="0"
+                  height="380"
+                  width="900"
+                />
+              </li>
+            </ul>
+          </AccordionItem>
+
+          <AccordionItem title="Algoritmos de aprendizaje automático">
+            <p>
+              Son algoritmos que permiten a una computadora aprender patrones a
+              partir de datos y hacer predicciones o tomar decisiones sin estar
+              programada explícitamente para cada caso. En lugar de decirle al
+              programa todas las reglas, se le proporcionan ejemplos y el
+              algoritmo ajusta un modelo matemático para aproximar una función.
+            </p>
+            <ul>
+              <li>
+                <h4>Regresión lineal</h4>
+                <iframe
+                  src="https://www.youtube.com/embed/hmVh2ddVCK4"
+                  title="Regresion Lineal"
+                  frameborder="0"
+                  height="380"
+                  width="900"
+                />
+              </li>
+              <li>
+                <h4>Support Vector Machines (SVM)</h4>
+                <iframe
+                  src="https://www.youtube.com/embed/pEvLf93kL6s"
+                  title="Support Vector Machines"
+                  frameborder="0"
+                  height="380"
+                  width="900"
+                />
+              </li>
+
+              <li>
+                <h4>Redes Neuronales</h4>
+                <iframe
+                  src="https://www.youtube.com/embed/jKCQsndqEGQ"
+                  title="Support Vector Machines"
+                  frameborder="0"
+                  height="380"
+                  width="900"
+                />
+              </li>
+            </ul>
+          </AccordionItem>
         </ol>
       </section>
     </Container>

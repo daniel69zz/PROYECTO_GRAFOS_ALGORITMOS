@@ -77,14 +77,6 @@ export function GraphPage() {
     }
   };
 
-  const handleNodeDoubleClick = (id) => {
-    const nodo = nodos.find((nodo) => nodo.id === id);
-
-    if (nodo) {
-      setNodoSidebar(nodo);
-    }
-  };
-
   // --- PAN ---
   const handleMouseDown = (e) => {
     if (weight_input) return;
@@ -155,7 +147,6 @@ export function GraphPage() {
             key={node.id}
             nodo={node}
             onClick={() => handleNodeClick(node.id)}
-            onDoubleClick={() => handleNodeDoubleClick(node.id)}
             seleccionado={node.id === nodo_seleccionado}
           />
         ))}
@@ -177,15 +168,6 @@ export function GraphPage() {
           </PesoContainer>
         )}
       </Canvas>
-
-      {nodoSidebar && (
-        <SidebarNodo
-          nodo={nodoSidebar}
-          aristas={aristas}
-          nodos={nodos}
-          onClose={() => setNodoSidebar(null)}
-        />
-      )}
     </Container>
   );
 }
