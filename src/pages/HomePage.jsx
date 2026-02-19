@@ -31,13 +31,17 @@ const Container = styled.div`
   border-radius: 10px;
   padding: 15px 0px;
 
+  h2 {
+    font-size: 40px;
+    margin-top: 15px;
+  }
   .ImgContent {
     height: 50%;
     display: flex;
     justify-content: center;
   }
   .InfoContent {
-    height: 50%;
+    margin-top: 80px;
     display: flex;
     justify-content: center;
     align-items: center;

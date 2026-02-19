@@ -278,14 +278,12 @@ export function AlgorithmsPage() {
   );
 }
 
-/* ════════════════════════════════════════════
-   STYLED COMPONENTS
-   ════════════════════════════════════════════ */
-
 const Container = styled.div`
-  min-height: 100vh;
+  min-height: 90vh;
   background-color: #f8fafc;
   overflow: auto;
+
+  border-radius: 10px;
 `;
 
 /* ── Hero ── */
@@ -448,7 +446,7 @@ const CharacteristicsList = styled.ul`
 const Badge = styled.span`
   display: inline-block;
   background: #ede9fe;
-  color: #6d28d9;
+  color: #0c065c;
   font-weight: 700;
   font-size: 0.85rem;
   padding: 4px 12px;
