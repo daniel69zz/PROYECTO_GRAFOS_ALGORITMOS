@@ -10,22 +10,25 @@ export function Mainlayout() {
   return (
     <Container>
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-      <main>
+      <Main>
         <Outlet />
-      </main>
+      </Main>
     </Container>
   );
 }
 
 const Container = styled.div`
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+`;
 
-  main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    background-color: #55db3a;
-  }
+const Main = styled.main`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background-color: #55db3a;
+  overflow-y: auto;
+  min-width: 0;
 `;

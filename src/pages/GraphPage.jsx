@@ -2,14 +2,11 @@ import { useState, useRef } from "react";
 import styled from "styled-components";
 import { Nodo } from "../components/Nodo";
 import { Arista } from "../components/Arista";
-import { SidebarNodo } from "../components/SidebarNodo";
 
 export function GraphPage() {
   const [nodos, setNodos] = useState([]);
   const [aristas, setAristas] = useState([]);
   const [nodo_seleccionado, setNodo_seleccionado] = useState(null);
-
-  const [nodoSidebar, setNodoSidebar] = useState(null);
 
   // Estado para el input de peso
   const [weight_input, setWeight_input] = useState(null);
@@ -101,6 +98,15 @@ export function GraphPage() {
   const handleMouseLeave = () => {
     setIsPanning(false);
   };
+
+  const handleClear = () => {
+    setNodos([]);
+    setAristas([]);
+    setNodo_seleccionado(null);
+    setWeight_input(null);
+    setWeight_value("1");
+    setOffset({ x: 0, y: 0 }); // opcional: también resetea el pan
+  };
   // --- FIN PAN ---
 
   const confirmarPeso = () => {
@@ -140,6 +146,11 @@ export function GraphPage() {
       onMouseLeave={handleMouseLeave}
       $isPanning={isPanning}
     >
+      <Toolbar>
+        <ClearButton onClick={handleClear} disabled={nodos.length === 0}>
+          Limpiar Todo
+        </ClearButton>
+      </Toolbar>
       <Canvas $offsetX={offset.x} $offsetY={offset.y}>
         <Arista aristas={aristas} nodos={nodos} />
         {nodos.map((node) => (
@@ -271,5 +282,47 @@ const BtnCancelar = styled.button`
 
   &:hover {
     background-color: #c62828;
+  }
+`;
+
+const Toolbar = styled.div`
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 20;
+  display: flex;
+  gap: 8px;
+`;
+
+const ClearButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition:
+    background-color 0.2s,
+    transform 0.1s,
+    opacity 0.2s;
+
+  &:hover:not(:disabled) {
+    background-color: #c62828;
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
 `;
