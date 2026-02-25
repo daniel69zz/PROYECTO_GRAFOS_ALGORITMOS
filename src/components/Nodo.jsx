@@ -9,7 +9,7 @@ export function Nodo({ nodo, seleccionado, onClick }) {
   return (
     <Container
       data-nodo="true"
-      nodo={nodo}
+      $nodo={nodo}
       $seleccionado={seleccionado}
       onClick={handleClick}
     >
@@ -20,12 +20,13 @@ export function Nodo({ nodo, seleccionado, onClick }) {
 
 const Container = styled.div`
   position: absolute;
-  left: ${(props) => props.nodo.x - 40}px;
-  top: ${(props) => props.nodo.y - 40}px;
+  left: ${(props) => props.$nodo.x - 40}px;
+  top: ${(props) => props.$nodo.y - 40}px;
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background-color: ${(props) => (props.$seleccionado ? "#ff9800" : "#2196f3")};
+  background-color: ${(props) =>
+    props.$seleccionado ? "#ff9800" : props.$nodo.color};
   color: white;
   display: flex;
   justify-content: center;

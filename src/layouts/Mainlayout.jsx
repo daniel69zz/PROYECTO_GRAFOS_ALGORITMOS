@@ -1,34 +1,29 @@
 import styled from "styled-components";
 import { Outlet } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
-
-import { useState } from "react";
+import Header from "../components/Header";
 
 export function Mainlayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   return (
-    <Container>
-      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-      <Main>
+    <AppShell>
+      <Header />
+      <Content>
         <Outlet />
-      </Main>
-    </Container>
+      </Content>
+    </AppShell>
   );
 }
 
-const Container = styled.div`
+const AppShell = styled.div`
   display: flex;
-  height: 100vh;
+  flex-direction: column;
+  height: 100dvh;
   overflow: hidden;
 `;
 
-const Main = styled.main`
+const Content = styled.main`
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  background-color: #55db3a;
+  min-height: 0;
   overflow-y: auto;
-  min-width: 0;
+  background-color: #f0f2f5;
+  box-sizing: border-box;
 `;
