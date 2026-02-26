@@ -201,6 +201,12 @@ export function Graph({ herramienta, setHerramienta, clearFlag }) {
     if (e.key === "Escape") cancelarPeso();
   };
 
+  // ── Mover nodo ──
+  const handleNodeDrag = (id, newX, newY) => {
+    setNodos((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, x: newX, y: newY } : n)),
+    );
+  };
   return (
     <Wrapper>
       <CanvasArea
@@ -253,6 +259,8 @@ export function Graph({ herramienta, setHerramienta, clearFlag }) {
               nodo={node}
               onClick={(e) => handleNodeClick(node.id, e)}
               seleccionado={node.id === nodo_seleccionado}
+              onDrag={handleNodeDrag}
+              herramienta={herramienta}
             />
           ))}
 
