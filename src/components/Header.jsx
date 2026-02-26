@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 import { FaHome, FaReadme } from "react-icons/fa";
 import { GrGraphQl } from "react-icons/gr";
+import { IoMdHelpCircle } from "react-icons/io";
 
 import logo_ucb from "/logo_ucb.png";
 
@@ -9,6 +10,7 @@ const navItems = [
   { to: "/", label: "Inicio", Icon: FaHome, end: true },
   { to: "/algorithm", label: "Algoritmos", Icon: FaReadme },
   { to: "/graph", label: "Grapho", Icon: GrGraphQl },
+  { to: "/ayuda", label: "Como Usar", Icon: IoMdHelpCircle },
 ];
 
 function Header() {

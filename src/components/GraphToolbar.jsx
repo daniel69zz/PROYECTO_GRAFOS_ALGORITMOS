@@ -63,22 +63,6 @@ export function GraphToolbar({
 
       <Divider />
 
-      {isOpen ? (
-        <ClearButton onClick={onClear} disabled={disableClear}>
-          Limpiar Todo
-        </ClearButton>
-      ) : (
-        <ClearButtonIcon
-          onClick={onClear}
-          disabled={disableClear}
-          title="Limpiar Todo"
-        >
-          🗑
-        </ClearButtonIcon>
-      )}
-
-      <Divider />
-
       {toolbarOptions.map(({ label, Icon, op }, index) => (
         <LinkWrapper key={index}>
           <OpcionButton
@@ -92,6 +76,22 @@ export function GraphToolbar({
           </OpcionButton>
         </LinkWrapper>
       ))}
+
+      <Divider />
+
+      {isOpen ? (
+        <ClearButton onClick={onClear} disabled={disableClear}>
+          Limpiar Todo
+        </ClearButton>
+      ) : (
+        <ClearButtonIcon
+          onClick={onClear}
+          disabled={disableClear}
+          title="Limpiar Todo"
+        >
+          🗑
+        </ClearButtonIcon>
+      )}
 
       <Divider />
 
