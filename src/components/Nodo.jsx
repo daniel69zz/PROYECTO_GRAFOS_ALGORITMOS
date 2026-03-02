@@ -8,13 +8,11 @@ export function Nodo({ nodo, seleccionado, onClick, onDrag, herramienta }) {
   const handleMouseDown = (e) => {
     e.stopPropagation();
 
-    // ── Herramientas que NO arrastran (editar, eliminar, etc.) ──
     if (herramienta !== 1) {
       onClick();
       return;
     }
 
-    // ── Herramienta 1: drag ──
     isDragging.current = true;
     hasMoved.current = false;
 
@@ -57,7 +55,7 @@ export function Nodo({ nodo, seleccionado, onClick, onDrag, herramienta }) {
       $herramienta={herramienta}
       onMouseDown={handleMouseDown}
     >
-      {nodo.label}
+      <Label>{nodo.label}</Label>
     </Container>
   );
 }
@@ -77,13 +75,50 @@ const Container = styled.div`
   align-items: center;
   text-align: center;
   font-weight: bold;
-  border-color: black;
-  border-width: 3px;
-  border-style: solid;
+  border: 3px solid black;
   cursor: ${(props) => (props.$herramienta === 1 ? "grab" : "pointer")};
   user-select: none;
+  transition: transform 0.1s ease;
 
   &:active {
     cursor: ${(props) => (props.$herramienta === 1 ? "grabbing" : "pointer")};
+  }
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  @media (max-width: 768px) {
+    width: 70px;
+    height: 70px;
+    left: ${(props) => props.$nodo.x - 35}px;
+    top: ${(props) => props.$nodo.y - 35}px;
+  }
+
+  @media (max-width: 480px) {
+    width: 60px;
+    height: 60px;
+    left: ${(props) => props.$nodo.x - 30}px;
+    top: ${(props) => props.$nodo.y - 30}px;
+    border-width: 2px;
+  }
+`;
+
+const Label = styled.span`
+  font-size: 14px;
+  padding: 4px;
+  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+
+  @media (max-width: 768px) {
+    font-size: 13px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 12px;
   }
 `;

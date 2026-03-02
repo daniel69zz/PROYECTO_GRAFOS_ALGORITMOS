@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { AccordionItem } from "../components/AccordionItem";
-
 import { MdInput, MdOutput } from "react-icons/md";
 import { VscServerProcess } from "react-icons/vsc";
 
@@ -20,7 +19,6 @@ function ResponsiveVideo({ src, title }) {
 export function AlgorithmsPage() {
   return (
     <Container>
-      {/* ── Hero Section ── */}
       <Hero>
         <HeroContent>
           <h1>Algoritmos</h1>
@@ -32,7 +30,6 @@ export function AlgorithmsPage() {
       </Hero>
 
       <Content>
-        {/* ── ¿Qué es un algoritmo? ── */}
         <Card>
           <SectionLabel>Introducción</SectionLabel>
           <h2>¿Qué es un algoritmo?</h2>
@@ -51,7 +48,6 @@ export function AlgorithmsPage() {
           </Blockquote>
         </Card>
 
-        {/* ── Origen ── */}
         <Card>
           <SectionLabel>Historia</SectionLabel>
           <h2>¿De dónde viene la palabra "algoritmo"?</h2>
@@ -67,7 +63,6 @@ export function AlgorithmsPage() {
           </p>
         </Card>
 
-        {/* ── Partes ── */}
         <Card>
           <SectionLabel>Estructura</SectionLabel>
           <h2>Partes de un algoritmo</h2>
@@ -108,7 +103,6 @@ export function AlgorithmsPage() {
           </FeatureGrid>
         </Card>
 
-        {/* ── Características ── */}
         <Card>
           <SectionLabel>Propiedades</SectionLabel>
           <h2>Características de un algoritmo</h2>
@@ -136,7 +130,6 @@ export function AlgorithmsPage() {
           </CharacteristicsList>
         </Card>
 
-        {/* ── Tipos ── */}
         <Card>
           <SectionLabel>Clasificación</SectionLabel>
           <h2>Tipos de algoritmos</h2>
@@ -279,22 +272,23 @@ export function AlgorithmsPage() {
 }
 
 const Container = styled.div`
-  min-height: 90vh;
+  min-height: calc(100vh - 56px);
   background-color: #f8fafc;
   overflow: auto;
-
-  border-radius: 10px;
 `;
 
-/* ── Hero ── */
 const Hero = styled.header`
-  background-color: #227390;
+  background: linear-gradient(135deg, #227390 0%, #2d8fa8 100%);
   padding: 60px 30px;
   text-align: center;
   color: white;
 
   @media (max-width: 768px) {
     padding: 40px 20px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 32px 16px;
   }
 `;
 
@@ -303,7 +297,7 @@ const HeroContent = styled.div`
   margin: 0 auto;
 
   h1 {
-    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-size: clamp(32px, 6vw, 56px);
     font-weight: 800;
     letter-spacing: -0.02em;
     margin-bottom: 16px;
@@ -311,8 +305,8 @@ const HeroContent = styled.div`
 `;
 
 const HeroSubtitle = styled.p`
-  font-size: clamp(1rem, 2.5vw, 1.25rem);
-  opacity: 0.9;
+  font-size: clamp(16px, 3vw, 20px);
+  opacity: 0.95;
   line-height: 1.6;
 `;
 
@@ -325,45 +319,52 @@ const Content = styled.main`
   gap: 32px;
 
   @media (max-width: 768px) {
-    padding: 24px 16px 60px;
+    padding: 28px 16px 60px;
     gap: 24px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 20px 12px 40px;
+    gap: 20px;
   }
 `;
 
-/* ── Card ── */
 const Card = styled.section`
   background: white;
   border-radius: 16px;
   padding: 36px 32px;
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.06),
-    0 1px 2px rgba(0, 0, 0, 0.04);
-  border: 3px solid #08264c;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 2px solid #08264c;
   display: flex;
   flex-direction: column;
   gap: 16px;
 
   h2 {
-    font-size: clamp(1.4rem, 3vw, 1.85rem);
+    font-size: clamp(22px, 4vw, 30px);
     font-weight: 700;
     color: #141b26;
     line-height: 1.3;
   }
 
   p {
-    font-size: 1.05rem;
+    font-size: clamp(15px, 2.5vw, 17px);
     line-height: 1.75;
-    color: black;
+    color: #0f172a;
     font-weight: 500;
   }
 
   @media (max-width: 768px) {
     padding: 24px 20px;
+    border-radius: 12px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 20px 16px;
   }
 `;
 
 const SectionLabel = styled.span`
-  font-size: 0.8rem;
+  font-size: clamp(11px, 2vw, 13px);
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -377,17 +378,25 @@ const Blockquote = styled.blockquote`
   background: #f5f3ff;
   border-radius: 0 8px 8px 0;
   font-style: italic;
-  font-size: 1.1rem;
+  font-size: clamp(15px, 2.5vw, 18px);
   color: #06300d;
   line-height: 1.6;
+
+  @media (max-width: 480px) {
+    padding: 12px 16px;
+  }
 `;
 
-/* ── Feature grid (Input / Proceso / Output) ── */
 const FeatureGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
   margin-top: 8px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 `;
 
 const FeatureCard = styled.div`
@@ -396,36 +405,37 @@ const FeatureCard = styled.div`
   padding: 24px;
   border: 1px solid #e2e8f0;
   border-top: 4px solid ${(props) => props.$accent};
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+  transition: all 0.2s;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   }
 
   h3 {
-    font-size: 1.1rem;
+    font-size: clamp(16px, 3vw, 18px);
     font-weight: 700;
     color: #1e293b;
     margin-bottom: 8px;
   }
 
   p {
-    font-size: 0.95rem;
+    font-size: clamp(14px, 2.5vw, 15px);
     color: #64748b;
     line-height: 1.6;
+  }
+
+  @media (max-width: 480px) {
+    padding: 20px;
   }
 `;
 
 const FeatureIcon = styled.span`
-  font-size: 2rem;
+  font-size: clamp(36px, 8vw, 48px);
   display: block;
   margin-bottom: 12px;
 `;
 
-/* ── Características ── */
 const CharacteristicsList = styled.ul`
   list-style: none;
   padding: 0;
@@ -434,12 +444,13 @@ const CharacteristicsList = styled.ul`
   gap: 12px;
 
   li {
-    font-size: 1.05rem;
+    font-size: clamp(15px, 2.5vw, 17px);
     color: #475569;
     line-height: 1.6;
     display: flex;
     align-items: baseline;
     gap: 12px;
+    flex-wrap: wrap;
   }
 `;
 
@@ -448,14 +459,13 @@ const Badge = styled.span`
   background: #ede9fe;
   color: #0c065c;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: clamp(12px, 2vw, 14px);
   padding: 4px 12px;
   border-radius: 20px;
   white-space: nowrap;
   flex-shrink: 0;
 `;
 
-/* ── Accordion ── */
 const AccordionList = styled.ol`
   list-style: none;
   padding: 0;
@@ -464,11 +474,10 @@ const AccordionList = styled.ol`
   gap: 12px;
 `;
 
-/* ── Video responsive ── */
 const VideoWrapper = styled.div`
   position: relative;
   width: 100%;
-  padding-bottom: 56.25%; /* 16:9 */
+  padding-bottom: 56.25%;
   margin: 16px 0;
   border-radius: 12px;
   overflow: hidden;
@@ -482,6 +491,11 @@ const VideoWrapper = styled.div`
     height: 100%;
     border: 0;
   }
+
+  @media (max-width: 480px) {
+    border-radius: 8px;
+    margin: 12px 0;
+  }
 `;
 
 const VideoList = styled.ul`
@@ -493,11 +507,15 @@ const VideoList = styled.ul`
   margin-top: 16px;
 
   h4 {
-    font-size: 1.1rem;
+    font-size: clamp(16px, 3vw, 18px);
     font-weight: 600;
     color: #334155;
     padding-bottom: 4px;
     border-bottom: 2px solid #e2e8f0;
     display: inline-block;
+  }
+
+  @media (max-width: 480px) {
+    gap: 20px;
   }
 `;

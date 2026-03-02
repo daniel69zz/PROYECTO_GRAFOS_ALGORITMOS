@@ -94,13 +94,12 @@ const MenuContainer = styled.div`
   left: ${({ $x }) => $x}px;
   top: ${({ $y }) => $y}px;
   z-index: 100;
-  width: 210px;
-  background: rgba(2, 14, 26, 0.97);
+  width: 240px;
+  background: rgba(2, 14, 26, 0.98);
   border: 1px solid rgba(79, 195, 247, 0.3);
   border-top: 2px solid #4fc3f7;
-  border-radius: 6px;
+  border-radius: 8px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  font-family: "Syne", sans-serif;
   color: #e8f4ff;
   animation: fadeIn 0.15s ease;
 
@@ -114,21 +113,43 @@ const MenuContainer = styled.div`
       transform: translateY(0);
     }
   }
+
+  @media (max-width: 768px) {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 320px;
+  }
+
+  @media (max-width: 480px) {
+    width: 85%;
+    max-width: 280px;
+  }
 `;
 
 const MenuHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 14px;
+  padding: 12px 16px;
   border-bottom: 1px solid rgba(79, 195, 247, 0.15);
 
   span {
-    font-size: 0.78rem;
+    font-size: 0.85rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     color: #4fc3f7;
     text-transform: uppercase;
+  }
+
+  @media (max-width: 480px) {
+    padding: 10px 14px;
+
+    span {
+      font-size: 0.8rem;
+    }
   }
 `;
 
@@ -137,44 +158,54 @@ const CloseBtn = styled.button`
   border: none;
   color: #4fc3f7;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 1rem;
   padding: 0;
   line-height: 1;
-  opacity: 0.6;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+
   &:hover {
     opacity: 1;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.1rem;
+    padding: 4px;
   }
 `;
 
 const MenuBody = styled.div`
-  padding: 14px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+
+  @media (max-width: 480px) {
+    padding: 14px;
+    gap: 12px;
+  }
 `;
 
 const Field = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 
   label {
-    font-size: 0.68rem;
+    font-size: 0.72rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: rgba(79, 195, 247, 0.6);
-    font-family: "Space Mono", monospace;
+    color: rgba(79, 195, 247, 0.7);
   }
 
   input[type="text"],
   input[type="number"] {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(79, 195, 247, 0.2);
-    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(79, 195, 247, 0.25);
+    border-radius: 6px;
     color: #e8f4ff;
-    font-family: "Syne", sans-serif;
-    font-size: 0.85rem;
-    padding: 7px 10px;
+    font-size: 0.9rem;
+    padding: 8px 12px;
     outline: none;
     width: 100%;
     box-sizing: border-box;
@@ -183,59 +214,86 @@ const Field = styled.div`
     &:focus {
       border-color: #4fc3f7;
     }
+
+    @media (max-width: 480px) {
+      font-size: 0.85rem;
+      padding: 10px 12px;
+    }
   }
 `;
 
 const ColorRow = styled.div`
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 
   input[type="color"] {
-    width: 36px;
-    height: 36px;
-    border: none;
-    border-radius: 4px;
+    width: 44px;
+    height: 44px;
+    border: 2px solid rgba(79, 195, 247, 0.3);
+    border-radius: 6px;
     cursor: pointer;
     padding: 0;
     background: none;
+    transition: border-color 0.2s;
+
+    &:hover {
+      border-color: #4fc3f7;
+    }
+
+    @media (max-width: 480px) {
+      width: 48px;
+      height: 48px;
+    }
   }
 `;
 
 const ColorPreview = styled.div`
   flex: 1;
-  height: 28px;
-  border-radius: 4px;
+  height: 32px;
+  border-radius: 6px;
   background: ${({ $color }) => $color};
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   transition: background 0.2s;
+
+  @media (max-width: 480px) {
+    height: 36px;
+  }
 `;
 
 const MenuFooter = styled.div`
   display: flex;
-  gap: 8px;
-  padding: 10px 14px;
+  gap: 10px;
+  padding: 12px 16px;
   border-top: 1px solid rgba(79, 195, 247, 0.15);
+
+  @media (max-width: 480px) {
+    padding: 10px 14px;
+  }
 `;
 
 const BtnBase = styled.button`
   flex: 1;
-  padding: 7px;
+  padding: 9px;
   border: none;
-  border-radius: 4px;
-  font-family: "Syne", sans-serif;
-  font-size: 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
-  transition:
-    opacity 0.2s,
-    transform 0.15s;
+  transition: all 0.2s;
+
   &:hover {
-    opacity: 0.85;
+    opacity: 0.9;
     transform: translateY(-1px);
   }
+
   &:active {
     transform: translateY(0);
+  }
+
+  @media (max-width: 480px) {
+    padding: 11px;
+    font-size: 0.9rem;
   }
 `;
 
@@ -245,7 +303,7 @@ const BtnGuardar = styled(BtnBase)`
 `;
 
 const BtnCancelar = styled(BtnBase)`
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.1);
   color: #e8f4ff;
-  border: 1px solid rgba(79, 195, 247, 0.2);
+  border: 1px solid rgba(79, 195, 247, 0.3);
 `;

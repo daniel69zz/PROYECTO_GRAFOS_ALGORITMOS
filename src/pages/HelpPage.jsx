@@ -3,181 +3,505 @@ import styled from "styled-components";
 
 export function HelpPage() {
   return (
-    <Page>
-      <Header>
-        <Title>Guía de Usuario — Toolbar</Title>
-        <Intro>
-          En el graficador interactivo encontrarás un <strong>Toolbar</strong>{" "}
-          ubicado <strong>al lado izquierdo del lienzo</strong>. Este toolbar
-          controla el <strong>modo de interacción</strong>: según la opción
-          seleccionada, cambia lo que ocurre al hacer clic en el lienzo, en un
-          nodo o en una arista.
-        </Intro>
-      </Header>
+    <Container>
+      <Card>
+        <Header>
+          <Title>📖 Guía de Usuario</Title>
+          <Subtitle>
+            Aprende a utilizar el <strong>Toolbar</strong> del graficador
+            interactivo
+          </Subtitle>
+        </Header>
 
-      <Section aria-labelledby="toolbar-switch">
-        <H2 id="toolbar-switch">Cómo cambiar de opción</H2>
-        <Paragraph>Puedes cambiar entre las opciones de dos maneras:</Paragraph>
-        <ol>
-          <li>
-            <strong>Haciendo clic</strong> sobre la opción en el toolbar.
-          </li>
-          <li>
-            Usando <strong>teclas rápidas</strong> del teclado:
-            <ul>
-              <li>
-                <strong>Tecla 1</strong> → Opción 1
-              </li>
-              <li>
-                <strong>Tecla 2</strong> → Opción 2
-              </li>
-              <li>
-                <strong>Tecla 3</strong> → Opción 3
-              </li>
-              <li>
-                <strong>Tecla 4</strong> → Opción 4
-              </li>
-            </ul>
-          </li>
-        </ol>
-      </Section>
+        <Section>
+          <SectionTitle>⌨️ Cómo cambiar de opción</SectionTitle>
+          <Text>Puedes cambiar entre las herramientas de dos maneras:</Text>
 
-      <Divider />
+          <MethodGrid>
+            <MethodCard>
+              <MethodIcon>🖱️</MethodIcon>
+              <MethodTitle>Clic</MethodTitle>
+              <MethodText>Haz clic sobre la opción en el toolbar</MethodText>
+            </MethodCard>
 
-      <Section aria-labelledby="option-1">
-        <H2 id="option-1">
-          Opción 1 (Tecla 1) — Crear / mover + desplazamiento
-        </H2>
-        <Paragraph>
-          Con esta opción puedes <strong>construir el grafo</strong> y{" "}
-          <strong>acomodar el lienzo</strong>.
-        </Paragraph>
-        <ul>
-          <li>
-            <strong>Crear nodos:</strong> doble clic en un espacio vacío del
-            lienzo.
-          </li>
-          <li>
-            <strong>Crear aristas dirigidas:</strong> clic en nodo origen → clic
-            en nodo destino → ingresar peso (si no se ingresa, el peso por
-            defecto es <strong>1</strong>).
-          </li>
-          <li>
-            <strong>Mover nodos:</strong> arrastra un nodo para reubicarlo
-            libremente.
-          </li>
-          <li>
-            <strong>Desplazarte por el lienzo (pan):</strong> clic en un espacio
-            vacío y arrastrar para moverte por el lienzo.
-          </li>
-        </ul>
-      </Section>
+            <MethodCard>
+              <MethodIcon>⌨️</MethodIcon>
+              <MethodTitle>Teclas rápidas</MethodTitle>
+              <MethodText>
+                <KeyList>
+                  <KeyItem>
+                    <Key>1</Key> Opción 1
+                  </KeyItem>
+                  <KeyItem>
+                    <Key>2</Key> Opción 2
+                  </KeyItem>
+                  <KeyItem>
+                    <Key>3</Key> Opción 3
+                  </KeyItem>
+                  <KeyItem>
+                    <Key>4</Key> Opción 4
+                  </KeyItem>
+                </KeyList>
+              </MethodText>
+            </MethodCard>
+          </MethodGrid>
+        </Section>
 
-      <Divider />
+        <Divider />
 
-      <Section aria-labelledby="option-2">
-        <H2 id="option-2">Opción 2 (Tecla 2) — Editar</H2>
-        <Paragraph>
-          Permite <strong>editar</strong> elementos existentes con un clic.
-        </Paragraph>
-        <ul>
-          <li>
-            <strong>Editar nodo:</strong> cambiar <strong>nombre</strong> y{" "}
-            <strong>color</strong>.
-          </li>
-          <li>
-            <strong>Editar arista:</strong> cambiar <strong>nombre</strong> (si
-            aplica), <strong>color</strong> y <strong>peso</strong>.
-          </li>
-        </ul>
-      </Section>
+        <ToolSection>
+          <ToolHeader>
+            <ToolNumber>1</ToolNumber>
+            <ToolTitle>Crear / Mover + Desplazamiento</ToolTitle>
+          </ToolHeader>
+          <ToolDescription>
+            Construye el grafo y acomoda el lienzo
+          </ToolDescription>
+          <FeatureList>
+            <Feature>
+              <FeatureIcon>➕</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Crear nodos</FeatureName>
+                <FeatureDesc>Doble clic en un espacio vacío</FeatureDesc>
+              </FeatureContent>
+            </Feature>
+            <Feature>
+              <FeatureIcon>🔗</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Crear aristas</FeatureName>
+                <FeatureDesc>
+                  Clic en nodo origen → nodo destino → peso (default: 1)
+                </FeatureDesc>
+              </FeatureContent>
+            </Feature>
+            <Feature>
+              <FeatureIcon>↔️</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Mover nodos</FeatureName>
+                <FeatureDesc>Arrastra un nodo para reubicarlo</FeatureDesc>
+              </FeatureContent>
+            </Feature>
+            <Feature>
+              <FeatureIcon>🖐️</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Desplazar lienzo (pan)</FeatureName>
+                <FeatureDesc>Clic y arrastra en espacio vacío</FeatureDesc>
+              </FeatureContent>
+            </Feature>
+          </FeatureList>
+        </ToolSection>
 
-      <Divider />
+        <Divider />
 
-      <Section aria-labelledby="option-3">
-        <H2 id="option-3">Opción 3 (Tecla 3) — Eliminar</H2>
-        <Paragraph>
-          Permite <strong>eliminar</strong> elementos específicos del grafo.
-        </Paragraph>
-        <ul>
-          <li>
-            Clic sobre un <strong>nodo</strong> para eliminarlo.
-          </li>
-          <li>
-            Clic sobre una <strong>arista</strong> para eliminarla.
-          </li>
-        </ul>
-      </Section>
+        <ToolSection>
+          <ToolHeader>
+            <ToolNumber>2</ToolNumber>
+            <ToolTitle>Editar</ToolTitle>
+          </ToolHeader>
+          <ToolDescription>
+            Modifica elementos existentes con un clic
+          </ToolDescription>
+          <FeatureList>
+            <Feature>
+              <FeatureIcon>🎨</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Editar nodo</FeatureName>
+                <FeatureDesc>Cambia nombre y color</FeatureDesc>
+              </FeatureContent>
+            </Feature>
+            <Feature>
+              <FeatureIcon>⚖️</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Editar arista</FeatureName>
+                <FeatureDesc>Modifica el peso</FeatureDesc>
+              </FeatureContent>
+            </Feature>
+          </FeatureList>
+        </ToolSection>
 
-      <Divider />
+        <Divider />
 
-      <Section aria-labelledby="option-4">
-        <H2 id="option-4">Opción 4 (Tecla 4) — Matriz ponderada dirigida</H2>
-        <Paragraph>
-          Genera la <strong>matriz ponderada dirigida</strong> del grafo actual,
-          considerando:
-        </Paragraph>
-        <ul>
-          <li>
-            <strong>Dirección</strong> de las aristas (origen → destino)
-          </li>
-          <li>
-            <strong>Peso</strong> de cada arista
-          </li>
-        </ul>
-      </Section>
+        <ToolSection>
+          <ToolHeader>
+            <ToolNumber>3</ToolNumber>
+            <ToolTitle>Eliminar</ToolTitle>
+          </ToolHeader>
+          <ToolDescription>
+            Elimina elementos específicos del grafo
+          </ToolDescription>
+          <FeatureList>
+            <Feature>
+              <FeatureIcon>🗑️</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Eliminar</FeatureName>
+                <FeatureDesc>
+                  Clic sobre nodo o arista para eliminarlo
+                </FeatureDesc>
+              </FeatureContent>
+            </Feature>
+          </FeatureList>
+        </ToolSection>
 
-      <Footer>
-        Consejo: si una acción no funciona como esperas, revisa que tengas
-        seleccionada la opción correcta del toolbar (o presiona 1–4 para cambiar
-        rápidamente).
-      </Footer>
-    </Page>
+        <Divider />
+
+        <ToolSection>
+          <ToolHeader>
+            <ToolNumber>4</ToolNumber>
+            <ToolTitle>Matriz Ponderada Dirigida</ToolTitle>
+          </ToolHeader>
+          <ToolDescription>
+            Genera la representación matricial del grafo
+          </ToolDescription>
+          <FeatureList>
+            <Feature>
+              <FeatureIcon>📊</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Matriz de adyacencia</FeatureName>
+                <FeatureDesc>
+                  Considera dirección y peso de las aristas
+                </FeatureDesc>
+              </FeatureContent>
+            </Feature>
+          </FeatureList>
+        </ToolSection>
+
+        <TipBox>
+          <TipIcon>💡</TipIcon>
+          <TipText>
+            <strong>Consejo:</strong> Si una acción no funciona como esperas,
+            verifica la opción seleccionada (presiona 1–4 para cambiar
+            rápidamente)
+          </TipText>
+        </TipBox>
+      </Card>
+    </Container>
   );
 }
 
-const Page = styled.main`
-  max-width: 900px;
+const Container = styled.div`
+  min-height: calc(100vh - 56px);
+  padding: 40px 24px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 1.5rem;
+
+  @media (max-width: 768px) {
+    padding: 24px 16px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 16px 12px;
+  }
+`;
+
+const Card = styled.div`
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  padding: 40px;
+  border: 1px solid #e2e8f0;
+
+  @media (max-width: 768px) {
+    padding: 28px 20px;
+    border-radius: 12px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 20px 16px;
+  }
 `;
 
 const Header = styled.header`
-  margin-bottom: 1rem;
+  text-align: center;
+  margin-bottom: 32px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 24px;
+  }
 `;
 
 const Title = styled.h1`
-  margin: 0;
+  font-size: clamp(28px, 5vw, 40px);
+  font-weight: 900;
+  color: #0f172a;
+  margin-bottom: 12px;
 `;
 
-const Intro = styled.p`
-  margin-top: 0.5rem;
-  color: #555;
+const Subtitle = styled.p`
+  font-size: clamp(14px, 3vw, 18px);
+  color: #64748b;
   line-height: 1.6;
 `;
 
 const Section = styled.section`
-  margin-top: 1.25rem;
+  margin-bottom: 32px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 24px;
+  }
 `;
 
-const H2 = styled.h2`
-  margin: 0 0 0.5rem 0;
+const SectionTitle = styled.h2`
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 16px;
 `;
 
-const Paragraph = styled.p`
-  margin: 0.5rem 0;
-  line-height: 1.6;
+const Text = styled.p`
+  font-size: 16px;
+  line-height: 1.7;
+  color: #475569;
+  margin-bottom: 20px;
+
+  @media (max-width: 480px) {
+    font-size: 15px;
+  }
+`;
+
+const MethodGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+`;
+
+const MethodCard = styled.div`
+  background: #f8fafc;
+  padding: 24px;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  text-align: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #5470eb;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(84, 112, 235, 0.15);
+  }
+
+  @media (max-width: 480px) {
+    padding: 20px;
+  }
+`;
+
+const MethodIcon = styled.div`
+  font-size: 48px;
+  margin-bottom: 16px;
+
+  @media (max-width: 480px) {
+    font-size: 40px;
+    margin-bottom: 12px;
+  }
+`;
+
+const MethodTitle = styled.h3`
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 8px;
+
+  @media (max-width: 480px) {
+    font-size: 16px;
+  }
+`;
+
+const MethodText = styled.div`
+  font-size: 14px;
+  color: #64748b;
+`;
+
+const KeyList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+`;
+
+const KeyItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const Key = styled.kbd`
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #5470eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 30px;
+  text-align: center;
+
+  @media (max-width: 480px) {
+    padding: 3px 8px;
+    font-size: 13px;
+  }
 `;
 
 const Divider = styled.hr`
-  margin: 1.5rem 0;
-  border: 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  border: none;
+  height: 1px;
+  background: #e2e8f0;
+  margin: 32px 0;
+
+  @media (max-width: 768px) {
+    margin: 24px 0;
+  }
 `;
 
-const Footer = styled.footer`
-  margin-top: 2rem;
-  color: #666;
-  font-size: 0.95rem;
+const ToolSection = styled.section`
+  margin-bottom: 32px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 24px;
+  }
+`;
+
+const ToolHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+`;
+
+const ToolNumber = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #5470eb;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 900;
+  flex-shrink: 0;
+
+  @media (max-width: 480px) {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+`;
+
+const ToolTitle = styled.h3`
+  font-size: clamp(18px, 3vw, 24px);
+  font-weight: 700;
+  color: #0f172a;
+`;
+
+const ToolDescription = styled.p`
+  font-size: 16px;
+  color: #64748b;
+  margin-bottom: 20px;
+  padding-left: 64px;
+
+  @media (max-width: 480px) {
+    padding-left: 0;
+    font-size: 15px;
+  }
+`;
+
+const FeatureList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+const Feature = styled.div`
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+
+  @media (max-width: 480px) {
+    padding: 12px;
+    gap: 10px;
+  }
+`;
+
+const FeatureIcon = styled.div`
+  font-size: 28px;
+  flex-shrink: 0;
+
+  @media (max-width: 480px) {
+    font-size: 24px;
+  }
+`;
+
+const FeatureContent = styled.div`
+  flex: 1;
+`;
+
+const FeatureName = styled.div`
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 4px;
+
+  @media (max-width: 480px) {
+    font-size: 15px;
+  }
+`;
+
+const FeatureDesc = styled.div`
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.5;
+
+  @media (max-width: 480px) {
+    font-size: 13px;
+  }
+`;
+
+const TipBox = styled.div`
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  background: #fef3c7;
+  border: 2px solid #fbbf24;
+  border-radius: 12px;
+  margin-top: 32px;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    padding: 16px;
+  }
+`;
+
+const TipIcon = styled.div`
+  font-size: 32px;
+  flex-shrink: 0;
+
+  @media (max-width: 480px) {
+    font-size: 28px;
+  }
+`;
+
+const TipText = styled.p`
+  font-size: 15px;
   line-height: 1.6;
+  color: #0f172a;
+
+  @media (max-width: 480px) {
+    font-size: 14px;
+  }
 `;

@@ -1,16 +1,26 @@
-import { useState, useEffect, useCallback } from "react";
-
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Graph } from "../components/Graph";
 import { GraphToolbar } from "../components/GraphToolbar";
 import styled from "styled-components";
 
 export function GraphPage() {
-  // 1 -> moverse, 2 -> editar nodo o arista, 3 -> eliminar nodo o arista en especifico
   const [herramienta, setHerramienta] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
-
   const [clearFlag, setClearFlag] = useState(false);
+
+  const graphRef = useRef(null);
+
   const handleClear = () => setClearFlag((f) => !f);
+
+  // ⬅️ Función para exportar
+  const handleExportar = () => {
+    graphRef.current?.handleExportar();
+  };
+
+  // ⬅️ Función para importar
+  const handleImportar = () => {
+    graphRef.current?.abrirSelectorArchivo();
+  };
 
   const handleKeyDown = useCallback((e) => {
     if (e.target.tagName === "INPUT") return;
@@ -32,8 +42,11 @@ export function GraphPage() {
         herramienta={herramienta}
         setHerramienta={setHerramienta}
         onClear={handleClear}
+        onExportar={handleExportar} // ⬅️ Pasar función
+        onImportar={handleImportar} // ⬅️ Pasar función
       />
       <Graph
+        ref={graphRef} // ⬅️ Agregar ref
         herramienta={herramienta}
         setHerramienta={setHerramienta}
         clearFlag={clearFlag}
@@ -47,4 +60,5 @@ const Container = styled.div`
   width: 100%;
   height: 100%;
   overflow: hidden;
+  position: relative;
 `;

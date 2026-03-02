@@ -52,15 +52,24 @@ const WindowWrapper = styled.div`
   position: absolute;
   top: ${({ $top }) => $top}px;
   left: ${({ $left }) => $left}px;
+  max-width: calc(100vw - 32px);
   border-radius: 12px;
-  box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.2),
-    0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
   z-index: 100;
   overflow: hidden;
   user-select: none;
   background: #fff;
   border: 1px solid #e2e8f0;
+
+  @media (max-width: 768px) {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: calc(100vw - 24px);
+    max-height: calc(100vh - 100px);
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
 const TitleBar = styled.div`
@@ -71,9 +80,14 @@ const TitleBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 
   &:active {
     cursor: grabbing;
+  }
+
+  @media (max-width: 768px) {
+    padding: 12px 16px;
   }
 `;
 
@@ -86,12 +100,24 @@ const TitleInfo = styled.div`
 const TitleIcon = styled.span`
   font-size: 18px;
   opacity: 0.9;
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
 `;
 
 const TitleText = styled.span`
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.3px;
+
+  @media (max-width: 768px) {
+    font-size: 13px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 12px;
+  }
 `;
 
 const CloseButton = styled.button`
@@ -99,35 +125,44 @@ const CloseButton = styled.button`
   border: none;
   color: inherit;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1;
-  padding: 4px 7px;
+  padding: 6px 9px;
   border-radius: 6px;
-  transition:
-    opacity 0.2s ease,
-    background 0.2s ease;
+  transition: all 0.2s ease;
 
   &:hover {
     background: rgba(255, 255, 255, 0.3);
+  }
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+    padding: 8px 10px;
   }
 `;
 
 const WindowBody = styled.div`
   padding: 16px;
-  font-size: inherit;
-  color: inherit;
-  max-height: 500px;
+  max-height: 70vh;
   overflow-y: auto;
 
-  /* scrollbar */
   &::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
   }
+
   &::-webkit-scrollbar-track {
     background: #f1f5f9;
   }
+
   &::-webkit-scrollbar-thumb {
     background: #cbd5e1;
-    border-radius: 3px;
+    border-radius: 4px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 12px;
+    max-height: none;
+    flex: 1;
+    overflow-y: auto;
   }
 `;
