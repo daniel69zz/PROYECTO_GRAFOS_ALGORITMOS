@@ -179,79 +179,95 @@ export function HelpPage() {
 }
 
 const Container = styled.div`
-  min-height: calc(100vh - 56px);
-  padding: 40px 24px;
-  max-width: 1000px;
-  margin: 0 auto;
+  min-height: calc(100vh - 64px);
+  padding: 80px 24px;
+  background-color: #050810;
+  background-image: 
+    radial-gradient(circle at 80% 20%, rgba(88, 166, 255, 0.08), transparent 40%),
+    radial-gradient(circle at 20% 80%, rgba(88, 166, 255, 0.12), transparent 40%);
+  position: relative;
+  z-index: 1;
 
   @media (max-width: 768px) {
-    padding: 24px 16px;
+    padding: 40px 16px;
   }
 
   @media (max-width: 480px) {
-    padding: 16px 12px;
+    padding: 24px 12px;
   }
 `;
 
 const Card = styled.div`
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  padding: 40px;
-  border: 1px solid #e2e8f0;
+  max-width: 1000px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  padding: 56px 48px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform var(--transition-bounce), box-shadow var(--transition-normal);
+
+  &:hover {
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
 
   @media (max-width: 768px) {
-    padding: 28px 20px;
-    border-radius: 12px;
+    padding: 40px 24px;
+    border-radius: 20px;
   }
 
   @media (max-width: 480px) {
-    padding: 20px 16px;
+    padding: 32px 20px;
   }
 `;
 
 const Header = styled.header`
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
 
   @media (max-width: 768px) {
-    margin-bottom: 24px;
+    margin-bottom: 32px;
   }
 `;
 
 const Title = styled.h1`
-  font-size: clamp(28px, 5vw, 40px);
+  font-size: clamp(36px, 6vw, 48px);
   font-weight: 900;
-  color: #0f172a;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #ffffff 0%, #a5c8ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 30px rgba(88, 166, 255, 0.2);
 `;
 
 const Subtitle = styled.p`
-  font-size: clamp(14px, 3vw, 18px);
-  color: #64748b;
+  font-size: clamp(16px, 3vw, 20px);
+  color: var(--text-secondary);
   line-height: 1.6;
 `;
 
 const Section = styled.section`
-  margin-bottom: 32px;
+  margin-bottom: 40px;
 
   @media (max-width: 768px) {
-    margin-bottom: 24px;
+    margin-bottom: 32px;
   }
 `;
 
 const SectionTitle = styled.h2`
-  font-size: clamp(20px, 4vw, 28px);
+  font-size: clamp(22px, 4vw, 28px);
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-primary);
   margin-bottom: 16px;
 `;
 
 const Text = styled.p`
   font-size: 16px;
-  line-height: 1.7;
-  color: #475569;
-  margin-bottom: 20px;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
 
   @media (max-width: 480px) {
     font-size: 15px;
@@ -260,8 +276,8 @@ const Text = styled.p`
 
 const MethodGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
 
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
@@ -270,77 +286,81 @@ const MethodGrid = styled.div`
 `;
 
 const MethodCard = styled.div`
-  background: #f8fafc;
-  padding: 24px;
-  border-radius: 12px;
-  border: 2px solid #e2e8f0;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 32px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
   text-align: center;
-  transition: all 0.2s ease;
+  transition: all var(--transition-bounce);
+  box-shadow: inset 0 2px 0 rgba(88, 166, 255, 0.5);
 
   &:hover {
-    border-color: #5470eb;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(84, 112, 235, 0.15);
+    border-color: rgba(88, 166, 255, 0.4);
+    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 3px 0 #58a6ff;
   }
 
   @media (max-width: 480px) {
-    padding: 20px;
+    padding: 24px;
   }
 `;
 
 const MethodIcon = styled.div`
-  font-size: 48px;
-  margin-bottom: 16px;
+  font-size: 56px;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
 
   @media (max-width: 480px) {
-    font-size: 40px;
-    margin-bottom: 12px;
+    font-size: 48px;
+    margin-bottom: 16px;
   }
 `;
 
 const MethodTitle = styled.h3`
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
-  color: #0f172a;
-  margin-bottom: 8px;
+  color: var(--text-primary);
+  margin-bottom: 12px;
 
   @media (max-width: 480px) {
-    font-size: 16px;
+    font-size: 18px;
   }
 `;
 
 const MethodText = styled.div`
-  font-size: 14px;
-  color: #64748b;
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
 `;
 
 const KeyList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   text-align: left;
 `;
 
 const KeyItem = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 `;
 
 const Key = styled.kbd`
-  background: white;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 6px 12px;
   font-weight: 700;
   font-size: 14px;
-  color: #5470eb;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  min-width: 30px;
+  color: var(--accent-hover);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  min-width: 36px;
   text-align: center;
 
   @media (max-width: 480px) {
-    padding: 3px 8px;
+    padding: 4px 10px;
     font-size: 13px;
   }
 `;
@@ -348,66 +368,67 @@ const Key = styled.kbd`
 const Divider = styled.hr`
   border: none;
   height: 1px;
-  background: #e2e8f0;
-  margin: 32px 0;
+  background: var(--glass-border);
+  margin: 40px 0;
 
   @media (max-width: 768px) {
-    margin: 24px 0;
+    margin: 32px 0;
   }
 `;
 
 const ToolSection = styled.section`
-  margin-bottom: 32px;
+  margin-bottom: 40px;
 
   @media (max-width: 768px) {
-    margin-bottom: 24px;
+    margin-bottom: 32px;
   }
 `;
 
 const ToolHeader = styled.div`
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 12px;
+  gap: 20px;
+  margin-bottom: 16px;
 
   @media (max-width: 480px) {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    gap: 16px;
   }
 `;
 
 const ToolNumber = styled.div`
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: #5470eb;
-  color: white;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--accent-color);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 900;
   flex-shrink: 0;
+  box-shadow: 0 0 20px var(--accent-glow);
 
   @media (max-width: 480px) {
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
   }
 `;
 
 const ToolTitle = styled.h3`
-  font-size: clamp(18px, 3vw, 24px);
+  font-size: clamp(20px, 3.5vw, 26px);
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-primary);
 `;
 
 const ToolDescription = styled.p`
   font-size: 16px;
-  color: #64748b;
-  margin-bottom: 20px;
-  padding-left: 64px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  padding-left: 76px;
 
   @media (max-width: 480px) {
     padding-left: 0;
@@ -418,29 +439,38 @@ const ToolDescription = styled.p`
 const FeatureList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 `;
 
 const Feature = styled.div`
   display: flex;
-  gap: 12px;
-  padding: 16px;
-  background: #f8fafc;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  gap: 20px;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  transition: all var(--transition-bounce);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+    transform: translateX(8px);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
 
   @media (max-width: 480px) {
-    padding: 12px;
-    gap: 10px;
+    padding: 20px;
+    gap: 16px;
   }
 `;
 
 const FeatureIcon = styled.div`
-  font-size: 28px;
+  font-size: 32px;
   flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 
   @media (max-width: 480px) {
-    font-size: 24px;
+    font-size: 28px;
   }
 `;
 
@@ -449,59 +479,65 @@ const FeatureContent = styled.div`
 `;
 
 const FeatureName = styled.div`
-  font-size: 16px;
-  font-weight: 600;
-  color: #0f172a;
-  margin-bottom: 4px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
 
   @media (max-width: 480px) {
-    font-size: 15px;
+    font-size: 16px;
   }
 `;
 
 const FeatureDesc = styled.div`
-  font-size: 14px;
-  color: #64748b;
-  line-height: 1.5;
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
 
   @media (max-width: 480px) {
-    font-size: 13px;
+    font-size: 14px;
   }
 `;
 
 const TipBox = styled.div`
   display: flex;
-  gap: 16px;
-  padding: 20px;
-  background: #fef3c7;
-  border: 2px solid #fbbf24;
-  border-radius: 12px;
-  margin-top: 32px;
+  gap: 24px;
+  padding: 32px;
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.1) 0%, rgba(251, 191, 36, 0.02) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-left: 4px solid #fbbf24;
+  border-radius: 20px;
+  margin-top: 56px;
 
   @media (max-width: 480px) {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 12px;
-    padding: 16px;
+    gap: 20px;
+    padding: 24px;
   }
 `;
 
 const TipIcon = styled.div`
-  font-size: 32px;
+  font-size: 36px;
   flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.4));
 
   @media (max-width: 480px) {
-    font-size: 28px;
+    font-size: 32px;
   }
 `;
 
 const TipText = styled.p`
-  font-size: 15px;
-  line-height: 1.6;
-  color: #0f172a;
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--text-primary);
+
+  strong {
+    color: #fbbf24;
+  }
 
   @media (max-width: 480px) {
-    font-size: 14px;
+    font-size: 15px;
   }
 `;

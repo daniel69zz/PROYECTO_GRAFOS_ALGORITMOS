@@ -1,19 +1,42 @@
-import styled from "styled-components";
+import { useState, useEffect } from "react";
+import styled, { keyframes } from "styled-components";
 import logo from "/logo_ucb.png";
 
 export function HomePage() {
+  const [titleText, setTitleText] = useState("");
+  const fullTitle = "ANÁLISIS DE ALGORITMOS";
+
+  useEffect(() => {
+    let i = 0;
+    setTitleText("");
+    const timer = setInterval(() => {
+      setTitleText(fullTitle.slice(0, i));
+      i++;
+      if (i > fullTitle.length) {
+        clearInterval(timer);
+      }
+    }, 70); // Typing speed
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <Container>
-      <Card>
-        <ImageSection>
+      <BackgroundGlow />
+      <HeroContent>
+        <LogoWrapper>
           <LogoImage src={logo} alt="Logo UCB" />
-        </ImageSection>
+        </LogoWrapper>
 
-        <ContentSection>
-          <Title>ANÁLISIS DE ALGORITMOS</Title>
+        <TitleWrapper>
+          <Title>
+            {titleText}
+            <Cursor />
+          </Title>
           <Subtitle>Proyecto Final - GraphX</Subtitle>
+        </TitleWrapper>
 
-          <InfoGrid>
+        <BottomSection>
+          <InfoCard>
             <InfoItem>
               <Label>Estudiante</Label>
               <Value>Luis Daniel Rojas Caceres</Value>
@@ -22,183 +45,190 @@ export function HomePage() {
               <Label>CI</Label>
               <Value>6991789</Value>
             </InfoItem>
-          </InfoGrid>
+          </InfoCard>
 
           <Description>
             Herramienta interactiva para la visualización y análisis de grafos
             dirigidos ponderados. Explora algoritmos, crea grafos y aprende de
             forma visual.
           </Description>
-        </ContentSection>
-      </Card>
+        </BottomSection>
+      </HeroContent>
     </Container>
   );
 }
 
+// --- ANIMATIONS ---
+const blink = keyframes`
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+`;
+
+const float = keyframes`
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(2deg); }
+`;
+
+// --- STYLED COMPONENTS ---
 const Container = styled.div`
-  min-height: calc(100vh - 56px);
-  padding: 40px 24px;
+  min-height: calc(100vh - 64px);
   display: flex;
   align-items: center;
   justify-content: center;
-
-  @media (max-width: 768px) {
-    padding: 24px 16px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 16px 12px;
-  }
-`;
-
-const Card = styled.div`
-  width: 100%;
-  max-width: 900px;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  position: relative;
   overflow: hidden;
-  border: 2px solid #e2e8f0;
-
-  @media (max-width: 768px) {
-    border-radius: 12px;
-  }
+  padding: 60px 20px;
+  background: radial-gradient(circle at 50% 0%, #0d1117 0%, #050810 100%);
 `;
 
-const ImageSection = styled.div`
-  padding: 60px 40px;
-  background: linear-gradient(135deg, #5470eb 0%, #7b93f7 100%);
+const BackgroundGlow = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80vw;
+  height: 80vw;
+  max-width: 800px;
+  max-height: 800px;
+  background: radial-gradient(circle, rgba(88, 166, 255, 0.1) 0%, transparent 60%);
+  filter: blur(80px);
+  z-index: 0;
+  pointer-events: none;
+`;
+
+const HeroContent = styled.div`
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1000px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  text-align: center;
+  gap: 48px;
+`;
 
-  @media (max-width: 768px) {
-    padding: 40px 24px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 32px 20px;
-  }
+const LogoWrapper = styled.div`
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 40px rgba(88, 166, 255, 0.05);
+  backdrop-filter: blur(10px);
 `;
 
 const LogoImage = styled.img`
-  height: 180px;
-  width: auto;
-  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.15));
-  animation: float 3s ease-in-out infinite;
-
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
+  width: 120px;
+  height: auto;
+  filter: drop-shadow(0 0 20px rgba(88, 166, 255, 0.3));
+  animation: ${float} 4s ease-in-out infinite;
 
   @media (max-width: 768px) {
-    height: 140px;
-  }
-
-  @media (max-width: 480px) {
-    height: 110px;
+    width: 100px;
   }
 `;
 
-const ContentSection = styled.div`
-  padding: 40px;
-
-  @media (max-width: 768px) {
-    padding: 32px 24px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 24px 16px;
-  }
+const TitleWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 `;
 
 const Title = styled.h1`
-  font-size: clamp(24px, 5vw, 40px);
+  font-size: clamp(32px, 6vw, 64px);
   font-weight: 900;
-  color: #0f172a;
-  text-align: center;
-  margin-bottom: 8px;
+  margin: 0;
   letter-spacing: -0.02em;
+  line-height: 1.1;
+  background: linear-gradient(to right, #ffffff 0%, #c2dcfc 50%, #58a6ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  min-height: clamp(36px, 7vw, 72px); /* Prevents layout jump while typing */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const Cursor = styled.span`
+  display: inline-block;
+  width: clamp(4px, 1vw, 8px);
+  height: clamp(32px, 6vw, 64px);
+  background-color: #58a6ff;
+  margin-left: 8px;
+  border-radius: 4px;
+  animation: ${blink} 1s step-end infinite;
 `;
 
 const Subtitle = styled.p`
-  font-size: clamp(14px, 3vw, 18px);
-  color: #64748b;
-  text-align: center;
-  margin-bottom: 32px;
-
-  @media (max-width: 480px) {
-    margin-bottom: 24px;
-  }
+  font-size: clamp(16px, 2.5vw, 22px);
+  color: var(--accent-color);
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-shadow: 0 0 20px rgba(88, 166, 255, 0.3);
 `;
 
-const InfoGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 32px;
+const BottomSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+  max-width: 800px;
+`;
 
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
-    gap: 12px;
-    margin-bottom: 24px;
+const InfoCard = styled.div`
+  display: flex;
+  gap: 48px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 24px 56px;
+  border-radius: 100px;
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: 24px;
+    border-radius: 24px;
+    padding: 32px;
+    width: 100%;
   }
 `;
 
 const InfoItem = styled.div`
-  background: #f8fafc;
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  text-align: center;
-
-  @media (max-width: 480px) {
-    padding: 16px;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
 `;
 
 const Label = styled.div`
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #94a3b8;
-  margin-bottom: 6px;
+  letter-spacing: 0.15em;
+  color: var(--text-secondary);
 `;
 
 const Value = styled.div`
   font-size: 18px;
   font-weight: 600;
-  color: #0f172a;
-
-  @media (max-width: 480px) {
-    font-size: 16px;
-  }
+  color: var(--text-primary);
 `;
 
 const Description = styled.p`
-  font-size: 16px;
-  line-height: 1.7;
-  color: #475569;
+  font-size: clamp(16px, 2vw, 18px);
+  line-height: 1.8;
+  color: var(--text-secondary);
   text-align: center;
-  padding: 20px;
-  background: #5470eb10;
-  border-radius: 12px;
-  border-left: 4px solid #5470eb;
-
-  @media (max-width: 768px) {
-    font-size: 15px;
-    padding: 16px;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 14px;
-    padding: 14px;
-  }
+  padding: 32px;
+  background: linear-gradient(180deg, rgba(88, 166, 255, 0.05) 0%, transparent 100%);
+  border-radius: 24px;
+  border-top: 1px solid rgba(88, 166, 255, 0.15);
+  box-shadow: inset 0 2px 10px rgba(255, 255, 255, 0.02);
+  margin: 0;
+  max-width: 640px;
 `;

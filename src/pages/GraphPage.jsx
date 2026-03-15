@@ -12,12 +12,10 @@ export function GraphPage() {
 
   const handleClear = () => setClearFlag((f) => !f);
 
-  // ⬅️ Función para exportar
   const handleExportar = () => {
     graphRef.current?.handleExportar();
   };
 
-  // ⬅️ Función para importar
   const handleImportar = () => {
     graphRef.current?.abrirSelectorArchivo();
   };
@@ -42,11 +40,11 @@ export function GraphPage() {
         herramienta={herramienta}
         setHerramienta={setHerramienta}
         onClear={handleClear}
-        onExportar={handleExportar} // ⬅️ Pasar función
-        onImportar={handleImportar} // ⬅️ Pasar función
+        onExportar={handleExportar}
+        onImportar={handleImportar}
       />
       <Graph
-        ref={graphRef} // ⬅️ Agregar ref
+        ref={graphRef}
         herramienta={herramienta}
         setHerramienta={setHerramienta}
         clearFlag={clearFlag}

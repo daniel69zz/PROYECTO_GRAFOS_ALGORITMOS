@@ -1,271 +1,120 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+ @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
 
-/* ========================================
+ /* ========================================
+   DESIGN SYSTEM (CSS VARIABLES)
+   ======================================== */
+ :root {
+   /* Colors - Premium Velvet Blue & Slate Theme */
+   --bg-color: #0d1117;
+   --bg-card: rgba(22, 27, 34, 0.6);
+   --bg-card-hover: rgba(33, 38, 45, 0.8);
+   --text-primary: #f0f6fc;
+   --text-secondary: #8b949e;
+   --accent-color: #58a6ff;
+   --accent-hover: #79c0ff;
+   --accent-glow: rgba(88, 166, 255, 0.3);
+
+   /* Green/Success Accent */
+   --success-color: #238636;
+   --success-hover: #2ea043;
+
+   /* Borders & Shadows */
+   --border-color: rgba(240, 246, 252, 0.1);
+   --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
+   --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+   --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+
+   /* Glassmorphism */
+   --glass-bg: rgba(13, 17, 23, 0.7);
+   --glass-border: rgba(255, 255, 255, 0.08);
+   --glass-blur: blur(12px);
+
+   /* Transitions */
+   --transition-fast: 0.15s ease-in-out;
+   --transition-normal: 0.3s ease;
+   --transition-bounce: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+ }
+
+ /* ========================================
    RESET Y BASE
    ======================================== */
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+ *,
+ *::before,
+ *::after {
+   box-sizing: border-box;
+   margin: 0;
+   padding: 0;
+ }
 
-html {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  font-size: 16px;
-}
+ html {
+   -webkit-font-smoothing: antialiased;
+   -moz-osx-font-smoothing: grayscale;
+   text-rendering: optimizeLegibility;
+   font-size: 16px;
+   scroll-behavior: smooth;
+ }
 
-body {
-  margin: 0;
-  font-family:
-    "Inter",
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    "Helvetica Neue",
-    Arial,
-    sans-serif;
-  background-color: #f0f2f5;
-  color: #0f172a;
-  line-height: 1.6;
-  overflow-x: hidden;
-}
+ body {
+   margin: 0;
+   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+   background-color: var(--bg-color);
+   background-image:
+     radial-gradient(circle at 15% 50%, rgba(88, 166, 255, 0.06), transparent 25%),
+     radial-gradient(circle at 85% 30%, rgba(46, 160, 67, 0.04), transparent 25%);
+   color: var(--text-primary);
+   line-height: 1.6;
+   overflow-x: hidden;
+   min-height: 100vh;
+ }
 
-html,
-body,
-#root {
-  height: 100%;
-  width: 100%;
-}
+ html,
+ body,
+ #root {
+   height: 100%;
+   width: 100%;
+   display: flex;
+   flex-direction: column;
+ }
 
-/* ========================================
-   TIPOGRAFÍA
-   ======================================== */
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-weight: 700;
-  line-height: 1.2;
-  color: #0f172a;
-}
-
-p {
-  margin-bottom: 1rem;
-}
-
-a {
-  color: #5470eb;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-a:hover {
-  color: #3f5ae6;
-}
-
-/* ========================================
-   ELEMENTOS DE FORMULARIO
-   ======================================== */
-
-button,
-input,
-textarea,
-select {
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-}
-
-button {
-  cursor: pointer;
-  border: none;
-  background: none;
-  padding: 0;
-  outline: none;
-}
-
-input,
-textarea {
-  outline: none;
-}
-
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type="number"] {
-  -moz-appearance: textfield;
-}
-
-/* ========================================
-   IMÁGENES Y MEDIOS
-   ======================================== */
-
-img,
-video {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* ========================================
+ /* ========================================
    SCROLLBAR PERSONALIZADO
    ======================================== */
 
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
+ ::-webkit-scrollbar {
+   width: 10px;
+   height: 10px;
+ }
 
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
+ ::-webkit-scrollbar-track {
+   background: var(--bg-color);
+ }
 
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 5px;
-  transition: background 0.2s ease;
-}
+ ::-webkit-scrollbar-thumb {
+   background: #30363d;
+   border-radius: 5px;
+   border: 2px solid var(--bg-color);
+ }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
+ ::-webkit-scrollbar-thumb:hover {
+   background: #484f58;
+ }
 
-/* Para Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 #f1f5f9;
-}
+ * {
+   scrollbar-width: thin;
+   scrollbar-color: #30363d var(--bg-color);
+ }
 
-/* ========================================
-   UTILIDADES GLOBALES
-   ======================================== */
-
-.no-scroll {
-  overflow: hidden;
-}
-
-/* Para touch devices */
-@media (hover: none) and (pointer: coarse) {
-  button,
-  a {
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
-  }
-}
-
-/* ========================================
-   ANIMACIONES
-   ======================================== */
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* ========================================
-   RESPONSIVE HELPERS
-   ======================================== */
-
-/* Ocultar en móvil */
-@media (max-width: 768px) {
-  .hide-mobile {
-    display: none !important;
-  }
-}
-
-/* Ocultar en desktop */
-@media (min-width: 769px) {
-  .hide-desktop {
-    display: none !important;
-  }
-}
-
-/* ========================================
-   PRINT STYLES
-   ======================================== */
-
-@media print {
-  *,
-  *::before,
-  *::after {
-    background: transparent !important;
-    color: #000 !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-  }
-
-  a,
-  a:visited {
-    text-decoration: underline;
-  }
-
-  img {
-    page-break-inside: avoid;
-  }
-
-  h2,
-  h3 {
-    page-break-after: avoid;
-  }
-}
-
-/* ========================================
-   FOCUS VISIBLE (Accesibilidad)
-   ======================================== */
-
-*:focus-visible {
-  outline: 2px solid #5470eb;
-  outline-offset: 2px;
-}
-
-button:focus-visible,
-a:focus-visible {
-  outline: 2px solid #5470eb;
-  outline-offset: 2px;
-}
-
-/* ========================================
+ /* ========================================
    SELECTION
    ======================================== */
 
-::selection {
-  background-color: #5470eb;
-  color: white;
-}
+ ::selection {
+   background-color: var(--accent-color);
+   color: #fff;
+ }
 
-::-moz-selection {
-  background-color: #5470eb;
-  color: white;
-}
+ ::-moz-selection {
+   background-color: var(--accent-color);
+   color: #fff;
+ }

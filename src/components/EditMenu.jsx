@@ -5,6 +5,7 @@ export function EditMenu({ tipo, datos, posicion, onGuardar, onCerrar }) {
   const [nombre, setNombre] = useState(datos.label || datos.weight || "");
   const [color, setColor] = useState(datos.color || "#4fc3f7");
   const [peso, setPeso] = useState(datos.weight || 1);
+  const [tipoArista, setTipoArista] = useState(datos.tipo || "dirigida");
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -21,7 +22,11 @@ export function EditMenu({ tipo, datos, posicion, onGuardar, onCerrar }) {
     if (tipo === "nodo") {
       onGuardar({ ...datos, label: nombre, color });
     } else {
-      onGuardar({ ...datos, weight: parseFloat(peso) || 1 });
+      onGuardar({
+        ...datos,
+        weight: parseFloat(peso) || 0,
+        tipo: tipoArista,
+      });
     }
     onCerrar();
   };
@@ -77,6 +82,25 @@ export function EditMenu({ tipo, datos, posicion, onGuardar, onCerrar }) {
                 autoFocus
               />
             </Field>
+            <Field>
+              <label>Tipo</label>
+              <TipoSelector>
+                <TipoOption
+                  $active={tipoArista === "dirigida"}
+                  onClick={() => setTipoArista("dirigida")}
+                >
+                  <TipoIcon>→</TipoIcon>
+                  <span>Dirigida</span>
+                </TipoOption>
+                <TipoOption
+                  $active={tipoArista === "no_dirigida"}
+                  onClick={() => setTipoArista("no_dirigida")}
+                >
+                  <TipoIcon>—</TipoIcon>
+                  <span>No Dirigida</span>
+                </TipoOption>
+              </TipoSelector>
+            </Field>
           </>
         )}
       </MenuBody>
@@ -90,7 +114,13 @@ export function EditMenu({ tipo, datos, posicion, onGuardar, onCerrar }) {
 }
 
 const MenuContainer = styled.div`
-  position: absolute;
+  position: ${({ $x, $y }) => {
+    // Si está muy cerca de los bordes en móvil, usar fixed
+    if (window.innerWidth <= 768) {
+      return "fixed";
+    }
+    return "absolute";
+  }};
   left: ${({ $x }) => $x}px;
   top: ${({ $y }) => $y}px;
   z-index: 100;
@@ -115,12 +145,8 @@ const MenuContainer = styled.div`
   }
 
   @media (max-width: 768px) {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 320px;
+    /* Remover el transform que centraba en móviles */
+    /* Si está cerca de los bordes, mantener la posición calculada */
   }
 
   @media (max-width: 480px) {
@@ -259,6 +285,54 @@ const ColorPreview = styled.div`
   @media (max-width: 480px) {
     height: 36px;
   }
+`;
+
+const TipoSelector = styled.div`
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+`;
+
+const TipoOption = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: ${({ $active }) =>
+    $active ? "rgba(79, 195, 247, 0.25)" : "rgba(255, 255, 255, 0.08)"};
+  border: 1px solid
+    ${({ $active }) => ($active ? "#4fc3f7" : "rgba(79, 195, 247, 0.25)")};
+  border-radius: 6px;
+  color: ${({ $active }) => ($active ? "#4fc3f7" : "#e8f4ff")};
+  font-size: 0.85rem;
+  font-weight: ${({ $active }) => ($active ? "700" : "500")};
+  cursor: pointer;
+  transition: all 0.2s;
+  outline: none;
+
+  &:hover {
+    background: rgba(79, 195, 247, 0.2);
+    border-color: #4fc3f7;
+  }
+
+  span {
+    flex: 1;
+    text-align: left;
+  }
+
+  @media (max-width: 480px) {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+`;
+
+const TipoIcon = styled.span`
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
 `;
 
 const MenuFooter = styled.div`

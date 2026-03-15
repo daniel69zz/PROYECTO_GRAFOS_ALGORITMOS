@@ -1,6 +1,6 @@
 export const exportar_grafo = (nodos, aristas, nextId) => {
   const grafo = {
-    version: "1.0",
+    version: "1.1",
     timestamp: new Date().toISOString(),
     graph: {
       nodos: nodos,
@@ -9,6 +9,11 @@ export const exportar_grafo = (nodos, aristas, nextId) => {
       metadata: {
         total_nodos: nodos.length,
         total_aristas: aristas.length,
+        aristas_dirigidas: aristas.filter(
+          (ar) => ar.tipo === "dirigida" || ar.tipo === undefined,
+        ).length,
+        aristas_no_dirigidas: aristas.filter((ar) => ar.tipo === "no_dirigida")
+          .length,
       },
     },
   };
@@ -24,7 +29,7 @@ export const exportar_grafo = (nodos, aristas, nextId) => {
   link.download = `grafo_${Date.now()}.json`;
 
   document.body.appendChild(link);
-  link.click(); // simula un autoclick al enlace de descarga lo cual genera que se autodescargue el archivo
+  link.click();
 
   document.body.removeChild(link);
   URL.revokeObjectURL(url_temp);
@@ -33,7 +38,7 @@ export const exportar_grafo = (nodos, aristas, nextId) => {
 export const importar_grafo = (file) => {
   return new Promise((resolve, reject) => {
     if (!file.name.endsWith(".json")) {
-      reject(new Error("Error, el archivo debe estar en formado JSON"));
+      reject(new Error("Error, el archivo debe estar en formato JSON"));
       return;
     }
 
@@ -45,7 +50,7 @@ export const importar_grafo = (file) => {
 
         if (!grafo_data.graph) {
           throw new Error(
-            "Formalo Invalido, no se encontró la propiedad 'graph'",
+            "Formato inválido, no se encontró la propiedad 'graph'",
           );
         }
 
@@ -53,7 +58,7 @@ export const importar_grafo = (file) => {
 
         if (!Array.isArray(nodos) || !Array.isArray(aristas)) {
           throw new Error(
-            "Formato invalido: nodos y aristas tienen que ser arreglos",
+            "Formato inválido: nodos y aristas tienen que ser arreglos",
           );
         }
 
@@ -66,7 +71,7 @@ export const importar_grafo = (file) => {
         );
 
         if (!nodos_validos) {
-          throw new Error("El arreglo de nodos no sigue un formato valido");
+          throw new Error("El arreglo de nodos no sigue un formato válido");
         }
 
         const aristas_validas = aristas.every(
@@ -77,12 +82,17 @@ export const importar_grafo = (file) => {
         );
 
         if (!aristas_validas) {
-          throw new Error("El arreglo de aristas no sigue un formato valido");
+          throw new Error("El arreglo de aristas no sigue un formato válido");
         }
+
+        const aristas_normalizadas = aristas.map((ar) => ({
+          ...ar,
+          tipo: ar.tipo || "dirigida",
+        }));
 
         const id_nodos = new Set(nodos.map((nodo) => nodo.id));
 
-        const aristas_nodos_validos = aristas.every(
+        const aristas_nodos_validos = aristas_normalizadas.every(
           (ar) => id_nodos.has(ar.from) && id_nodos.has(ar.to),
         );
 
@@ -92,14 +102,14 @@ export const importar_grafo = (file) => {
 
         resolve({
           nodos,
-          aristas,
+          aristas: aristas_normalizadas,
           nextId: nextId || Math.max(...nodos.map((nodo) => nodo.id), 0) + 1,
           metadata: grafo_data.graph.metadata || {},
           version: grafo_data.version,
           timestamp: grafo_data.timestamp,
         });
       } catch (e) {
-        reject(new Error(`Error al procesar el archivo ${e.message}`));
+        reject(new Error(`Error al procesar el archivo: ${e.message}`));
       }
     };
 

@@ -46,48 +46,49 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
 //#region STYLED COMPONENTS
 const Container = styled.div`
-  border-right: 2px solid #000000;
-  color: #000000;
-  background-color: #5470eb;
+  border-right: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  background-color: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
   position: sticky;
-  font-weight: bold;
+  font-weight: 600;
 
   top: 0;
-  height: 100dvh;
+  height: calc(100vh - 64px);
   min-width: 0;
 
-  width: ${({ $isOpen }) => ($isOpen ? "200px" : "80px")};
-  transition: width 0.3s ease;
+  width: ${({ $isOpen }) => ($isOpen ? "240px" : "80px")};
+  transition: width var(--transition-bounce), background-color var(--transition-fast);
+  z-index: 90;
 
   .SidebarButton {
     position: absolute;
-    top: 100px;
-    right: -18px;
+    top: 80px;
+    right: -16px;
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: black;
-    box-shadow:
-      0 0 4px #000000,
-      0 0 7px #000000;
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-md);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all var(--transition-bounce);
     transform: ${({ $isOpen }) => ($isOpen ? `initial` : `rotate(180deg)`)};
-    border: none;
-    letter-spacing: inherit;
-    color: inherit;
-    font-size: inherit;
-    text-align: inherit;
+    color: var(--text-primary);
     padding: 0;
-    font-family: inherit;
-    outline: none;
+    z-index: 10;
+
+    &:hover {
+      background: var(--accent-color);
+      color: #fff;
+      transform: ${({ $isOpen }) => ($isOpen ? `scale(1.1)` : `rotate(180deg) scale(1.1)`)};
+    }
 
     svg {
-      background-color: #000000;
-      color: white;
+      font-size: 16px;
     }
   }
 
@@ -96,71 +97,83 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
     padding-bottom: 24px;
-    padding-top: 20px;
-    gap: 20px;
-    background-color: inherit;
+    padding-top: 24px;
+    gap: 16px;
+    border-bottom: 1px solid var(--glass-border);
+    margin-bottom: 16px;
 
     .imgContent {
       display: flex;
-      background-color: inherit;
       img {
-        height: 60px;
-        width: 45px;
-        object-fit: cover;
-        background-color: inherit;
+        height: 48px;
+        width: auto;
+        object-fit: contain;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
       }
 
       cursor: pointer;
-      transition: all 0.3s;
-      transform: ${({ $isOpen }) => ($isOpen ? `scale(1.4)` : `scale(1.5)`)};
+      transition: transform var(--transition-bounce);
+      transform: ${({ $isOpen }) => ($isOpen ? `scale(1.1)` : `scale(1.3)`)};
     }
 
     h2 {
       display: ${({ $isOpen }) => ($isOpen ? `block` : `none`)};
-      background-color: inherit;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      background: linear-gradient(90deg, #fff 0%, #a5c8ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
     }
   }
 
   .LinkContainer {
     display: block;
-    background-color: inherit;
-    align-items: center;
-    border-radius: 10px;
-    margin: 8px 3px;
-    padding: 0 15%;
-    &:hover {
-      background-color: #5ee090;
-    }
+    margin: 8px 12px;
+    
     .Links {
       display: flex;
       align-items: center;
-      background-color: inherit;
       justify-content: ${({ $isOpen }) => ($isOpen ? "flex-start" : "center")};
-
       text-decoration: none;
-      padding: calc(8px - 2px) 0;
-      color: black;
+      padding: 10px;
+      border-radius: 12px;
+      color: var(--text-secondary);
+      transition: all var(--transition-fast);
+      gap: 12px;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-primary);
+        transform: translateX(4px);
+      }
 
       .Linkicon {
-        background-color: inherit;
-        padding: 8px 16px;
         display: flex;
+        align-items: center;
+        justify-content: center;
+        
         svg {
-          background-color: inherit;
-          font-size: 25px;
+          font-size: 24px;
+          transition: transform 0.2s;
         }
       }
+
       &.active {
-        .Linkicon {
-          svg {
-            color: #000000;
-          }
+        background: rgba(88, 166, 255, 0.15);
+        color: var(--accent-hover);
+        box-shadow: inset 2px 0 0 var(--accent-color);
+        
+        .Linkicon svg {
+          color: var(--accent-color);
         }
-        color: #000000;
       }
 
       span {
-        background-color: inherit;
+        font-size: 15px;
+        font-weight: 600;
+        white-space: nowrap;
       }
     }
   }
@@ -168,8 +181,8 @@ const Container = styled.div`
 
 const Divider = styled.div`
   height: 1px;
-  width: 100%;
-  background: black;
-  margin: 24px 0;
+  width: calc(100% - 24px);
+  background: var(--glass-border);
+  margin: 16px auto;
 `;
 //#endregion

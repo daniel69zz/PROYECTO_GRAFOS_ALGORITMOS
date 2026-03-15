@@ -10,6 +10,8 @@ export function Arista({
 
   if (!nodo_a || !nodo_b) return null;
 
+  const esDirigida = ar.tipo === "dirigida" || ar.tipo === undefined;
+
   const clickStyle = {
     stroke: "transparent",
     strokeWidth: 20,
@@ -49,7 +51,7 @@ export function Arista({
           stroke="black"
           strokeWidth="3"
           fill="none"
-          markerEnd="url(#arrowhead)"
+          markerEnd={esDirigida ? "url(#arrowhead)" : undefined}
         />
         <path d={pathD} style={clickStyle} onClick={handleClick} />
         <rect
@@ -117,7 +119,7 @@ export function Arista({
           stroke="black"
           strokeWidth="3"
           fill="none"
-          markerEnd="url(#arrowhead)"
+          markerEnd={esDirigida ? "url(#arrowhead)" : undefined}
         />
         <path d={pathD} style={clickStyle} onClick={handleClick} />
         <rect
@@ -158,7 +160,7 @@ export function Arista({
         y2={y2}
         stroke="black"
         strokeWidth="3"
-        markerEnd="url(#arrowhead)"
+        markerEnd={esDirigida ? "url(#arrowhead)" : undefined}
       />
       <line
         x1={x1}

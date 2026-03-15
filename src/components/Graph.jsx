@@ -10,11 +10,88 @@ import { Nodo } from "./Nodo";
 import { Arista } from "./Arista";
 import { EditMenu } from "./EditMenu";
 import { DragMatrix } from "./DragMatrix";
+import { Notification } from "./Notification";
 
 import { exportar_grafo, importar_grafo } from "../utils/exp_imp_grafo";
 
 const existeAristaContraria = (aristas, from, to) =>
   aristas.some((ar) => ar.from === to && ar.to === from);
+
+const calcularPosicionMenu = (
+  nodoX,
+  nodoY,
+  offsetX,
+  offsetY,
+  tipo = "nodo",
+) => {
+  const menuWidth = 240;
+  const menuHeight = tipo === "nodo" ? 320 : 220;
+  const padding = 16;
+  const nodoRadius = 40; // Radio del nodo
+
+  // Posición absoluta del nodo en viewport
+  const nodoViewportX = nodoX + offsetX;
+  const nodoViewportY = nodoY + offsetY;
+
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  let menuX = nodoViewportX + nodoRadius + 10; // A la derecha del nodo
+  let menuY = nodoViewportY - menuHeight / 2; // Centrado verticalmente
+
+  // Si no cabe a la derecha, ponerlo a la izquierda
+  if (menuX + menuWidth + padding > viewportWidth) {
+    menuX = nodoViewportX - nodoRadius - menuWidth - 10;
+  }
+
+  // Si aún no cabe a la izquierda, forzar dentro del viewport
+  if (menuX < padding) {
+    menuX = padding;
+  }
+  if (menuX + menuWidth + padding > viewportWidth) {
+    menuX = viewportWidth - menuWidth - padding;
+  }
+
+  // Ajustar verticalmente
+  if (menuY < padding) {
+    menuY = padding;
+  }
+  if (menuY + menuHeight + padding > viewportHeight) {
+    menuY = viewportHeight - menuHeight - padding;
+  }
+
+  return { x: menuX, y: menuY };
+};
+
+const calcularPosicionMenuArista = (clickX, clickY, tipo = "arista") => {
+  const menuWidth = 240;
+  const menuHeight = 220;
+  const padding = 16;
+
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  let menuX = clickX + 20; // Offset desde el click
+  let menuY = clickY - menuHeight / 2;
+
+  // Ajustar horizontalmente
+  if (menuX + menuWidth + padding > viewportWidth) {
+    menuX = clickX - menuWidth - 20;
+  }
+  if (menuX < padding) {
+    menuX = padding;
+  }
+
+  // Ajustar verticalmente
+  if (menuY < padding) {
+    menuY = padding;
+  }
+  if (menuY + menuHeight + padding > viewportHeight) {
+    menuY = viewportHeight - menuHeight - padding;
+  }
+
+  return { x: menuX, y: menuY };
+};
 
 export const Graph = forwardRef(
   ({ herramienta, setHerramienta, clearFlag }, ref) => {
@@ -31,19 +108,27 @@ export const Graph = forwardRef(
     const panStart = useRef({ x: 0, y: 0 });
 
     const [editMenu, setEditMenu] = useState(null);
+    const [notification, setNotification] = useState(null);
     const nextId = useRef(1);
 
     const fileInputRef = useRef(null);
 
-    //exportar
+    const showNotification = (message, type = "info") => {
+      setNotification({ message, type });
+    };
+
+    const closeNotification = () => {
+      setNotification(null);
+    };
+
     const handleExportar = () => {
       try {
         exportar_grafo(nodos, aristas, nextId.current);
-
+        showNotification("Grafo exportado correctamente", "success");
         console.log("Grafo exportado correctamente");
       } catch (e) {
         console.error("Error al exportar:", e);
-        alert(`Error al exportar el grafo: ${e.message}`);
+        showNotification(`Error al exportar el grafo:\n${e.message}`, "error");
       }
     };
 
@@ -65,11 +150,11 @@ export const Graph = forwardRef(
         setEditMenu(null);
         setOffset({ x: 0, y: 0 });
 
-        alert("✅ Grafo importado correctamente");
+        showNotification("Grafo importado correctamente", "success");
         console.log("Metadata:", grafo_data.metadata);
       } catch (e) {
         console.error("Error al importar:", e);
-        alert(`❌ Grafo NO IMPORTADO, ${e.message}`); // ⬅️ Corregido: era 'error.message'
+        showNotification(`Grafo NO IMPORTADO\n${e.message}`, "error");
       }
 
       event.target.value = "";
@@ -79,7 +164,6 @@ export const Graph = forwardRef(
       fileInputRef.current?.click();
     };
 
-    // ⬅️ Ahora useImperativeHandle está importado correctamente
     useImperativeHandle(ref, () => ({
       handleExportar,
       abrirSelectorArchivo,
@@ -112,13 +196,18 @@ export const Graph = forwardRef(
 
       if (herramienta === 2) {
         const nodo = nodos.find((n) => n.id === id);
+        const posicionSegura = calcularPosicionMenu(
+          nodo.x,
+          nodo.y,
+          offset.x,
+          offset.y,
+          "nodo",
+        );
+
         setEditMenu({
           tipo: "nodo",
           datos: nodo,
-          posicion: {
-            x: nodo.x + offset.x + 30,
-            y: nodo.y + offset.y - 20,
-          },
+          posicion: posicionSegura,
         });
         return;
       }
@@ -166,10 +255,16 @@ export const Graph = forwardRef(
         return;
       }
       if (herramienta === 2) {
+        const posicionSegura = calcularPosicionMenuArista(
+          posicion.x,
+          posicion.y,
+          "arista",
+        );
+
         setEditMenu({
           tipo: "arista",
           datos: arista,
-          posicion,
+          posicion: posicionSegura,
         });
       }
     };
@@ -232,20 +327,23 @@ export const Graph = forwardRef(
     }, [clearFlag]);
 
     const confirmarPeso = () => {
+      const peso = parseFloat(weight_value);
+      const pesoFinal = isNaN(peso) || peso < 0 ? 1 : peso;
+
       if (weight_value.trim() !== "") {
         setAristas((prev) => [
           ...prev,
           {
             from: weight_input.from,
             to: weight_input.to,
-            weight: parseFloat(weight_value) || 1,
+            weight: pesoFinal,
+            tipo: "dirigida",
           },
         ]);
       }
       setWeight_input(null);
       setWeight_value("1");
     };
-
     const cancelarPeso = () => {
       setWeight_input(null);
       setWeight_value("1");
@@ -262,6 +360,20 @@ export const Graph = forwardRef(
       );
     };
 
+    const tieneAristasNoDirigidas = aristas.some(
+      (ar) => ar.tipo === "no_dirigida",
+    );
+
+    useEffect(() => {
+      if (herramienta === 4 && tieneAristasNoDirigidas) {
+        showNotification(
+          "No se puede mostrar la matriz para grafos con aristas no dirigidas.\n\nLa matriz de adyacencia está diseñada solo para grafos dirigidos.",
+          "warning",
+        );
+        setHerramienta(1);
+      }
+    }, [herramienta, tieneAristasNoDirigidas, setHerramienta]);
+
     return (
       <Wrapper>
         <input
@@ -271,6 +383,15 @@ export const Graph = forwardRef(
           style={{ display: "none" }}
           onChange={handleImportar}
         />
+
+        {notification && (
+          <Notification
+            message={notification.message}
+            type={notification.type}
+            onClose={closeNotification}
+          />
+        )}
+
         <CanvasArea
           onDoubleClick={handleDoubleClick}
           onMouseDown={handleMouseDown}
@@ -279,7 +400,7 @@ export const Graph = forwardRef(
           onMouseLeave={handleMouseLeave}
           $isPanning={isPanning}
         >
-          {herramienta === 4 && (
+          {herramienta === 4 && !tieneAristasNoDirigidas && (
             <DragMatrix
               title="Matriz Ponderada Dirigida"
               nodos={nodos}

@@ -4,7 +4,7 @@ import { FaEdit } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 import { AiOutlineLeft } from "react-icons/ai";
 import { TbMatrix } from "react-icons/tb";
-import { BiExport, BiImport } from "react-icons/bi"; // ⬅️ Nuevos iconos
+import { BiExport, BiImport } from "react-icons/bi";
 
 const toolbarLinks = [
   { label: "Mover", Icon: LuMousePointer2, op: 1 },
@@ -14,7 +14,6 @@ const toolbarLinks = [
 
 const toolbarOptions = [{ label: "Matriz", Icon: TbMatrix, op: 4 }];
 
-// ⬅️ Nueva sección para archivo
 const fileOptions = [
   { label: "Exportar", Icon: BiExport, action: "exportar" },
   { label: "Importar", Icon: BiImport, action: "importar" },
@@ -27,8 +26,9 @@ export function GraphToolbar({
   disableClear,
   herramienta,
   setHerramienta,
-  onExportar, // ⬅️ Nueva prop
-  onImportar, // ⬅️ Nueva prop
+  onExportar,
+  onImportar,
+  tieneAristasNoDirigidas,
 }) {
   const handleFileAction = (action) => {
     if (action === "exportar") {
@@ -36,6 +36,11 @@ export function GraphToolbar({
     } else if (action === "importar") {
       onImportar?.();
     }
+  };
+
+  const handleMatrizClick = () => {
+    // La validación y notificación ahora se manejan en Graph.jsx
+    setHerramienta(4);
   };
 
   return (
@@ -70,16 +75,21 @@ export function GraphToolbar({
             key={index}
             $isOpen={isOpen}
             $active={herramienta === op}
-            onClick={() => setHerramienta(op)}
-            title={label}
+            onClick={handleMatrizClick}
+            title={
+              tieneAristasNoDirigidas
+                ? "No disponible para aristas no dirigidas"
+                : label
+            }
+            $disabled={tieneAristasNoDirigidas}
           >
             <Icon />
             {isOpen && <span>{label}</span>}
+            {tieneAristasNoDirigidas && <DisabledBadge>⚠</DisabledBadge>}
           </ToolButton>
         ))}
       </ToolsSection>
 
-      {/* ⬅️ Nueva sección de Archivo */}
       <Divider />
 
       <ToolsSection>
@@ -122,49 +132,53 @@ export function GraphToolbar({
   );
 }
 
-// ── Styled Components Existentes ──
+// ── Styled Components ──
 
 const Container = styled.aside`
   position: relative;
   flex-shrink: 0;
-  width: ${({ $isOpen }) => ($isOpen ? "180px" : "68px")};
-  height: 100%;
-  background-color: #5470eb;
-  border: 2px solid #000;
-  border-radius: 12px;
-  margin: 4px 8px 4px 4px;
+  width: ${({ $isOpen }) => ($isOpen ? "180px" : "72px")};
+  height: calc(100vh - 64px - 16px);
+  background-color: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  margin: 8px;
   display: flex;
   flex-direction: column;
-  padding: 12px 8px;
-  gap: 4px;
-  transition: width 0.3s ease;
+  padding: 16px 8px;
+  gap: 8px;
+  transition: width var(--transition-bounce), background-color var(--transition-fast);
   z-index: 100;
+  box-shadow: var(--shadow-md);
 
   @media (max-width: 768px) {
     position: absolute;
     left: 8px;
     top: 8px;
-    width: ${({ $isOpen }) => ($isOpen ? "200px" : "56px")};
+    height: calc(100% - 16px);
+    width: ${({ $isOpen }) => ($isOpen ? "200px" : "60px")};
     margin: 0;
-    padding: 10px 6px;
-    border-radius: 10px;
-    background-color: rgba(84, 112, 235, 0.98);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    padding: 12px 6px;
+    border-radius: 12px;
+    background-color: rgba(13, 17, 23, 0.85);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   }
 
   @media (max-width: 480px) {
-    width: ${({ $isOpen }) => ($isOpen ? "170px" : "50px")};
+    width: ${({ $isOpen }) => ($isOpen ? "170px" : "56px")};
     padding: 8px 4px;
+    height: calc(100% - 16px);
   }
 `;
 
 const TopSection = styled.div`
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--glass-border);
 
   @media (max-width: 768px) {
-    padding-bottom: 8px;
+    padding-bottom: 12px;
   }
 `;
 
@@ -172,77 +186,81 @@ const Logo = styled.div`
   display: flex;
   align-items: center;
   justify-content: ${({ $isOpen }) => ($isOpen ? "flex-start" : "center")};
-  gap: 8px;
+  gap: 12px;
+  padding: 0 4px;
 `;
 
 const LogoMark = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.25);
-  color: white;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 900;
   flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 
   @media (max-width: 768px) {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     font-size: 20px;
-  }
-
-  @media (max-width: 480px) {
-    width: 32px;
-    height: 32px;
-    font-size: 18px;
   }
 `;
 
 const LogoText = styled.span`
-  font-size: 15px;
-  font-weight: 900;
-  letter-spacing: 0.05em;
-  color: white;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  background: linear-gradient(90deg, #fff 0%, #a5c8ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 
   @media (max-width: 480px) {
-    font-size: 13px;
+    font-size: 14px;
   }
 `;
 
 const ToolsSection = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 `;
 
 const ToolButton = styled.button`
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: ${({ $isOpen }) => ($isOpen ? "flex-start" : "center")};
-  gap: 8px;
-  padding: 10px 8px;
-  border: none;
-  border-radius: 8px;
-  background: ${({ $active }) =>
-    $active ? "#5ee090" : "rgba(255, 255, 255, 0.15)"};
-  color: ${({ $active }) => ($active ? "#000" : "#fff")};
-  font-weight: 700;
+  gap: 12px;
+  padding: 12px 10px;
+  border: 1px solid ${({ $active }) => ($active ? 'var(--accent-glow)' : 'transparent')};
+  border-radius: 10px;
+  background: ${({ $active, $disabled }) =>
+    $disabled
+      ? "rgba(255, 255, 255, 0.02)"
+      : $active
+        ? "var(--accent-color)"
+        : "transparent"};
+  color: ${({ $active, $disabled }) =>
+    $disabled ? "var(--text-secondary)" : $active ? "#fff" : "var(--text-secondary)"};
+  font-weight: 600;
   font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  cursor: ${({ $disabled }) => ($disabled ? "not-allowed" : "pointer")};
+  transition: all var(--transition-fast);
+  opacity: ${({ $disabled }) => ($disabled ? 0.4 : 1)};
+  box-shadow: ${({ $active }) => ($active ? '0 0 15px var(--accent-glow)' : 'none')};
 
   svg {
-    font-size: 26px;
+    font-size: 24px;
     flex-shrink: 0;
+    transition: transform 0.2s;
 
     @media (max-width: 768px) {
-      font-size: 24px;
-    }
-
-    @media (max-width: 480px) {
       font-size: 22px;
     }
   }
@@ -252,46 +270,62 @@ const ToolButton = styled.button`
     overflow: hidden;
 
     @media (max-width: 480px) {
-      font-size: 12px;
+      font-size: 13px;
     }
   }
 
   &:hover {
-    background: ${({ $active }) =>
-      $active ? "#3ec970" : "rgba(255, 255, 255, 0.25)"};
+    background: ${({ $active, $disabled }) =>
+    $disabled
+      ? "rgba(255, 255, 255, 0.02)"
+      : $active
+        ? "var(--accent-hover)"
+        : "rgba(255, 255, 255, 0.08)"};
+    color: var(--text-primary);
+    
+    svg {
+      transform: ${({ $disabled }) => ($disabled ? 'none' : 'scale(1.1)')};
+    }
   }
 
   @media (max-width: 768px) {
-    padding: 8px 6px;
+    padding: 10px 8px;
   }
 `;
 
-// ⬅️ Nuevo botón para archivo (similar a ToolButton pero con color personalizado)
+const DisabledBadge = styled.span`
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 12px;
+  line-height: 1;
+
+  @media (max-width: 768px) {
+    font-size: 10px;
+  }
+`;
+
 const FileButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: ${({ $isOpen }) => ($isOpen ? "flex-start" : "center")};
-  gap: 8px;
-  padding: 10px 8px;
-  border: none;
-  border-radius: 8px;
-  background: ${({ $color }) => $color || "rgba(255, 255, 255, 0.15)"};
-  color: #fff;
-  font-weight: 700;
+  gap: 12px;
+  padding: 12px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  font-weight: 600;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
-  opacity: 0.9;
 
   svg {
-    font-size: 26px;
+    font-size: 24px;
     flex-shrink: 0;
+    color: ${({ $color }) => $color || "var(--text-secondary)"};
 
     @media (max-width: 768px) {
-      font-size: 24px;
-    }
-
-    @media (max-width: 480px) {
       font-size: 22px;
     }
   }
@@ -301,14 +335,16 @@ const FileButton = styled.button`
     overflow: hidden;
 
     @media (max-width: 480px) {
-      font-size: 12px;
+      font-size: 13px;
     }
   }
 
   &:hover {
-    opacity: 1;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 
   &:active {
@@ -316,19 +352,15 @@ const FileButton = styled.button`
   }
 
   @media (max-width: 768px) {
-    padding: 8px 6px;
+    padding: 10px 8px;
   }
 `;
 
 const Divider = styled.div`
   height: 1px;
-  width: 90%;
-  background: rgba(0, 0, 0, 0.2);
-  margin: 8px auto;
-
-  @media (max-width: 768px) {
-    margin: 6px auto;
-  }
+  width: 100%;
+  background: var(--glass-border);
+  margin: 10px 0;
 `;
 
 const Spacer = styled.div`
@@ -338,93 +370,76 @@ const Spacer = styled.div`
 const ActionSection = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(0, 0, 0, 0.2);
-
-  @media (max-width: 768px) {
-    padding-top: 6px;
-  }
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--glass-border);
 `;
 
 const ClearButton = styled.button`
   width: 100%;
-  padding: 8px;
-  background-color: #f44336;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 13px;
+  padding: 10px;
+  background-color: rgba(244, 67, 54, 0.15);
+  color: #f44336;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  border-radius: 10px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
 
   &:hover:not(:disabled) {
-    background-color: #c62828;
+    background-color: #f44336;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
   }
 
   &:disabled {
-    opacity: 0.4;
+    opacity: 0.3;
     cursor: not-allowed;
-  }
-
-  @media (max-width: 480px) {
-    padding: 6px;
-    font-size: 12px;
   }
 `;
 
 const ClearButtonIcon = styled.button`
   width: 100%;
-  padding: 8px;
-  background: rgba(244, 67, 54, 0.9);
-  border: none;
-  font-size: 20px;
+  padding: 10px;
+  background: rgba(244, 67, 54, 0.15);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  color: #f44336;
+  font-size: 22px;
   cursor: pointer;
-  border-radius: 8px;
-  opacity: ${({ disabled }) => (disabled ? 0.4 : 1)};
+  border-radius: 10px;
+  opacity: ${({ disabled }) => (disabled ? 0.3 : 1)};
   pointer-events: ${({ disabled }) => (disabled ? "none" : "auto")};
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
 
   &:hover {
     background: #f44336;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 18px;
-    padding: 6px;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
   }
 `;
 
 const ToggleButton = styled.button`
   width: 100%;
-  height: 36px;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.3);
-  color: white;
-  border: none;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  border: 1px solid var(--glass-border);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
 
   svg {
-    font-size: 18px;
+    font-size: 20px;
     transform: ${({ $isOpen }) =>
-      $isOpen ? "rotate(0deg)" : "rotate(180deg)"};
-    transition: transform 0.3s ease;
+    $isOpen ? "rotate(0deg)" : "rotate(180deg)"};
+    transition: transform var(--transition-bounce);
   }
 
   &:hover {
-    background: rgba(0, 0, 0, 0.4);
-  }
-
-  @media (max-width: 768px) {
-    height: 32px;
-
-    svg {
-      font-size: 16px;
-    }
+    background: rgba(255, 255, 255, 0.1);
   }
 `;
