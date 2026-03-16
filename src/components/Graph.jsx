@@ -116,21 +116,33 @@ export const Graph = forwardRef(
 
     const [cpmOrigen, setCpmOrigen] = useState(null);
     const [cpmDestino, setCpmDestino] = useState(null);
+    const [cpmOrigenId, setCpmOrigenId] = useState(null);
+    const [cpmDestinoId, setCpmDestinoId] = useState(null);
     const [cpmStep, setCpmStep] = useState(0);
 
     const [cpmPickTarget, setCpmPickTarget] = useState("origen"); // "origen" | "destino"
 
+    const getLabelById = (id) => nodos.find((n) => n.id === id)?.label ?? "";
+    const cpmOrigenLabel = cpmOrigenId != null ? getLabelById(cpmOrigenId) : "";
+    const cpmDestinoLabel =
+      cpmDestinoId != null ? getLabelById(cpmDestinoId) : "";
+
     const handleCpmPickNode = (id) => {
-      if (cpmPickTarget === "origen") {
-        setCpmOrigen(id);
-        setCpmPickTarget("destino");
+      // si aún no hay origen, set origen
+      if (cpmOrigenId == null) {
+        setCpmOrigenId(nodeId);
         return;
       }
 
-      if (cpmPickTarget === "destino" && id === cpmOrigen) return;
+      // si aún no hay destino, set destino
+      if (cpmDestinoId == null) {
+        setCpmDestinoId(nodeId);
+        return;
+      }
 
-      setCpmDestino(id);
-      setCpmPickTarget("origen");
+      // si ya hay ambos, podrías: resetear y empezar con nuevo origen
+      setCpmOrigenId(nodeId);
+      setCpmDestinoId(null);
     };
 
     const cpmPrev = () => setCpmStep((s) => Math.max(0, s - 1));
@@ -247,9 +259,7 @@ export const Graph = forwardRef(
       }
 
       if (herramienta === 5) {
-        const nodo_cp = nodos.find((n) => n.id === id);
-
-        handleCpmPickNode(nodo_cp.label);
+        handleCpmPickNode(id);
         return;
       }
 
@@ -515,8 +525,9 @@ export const Graph = forwardRef(
 
         {herramienta === 5 && (
           <CpmControls
-            origen={cpmOrigen}
-            destino={cpmDestino}
+            origen={cpmOrigenLabel}
+            destino={cpmDestinoLabel}
+            step={cpmStep}
             pickTarget={cpmPickTarget}
             onClear={() => {
               setCpmOrigen(null);
