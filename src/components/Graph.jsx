@@ -128,7 +128,7 @@ export const Graph = forwardRef(
     const handleCpmPickNode = (id) => {
       // si aún no hay origen, set origen
       if (cpmOrigenId == null) {
-        setCpmOrigenId(nodeId);
+        setCpmOrigenId(id);
         return;
       }
 
@@ -139,7 +139,7 @@ export const Graph = forwardRef(
       }
 
       // si ya hay ambos, podrías: resetear y empezar con nuevo origen
-      setCpmOrigenId(nodeId);
+      setCpmOrigenId(id);
       setCpmDestinoId(null);
     };
 
@@ -535,8 +535,8 @@ export const Graph = forwardRef(
             onNext={cpmNext}
             onFinish={cpmFinish}
             disabledPrev={cpmStep === 0}
-            disabledNext={cpmOrigen == null || cpmDestino == null}
-            disabledFinish={cpmOrigen == null || cpmDestino == null}
+            disabledNext={cpmOrigenId == null || cpmDestinoId == null}
+            disabledFinish={cpmOrigenId == null || cpmDestinoId == null}
           />
         )}
       </Wrapper>
