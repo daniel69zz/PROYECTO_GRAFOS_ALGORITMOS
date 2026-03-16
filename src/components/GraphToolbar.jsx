@@ -5,6 +5,7 @@ import { MdDeleteForever } from "react-icons/md";
 import { AiOutlineLeft } from "react-icons/ai";
 import { TbMatrix } from "react-icons/tb";
 import { BiExport, BiImport } from "react-icons/bi";
+import { TbRouteSquare2 } from "react-icons/tb";
 
 const toolbarLinks = [
   { label: "Mover", Icon: LuMousePointer2, op: 1 },
@@ -12,7 +13,10 @@ const toolbarLinks = [
   { label: "Eliminar", Icon: MdDeleteForever, op: 3 },
 ];
 
-const toolbarOptions = [{ label: "Matriz", Icon: TbMatrix, op: 4 }];
+const toolbarOptions = [
+  { label: "Matriz", Icon: TbMatrix, op: 4 },
+  { label: "CPM", Icon: TbRouteSquare2, op: 5 },
+];
 
 const fileOptions = [
   { label: "Exportar", Icon: BiExport, action: "exportar" },
@@ -38,19 +42,16 @@ export function GraphToolbar({
     }
   };
 
-  const handleMatrizClick = () => {
-    // La validación y notificación ahora se manejan en Graph.jsx
-    setHerramienta(4);
-  };
+
 
   return (
     <Container $isOpen={isOpen} data-toolbar="true">
-      <TopSection>
+      {/* <TopSection>
         <Logo $isOpen={isOpen}>
           <LogoMark>G</LogoMark>
           {isOpen && <LogoText>GRAPHX</LogoText>}
         </Logo>
-      </TopSection>
+      </TopSection> */}
 
       <ToolsSection>
         {toolbarLinks.map(({ label, Icon, op }, index) => (
@@ -75,7 +76,7 @@ export function GraphToolbar({
             key={index}
             $isOpen={isOpen}
             $active={herramienta === op}
-            onClick={handleMatrizClick}
+            onClick={() => setHerramienta(op)}
             title={
               tieneAristasNoDirigidas
                 ? "No disponible para aristas no dirigidas"
@@ -148,7 +149,9 @@ const Container = styled.aside`
   flex-direction: column;
   padding: 16px 8px;
   gap: 8px;
-  transition: width var(--transition-bounce), background-color var(--transition-fast);
+  transition:
+    width var(--transition-bounce),
+    background-color var(--transition-fast);
   z-index: 100;
   box-shadow: var(--shadow-md);
 
@@ -194,7 +197,11 @@ const LogoMark = styled.div`
   width: 42px;
   height: 42px;
   border-radius: 10px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: var(--text-primary);
   display: flex;
@@ -238,7 +245,8 @@ const ToolButton = styled.button`
   justify-content: ${({ $isOpen }) => ($isOpen ? "flex-start" : "center")};
   gap: 12px;
   padding: 12px 10px;
-  border: 1px solid ${({ $active }) => ($active ? 'var(--accent-glow)' : 'transparent')};
+  border: 1px solid
+    ${({ $active }) => ($active ? "var(--accent-glow)" : "transparent")};
   border-radius: 10px;
   background: ${({ $active, $disabled }) =>
     $disabled
@@ -247,13 +255,18 @@ const ToolButton = styled.button`
         ? "var(--accent-color)"
         : "transparent"};
   color: ${({ $active, $disabled }) =>
-    $disabled ? "var(--text-secondary)" : $active ? "#fff" : "var(--text-secondary)"};
+    $disabled
+      ? "var(--text-secondary)"
+      : $active
+        ? "#fff"
+        : "var(--text-secondary)"};
   font-weight: 600;
   font-size: 14px;
   cursor: ${({ $disabled }) => ($disabled ? "not-allowed" : "pointer")};
   transition: all var(--transition-fast);
   opacity: ${({ $disabled }) => ($disabled ? 0.4 : 1)};
-  box-shadow: ${({ $active }) => ($active ? '0 0 15px var(--accent-glow)' : 'none')};
+  box-shadow: ${({ $active }) =>
+    $active ? "0 0 15px var(--accent-glow)" : "none"};
 
   svg {
     font-size: 24px;
@@ -276,15 +289,15 @@ const ToolButton = styled.button`
 
   &:hover {
     background: ${({ $active, $disabled }) =>
-    $disabled
-      ? "rgba(255, 255, 255, 0.02)"
-      : $active
-        ? "var(--accent-hover)"
-        : "rgba(255, 255, 255, 0.08)"};
+      $disabled
+        ? "rgba(255, 255, 255, 0.02)"
+        : $active
+          ? "var(--accent-hover)"
+          : "rgba(255, 255, 255, 0.08)"};
     color: var(--text-primary);
-    
+
     svg {
-      transform: ${({ $disabled }) => ($disabled ? 'none' : 'scale(1.1)')};
+      transform: ${({ $disabled }) => ($disabled ? "none" : "scale(1.1)")};
     }
   }
 
@@ -357,10 +370,10 @@ const FileButton = styled.button`
 `;
 
 const Divider = styled.div`
-  height: 1px;
+  height: 2px;
   width: 100%;
   background: var(--glass-border);
-  margin: 10px 0;
+  margin: 2px 0;
 `;
 
 const Spacer = styled.div`
@@ -435,7 +448,7 @@ const ToggleButton = styled.button`
   svg {
     font-size: 20px;
     transform: ${({ $isOpen }) =>
-    $isOpen ? "rotate(0deg)" : "rotate(180deg)"};
+      $isOpen ? "rotate(0deg)" : "rotate(180deg)"};
     transition: transform var(--transition-bounce);
   }
 

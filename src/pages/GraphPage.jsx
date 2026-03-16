@@ -24,7 +24,7 @@ export function GraphPage() {
     if (e.target.tagName === "INPUT") return;
 
     const num = Number(e.key);
-    if (num >= 1 && num <= 4) setHerramienta(num);
+    if (num >= 1 && num <= 5) setHerramienta(num);
   }, []);
 
   useEffect(() => {

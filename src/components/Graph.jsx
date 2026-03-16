@@ -11,6 +11,7 @@ import { Arista } from "./Arista";
 import { EditMenu } from "./EditMenu";
 import { DragMatrix } from "./DragMatrix";
 import { Notification } from "./Notification";
+import { CpmControls } from "./CpmControls";
 
 import { exportar_grafo, importar_grafo } from "../utils/exp_imp_grafo";
 
@@ -112,6 +113,31 @@ export const Graph = forwardRef(
     const nextId = useRef(1);
 
     const fileInputRef = useRef(null);
+
+    const [cpmOrigen, setCpmOrigen] = useState(null);
+    const [cpmDestino, setCpmDestino] = useState(null);
+    const [cpmStep, setCpmStep] = useState(0);
+
+    const [cpmPickTarget, setCpmPickTarget] = useState("origen"); // "origen" | "destino"
+
+    const handleCpmPickNode = (id) => {
+      if (cpmPickTarget === "origen") {
+        setCpmOrigen(id);
+        setCpmPickTarget("destino");
+        return;
+      }
+
+      if (cpmPickTarget === "destino" && id === cpmOrigen) return;
+
+      setCpmDestino(id);
+      setCpmPickTarget("origen");
+    };
+
+    const cpmPrev = () => setCpmStep((s) => Math.max(0, s - 1));
+    const cpmNext = () => setCpmStep((s) => s + 1);
+    const cpmFinish = () => {
+      setCpmRunning(false);
+    };
 
     const showNotification = (message, type = "info") => {
       setNotification({ message, type });
@@ -217,6 +243,13 @@ export const Graph = forwardRef(
         setAristas((prev) =>
           prev.filter((ar) => ar.from !== id && ar.to !== id),
         );
+        return;
+      }
+
+      if (herramienta === 5) {
+        const nodo_cp = nodos.find((n) => n.id === id);
+
+        handleCpmPickNode(nodo_cp.label);
         return;
       }
 
@@ -479,12 +512,72 @@ export const Graph = forwardRef(
             )}
           </Canvas>
         </CanvasArea>
+
+        {herramienta === 5 && (
+          <CpmControls
+            origen={cpmOrigen}
+            destino={cpmDestino}
+            pickTarget={cpmPickTarget}
+            onClear={() => {
+              setCpmOrigen(null);
+              setCpmDestino(null);
+              setCpmPickTarget("origen");
+            }}
+            onPrev={cpmPrev}
+            onNext={cpmNext}
+            onFinish={cpmFinish}
+            disabledPrev={cpmStep === 0}
+            disabledNext={cpmOrigen == null || cpmDestino == null}
+            disabledFinish={cpmOrigen == null || cpmDestino == null}
+          />
+        )}
       </Wrapper>
     );
   },
 );
 
 Graph.displayName = "Graph";
+
+const CpmBtn = styled.button`
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+
+  color: #fff;
+  font-weight: 900;
+  font-size: 18px;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    transform 0.12s ease,
+    background 0.12s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  &:active {
+    transform: translateY(0px);
+  }
+`;
+
+const CpmBtnFinish = styled(CpmBtn)`
+  background: rgba(94, 224, 144, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  color: #000;
+
+  &:hover {
+    background: rgba(94, 224, 144, 1);
+  }
+`;
 
 const Wrapper = styled.div`
   display: flex;
