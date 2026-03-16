@@ -12,6 +12,25 @@ export function Arista({
 
   const esDirigida = ar.tipo === "dirigida" || ar.tipo === undefined;
 
+  // ---- CPM slack (holgura) por arista: TL[to] - TE[from] - w ----
+  const numOrNull = (x) => {
+    if (x === "" || x == null) return null;
+    const n = Number(x);
+    return Number.isFinite(n) ? n : null;
+  };
+
+  const teFrom = numOrNull(nodo_a?.cpm?.bl);
+  const tlTo = numOrNull(nodo_b?.cpm?.br);
+  const w = Number(ar.weight) || 0;
+
+  let slack = null;
+  if (teFrom != null && tlTo != null) {
+    slack = tlTo - teFrom - w;
+    // evitar -0
+    if (Object.is(slack, -0)) slack = 0;
+  }
+  const isCritical = slack === 0;
+
   const clickStyle = {
     stroke: "transparent",
     strokeWidth: 20,
@@ -28,6 +47,26 @@ export function Arista({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     });
+  };
+
+  const renderSlack = (x, y) => {
+    if (slack == null) return null;
+    return (
+      <text
+        x={x}
+        y={y - 20} // "encima" del peso
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fontSize="14"
+        fontWeight="900"
+        fill={isCritical ? "#ff1744" : "black"}
+        stroke="white"
+        strokeWidth="3"
+        paintOrder="stroke"
+      >
+        {"H: " + slack}
+      </text>
+    );
   };
 
   // ── CASO 1: LOOP ──
@@ -48,12 +87,16 @@ export function Arista({
       <g>
         <path
           d={pathD}
-          stroke="black"
+          stroke={isCritical ? "#ff1744" : "black"}
           strokeWidth="3"
           fill="none"
           markerEnd={esDirigida ? "url(#arrowhead)" : undefined}
         />
         <path d={pathD} style={clickStyle} onClick={handleClick} />
+
+        {/* holgura encima del peso */}
+        {renderSlack(pesoX, pesoY)}
+
         <rect
           x={pesoX - 15}
           y={pesoY - 12}
@@ -116,12 +159,16 @@ export function Arista({
       <g>
         <path
           d={pathD}
-          stroke="black"
+          stroke={isCritical ? "#ff1744" : "black"}
           strokeWidth="3"
           fill="none"
           markerEnd={esDirigida ? "url(#arrowhead)" : undefined}
         />
         <path d={pathD} style={clickStyle} onClick={handleClick} />
+
+        {/* holgura encima del peso */}
+        {renderSlack(pesoX, pesoY)}
+
         <rect
           x={pesoX - 15}
           y={pesoY - 12}
@@ -158,7 +205,7 @@ export function Arista({
         y1={y1}
         x2={x2}
         y2={y2}
-        stroke="black"
+        stroke={isCritical ? "#ff1744" : "black"}
         strokeWidth="3"
         markerEnd={esDirigida ? "url(#arrowhead)" : undefined}
       />
@@ -170,6 +217,10 @@ export function Arista({
         style={clickStyle}
         onClick={handleClick}
       />
+
+      {/* holgura encima del peso */}
+      {renderSlack(midX, midY)}
+
       <rect
         x={midX - 15}
         y={midY - 12}

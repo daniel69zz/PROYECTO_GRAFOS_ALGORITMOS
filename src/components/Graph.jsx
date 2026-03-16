@@ -15,6 +15,78 @@ import { CpmControls } from "./CpmControls";
 
 import { exportar_grafo, importar_grafo } from "../utils/exp_imp_grafo";
 
+const clearTEOnNodes = (nodos, id) =>
+  nodos.map((n) =>
+    n.id === id ? { ...n, cpm: { ...(n.cpm ?? {}), bl: "" } } : n,
+  );
+
+const clearTLOnNodes = (nodos, id) =>
+  nodos.map((n) =>
+    n.id === id ? { ...n, cpm: { ...(n.cpm ?? {}), br: "" } } : n,
+  );
+
+const buildReachableFromOrigin = (nodos, aristas, originId) => {
+  const out = new Map();
+  for (const n of nodos) out.set(n.id, []);
+  for (const e of aristas) {
+    if (out.has(e.from)) out.get(e.from).push(e);
+  }
+
+  const reachable = new Set();
+  const q = [originId];
+  reachable.add(originId);
+
+  while (q.length) {
+    const u = q.shift();
+    for (const e of out.get(u) ?? []) {
+      const v = e.to;
+      if (!reachable.has(v)) {
+        reachable.add(v);
+        q.push(v);
+      }
+    }
+  }
+  return reachable;
+};
+
+const buildTopoForReachable = (nodos, aristas, reachableSet) => {
+  const ids = nodos.map((n) => n.id).filter((id) => reachableSet.has(id));
+
+  const indeg = new Map();
+  const inEdges = new Map();
+  const outEdges = new Map();
+
+  for (const id of ids) {
+    indeg.set(id, 0);
+    inEdges.set(id, []);
+    outEdges.set(id, []);
+  }
+
+  for (const e of aristas) {
+    if (!reachableSet.has(e.from) || !reachableSet.has(e.to)) continue;
+    outEdges.get(e.from).push(e);
+    inEdges.get(e.to).push(e);
+    indeg.set(e.to, indeg.get(e.to) + 1);
+  }
+
+  const queue = [];
+  for (const id of ids) if (indeg.get(id) === 0) queue.push(id);
+
+  const order = [];
+  while (queue.length) {
+    const u = queue.shift();
+    order.push(u);
+    for (const e of outEdges.get(u)) {
+      const v = e.to;
+      indeg.set(v, indeg.get(v) - 1);
+      if (indeg.get(v) === 0) queue.push(v);
+    }
+  }
+
+  const hasCycle = order.length !== ids.length;
+  return { order, hasCycle, inEdges, outEdges };
+};
+
 const existeAristaContraria = (aristas, from, to) =>
   aristas.some((ar) => ar.from === to && ar.to === from);
 
@@ -94,8 +166,149 @@ const calcularPosicionMenuArista = (clickX, clickY, tipo = "arista") => {
   return { x: menuX, y: menuY };
 };
 
+const forwardPassAll = (nodos, aristas, originId) => {
+  const reachable = buildReachableFromOrigin(nodos, aristas, originId);
+  const { order, hasCycle, inEdges } = buildTopoForReachable(
+    nodos,
+    aristas,
+    reachable,
+  );
+
+  if (hasCycle) {
+    return {
+      ok: false,
+      error: "Hay un ciclo en el subgrafo alcanzable. CPM requiere DAG.",
+    };
+  }
+
+  const TE = new Map();
+  for (const n of nodos) TE.set(n.id, null); // null = no alcanzable/no calculado
+  TE.set(originId, 0);
+
+  for (const v of order) {
+    if (v === originId) continue;
+
+    let best = null;
+    for (const e of inEdges.get(v) ?? []) {
+      const teU = TE.get(e.from);
+      if (teU == null) continue; // si el predecesor no tiene TE, no aporta
+      const cand = teU + (Number(e.weight) || 0);
+      best = best == null ? cand : Math.max(best, cand);
+    }
+    // si no hay predecesores alcanzables con TE, queda null
+    TE.set(v, best);
+  }
+
+  const nodosUpdated = nodos.map((n) => ({
+    ...n,
+    cpm: {
+      ...(n.cpm ?? {}),
+      bl: TE.get(n.id) ?? "", // en UI vacío si no calculado
+    },
+  }));
+
+  return { ok: true, nodos: nodosUpdated, TE, order };
+};
+
+const forwardStep = (state, nodos, aristas, originId) => {
+  // state: { order, index, TE }
+  const reachable = buildReachableFromOrigin(nodos, aristas, originId);
+  const { order, hasCycle, inEdges } = buildTopoForReachable(
+    nodos,
+    aristas,
+    reachable,
+  );
+
+  if (hasCycle) {
+    return {
+      ok: false,
+      error: "Hay un ciclo en el subgrafo alcanzable. CPM requiere DAG.",
+    };
+  }
+
+  // Inicialización si no hay state previa
+  let TE = state?.TE ? new Map(state.TE) : new Map();
+  if (!state?.TE) {
+    for (const n of nodos) TE.set(n.id, null);
+    TE.set(originId, 0);
+  }
+
+  let index = state?.index ?? 0;
+
+  let progressed = false;
+  let anyResolvedThisClick = 0;
+
+  // Intentamos resolver desde index hacia adelante
+  for (let i = index; i < order.length; i++) {
+    const v = order[i];
+
+    // ya está resuelto
+    if (TE.get(v) != null) {
+      index = i + 1;
+      continue;
+    }
+
+    // origen siempre resuelto
+    if (v === originId) {
+      TE.set(v, 0);
+      progressed = true;
+      anyResolvedThisClick++;
+      index = i + 1;
+      continue;
+    }
+
+    // ¿todos los predecesores alcanzables están resueltos?
+    const preds = inEdges.get(v) ?? [];
+    const unresolvedPred = preds.some((e) => TE.get(e.from) == null);
+
+    if (unresolvedPred) {
+      // paramos aquí: todavía no se puede resolver este nodo
+      break;
+    }
+
+    // calcular TE[v]
+    let best = 0;
+    for (const e of preds) {
+      const cand = (TE.get(e.from) ?? 0) + (Number(e.weight) || 0);
+      best = Math.max(best, cand);
+    }
+    TE.set(v, best);
+
+    progressed = true;
+    anyResolvedThisClick++;
+    index = i + 1;
+  }
+
+  // volcar a nodos.cpm.bl
+  const nodosUpdated = nodos.map((n) => ({
+    ...n,
+    cpm: {
+      ...(n.cpm ?? {}),
+      bl: TE.get(n.id) ?? "",
+    },
+  }));
+
+  const done = order.every((id) => TE.get(id) != null);
+
+  return {
+    ok: true,
+    nodos: nodosUpdated,
+    stepState: { order, index, TE: Array.from(TE.entries()) },
+    progressed,
+    anyResolvedThisClick,
+    done,
+  };
+};
+
 export const Graph = forwardRef(
   ({ herramienta, setHerramienta, clearFlag }, ref) => {
+    const [cpmPhase, setCpmPhase] = useState("forward"); // "forward" | "backward"
+    const [cpmForwardOrder, setCpmForwardOrder] = useState(null); // array de ids alcanzables en orden topo
+    const [cpmForwardIndex, setCpmForwardIndex] = useState(0); // siguiente posición a resolver
+
+    const [cpmBackwardOrder, setCpmBackwardOrder] = useState(null); // number[] (reverse topo)
+    const [cpmBackwardIndex, setCpmBackwardIndex] = useState(0);
+    const [cpmForwardState, setCpmForwardState] = useState(null);
     const [nodos, setNodos] = useState([]);
     const [aristas, setAristas] = useState([]);
     const [nodo_seleccionado, setNodo_seleccionado] = useState(null);
@@ -125,6 +338,193 @@ export const Graph = forwardRef(
     const cpmDestinoLabel =
       cpmDestinoId != null ? getLabelById(cpmDestinoId) : "";
 
+    const cpmNextForwardOneNode = () => {
+      const reachable = buildReachableFromOrigin(nodos, aristas, cpmOrigenId);
+      const topo = buildTopoForReachable(nodos, aristas, reachable);
+
+      if (topo.hasCycle) {
+        showNotification(
+          "Hay un ciclo en el subgrafo alcanzable. CPM requiere DAG.",
+          "error",
+        );
+        return;
+      }
+
+      const order = cpmForwardOrder ?? topo.order;
+      const inEdges = topo.inEdges;
+
+      if (!cpmForwardOrder) {
+        setCpmForwardOrder(order);
+        setCpmForwardIndex(0);
+      }
+
+      if (cpmForwardIndex >= order.length) {
+        // forward terminado => pasar a backward
+        setCpmPhase("backward");
+        setCpmBackwardOrder([...order].reverse());
+        setCpmBackwardIndex(0);
+        showNotification("Forward terminado. Iniciando Backward.", "info");
+        return;
+      }
+
+      const v = order[cpmForwardIndex];
+      const vNode = nodos.find((n) => n.id === v);
+
+      // si ya estaba resuelto, avanza índice
+      if (getTE(vNode) != null) {
+        setCpmForwardIndex((i) => i + 1);
+        return;
+      }
+
+      // origen: TE=0 (tu requisito: primer Next resuelve origen)
+      if (v === cpmOrigenId) {
+        setNodos((prev) => setTEOnNodes(prev, v, 0));
+        setCpmForwardIndex((i) => i + 1);
+        showNotification("Forward: Origen resuelto (TE=0).", "success");
+        return;
+      }
+
+      // validar predecesores resueltos
+      const preds = inEdges.get(v) ?? [];
+      for (const e of preds) {
+        const uNode = nodos.find((n) => n.id === e.from);
+        if (getTE(uNode) == null) {
+          showNotification(
+            `No se puede resolver ${getLabelById(v)} aún. Falta TE de ${getLabelById(e.from)}.`,
+            "warning",
+          );
+          return;
+        }
+      }
+
+      // TE[v]
+      let best = 0;
+      for (const e of preds) {
+        const uNode = nodos.find((n) => n.id === e.from);
+        const cand = (getTE(uNode) ?? 0) + (Number(e.weight) || 0);
+        best = Math.max(best, cand);
+      }
+
+      setNodos((prev) => setTEOnNodes(prev, v, best));
+      setCpmForwardIndex((i) => i + 1);
+
+      // si ya resolviste el destino, pasar a backward inmediatamente
+      if (v === cpmDestinoId) {
+        setCpmPhase("backward");
+        setCpmBackwardOrder([...order].reverse());
+        setCpmBackwardIndex(0);
+        showNotification(
+          "Forward: destino resuelto. Iniciando Backward.",
+          "success",
+        );
+      }
+    };
+
+    const cpmNextBackwardOneNode = () => {
+      const reachable = buildReachableFromOrigin(nodos, aristas, cpmOrigenId);
+      const topo = buildTopoForReachable(nodos, aristas, reachable);
+
+      if (topo.hasCycle) {
+        showNotification(
+          "Hay un ciclo en el subgrafo alcanzable. CPM requiere DAG.",
+          "error",
+        );
+        return;
+      }
+
+      const order = cpmForwardOrder ?? topo.order;
+      const outEdges = topo.outEdges;
+
+      const backOrder = cpmBackwardOrder ?? [...order].reverse();
+      if (!cpmBackwardOrder) {
+        setCpmBackwardOrder(backOrder);
+        setCpmBackwardIndex(0);
+      }
+
+      if (cpmBackwardIndex >= backOrder.length) {
+        showNotification(
+          "Backward terminado (no hay más nodos por resolver).",
+          "success",
+        );
+        return;
+      }
+
+      const u = backOrder[cpmBackwardIndex];
+      const uNode = nodos.find((n) => n.id === u);
+
+      // si ya tiene TL, avanzar
+      if (getTL(uNode) != null) {
+        setCpmBackwardIndex((i) => i + 1);
+        return;
+      }
+
+      // Primer paso backward: destino => TL = TE(destino)
+      if (u === cpmDestinoId) {
+        const teDest = getTE(nodos.find((n) => n.id === cpmDestinoId));
+        if (teDest == null) {
+          showNotification(
+            "Primero resuelve el forward hasta el destino.",
+            "warning",
+          );
+          return;
+        }
+        setNodos((prev) => setTLOnNodes(prev, u, teDest));
+        setCpmBackwardIndex((i) => i + 1);
+        showNotification(
+          "Backward: Destino resuelto (TL = TE(destino)).",
+          "success",
+        );
+        return;
+      }
+
+      // TL[u] necesita al menos un sucesor con TL conocido
+      const outs = outEdges.get(u) ?? [];
+
+      let best = null; // min
+      for (const e of outs) {
+        const vNode = nodos.find((n) => n.id === e.to);
+        const tlV = getTL(vNode);
+        if (tlV == null) continue;
+        const cand = tlV - (Number(e.weight) || 0);
+        best = best == null ? cand : Math.min(best, cand);
+      }
+
+      if (best == null) {
+        showNotification(
+          `No se puede resolver TL(${getLabelById(u)}) aún (no hay sucesores con TL).`,
+          "warning",
+        );
+        return;
+      }
+
+      setNodos((prev) => setTLOnNodes(prev, u, best));
+      setCpmBackwardIndex((i) => i + 1);
+    };
+
+    const getTE = (node) => {
+      const val = node?.cpm?.bl;
+      if (val === "" || val == null) return null;
+      const n = Number(val);
+      return Number.isFinite(n) ? n : null;
+    };
+
+    const getTL = (node) => {
+      const val = node?.cpm?.br;
+      if (val === "" || val == null) return null;
+      const n = Number(val);
+      return Number.isFinite(n) ? n : null;
+    };
+
+    const setTEOnNodes = (nodos, id, te) =>
+      nodos.map((n) =>
+        n.id === id ? { ...n, cpm: { ...(n.cpm ?? {}), bl: te } } : n,
+      );
+
+    const setTLOnNodes = (nodos, id, tl) =>
+      nodos.map((n) =>
+        n.id === id ? { ...n, cpm: { ...(n.cpm ?? {}), br: tl } } : n,
+      );
+
     const handleCpmPickNode = (id) => {
       // si aún no hay origen, set origen
       if (cpmOrigenId == null) {
@@ -143,9 +543,151 @@ export const Graph = forwardRef(
       setCpmDestinoId(null);
     };
 
-    const cpmPrev = () => setCpmStep((s) => Math.max(0, s - 1));
-    const cpmNext = () => setCpmStep((s) => s + 1);
-    const cpmFinish = () => {};
+    const cpmPrev = () => {
+      if (cpmOrigenId == null || cpmDestinoId == null) {
+        showNotification("No hay CPM iniciado para retroceder.", "warning");
+        return;
+      }
+
+      // 1) Si estamos en BACKWARD y hay pasos backward hechos, deshacer 1 TL
+      if (cpmPhase === "backward") {
+        if (cpmBackwardOrder && cpmBackwardIndex > 0) {
+          const lastResolvedId = cpmBackwardOrder[cpmBackwardIndex - 1];
+          setNodos((prev) => clearTLOnNodes(prev, lastResolvedId));
+          setCpmBackwardIndex((i) => i - 1);
+          return;
+        }
+
+        // 2) Si estamos en BACKWARD pero no hay nada backward para deshacer,
+        // cruzamos a FORWARD y seguimos intentando deshacer 1 TE en el MISMO click.
+        setCpmPhase("forward");
+        // no return
+      }
+
+      // 3) Ahora intentamos deshacer 1 paso de FORWARD
+      if (cpmForwardOrder && cpmForwardIndex > 0) {
+        const lastResolvedId = cpmForwardOrder[cpmForwardIndex - 1];
+        setNodos((prev) => clearTEOnNodes(prev, lastResolvedId));
+        setCpmForwardIndex((i) => i - 1);
+        return;
+      }
+
+      showNotification(
+        "Ya estás en el inicio (no hay más pasos por deshacer).",
+        "info",
+      );
+    };
+    const cpmNext = () => {
+      if (cpmOrigenId == null || cpmDestinoId == null) {
+        showNotification(
+          "Selecciona primero un nodo origen y un nodo final.",
+          "warning",
+        );
+        return;
+      }
+
+      if (cpmPhase === "forward") {
+        cpmNextForwardOneNode();
+      } else {
+        cpmNextBackwardOneNode();
+      }
+    };
+    const cpmFinish = () => {
+      if (cpmOrigenId == null || cpmDestinoId == null) {
+        showNotification(
+          "Selecciona primero un nodo origen y un nodo final.",
+          "warning",
+        );
+        return;
+      }
+
+      const reachable = buildReachableFromOrigin(nodos, aristas, cpmOrigenId);
+      const topo = buildTopoForReachable(nodos, aristas, reachable);
+
+      if (topo.hasCycle) {
+        showNotification(
+          "Hay un ciclo en el subgrafo alcanzable. CPM requiere DAG.",
+          "error",
+        );
+        return;
+      }
+
+      const { order, inEdges, outEdges } = topo;
+
+      // ---- FORWARD (TE) ----
+      const TE = new Map();
+      for (const n of nodos) TE.set(n.id, null);
+      TE.set(cpmOrigenId, 0);
+
+      for (const v of order) {
+        if (v === cpmOrigenId) continue;
+
+        let best = null;
+        for (const e of inEdges.get(v) ?? []) {
+          const teU = TE.get(e.from);
+          if (teU == null) continue;
+          const cand = teU + (Number(e.weight) || 0);
+          best = best == null ? cand : Math.max(best, cand);
+        }
+        TE.set(v, best);
+      }
+
+      const teDest = TE.get(cpmDestinoId);
+      if (teDest == null) {
+        showNotification(
+          "No existe ruta alcanzable desde el origen hasta el destino.",
+          "error",
+        );
+        return;
+      }
+
+      // ---- BACKWARD (TL) ----
+      const TL = new Map();
+      for (const n of nodos) TL.set(n.id, null);
+      TL.set(cpmDestinoId, teDest);
+
+      const rev = [...order].reverse();
+      for (const u of rev) {
+        if (u === cpmDestinoId) continue;
+
+        let best = null; // min
+        for (const e of outEdges.get(u) ?? []) {
+          const tlV = TL.get(e.to);
+          if (tlV == null) continue;
+          const cand = tlV - (Number(e.weight) || 0);
+          best = best == null ? cand : Math.min(best, cand);
+        }
+        TL.set(u, best);
+      }
+
+      // ---- VOLCAR A NODOS ----
+      setNodos((prev) =>
+        prev.map((n) => ({
+          ...n,
+          cpm: {
+            ...(n.cpm ?? {}),
+            bl: TE.get(n.id) ?? "",
+            br: TL.get(n.id) ?? "",
+          },
+        })),
+      );
+
+      // Preparar step-by-step para que después puedas seguir con backward si quieres
+      setCpmForwardOrder(order);
+      setCpmForwardIndex(order.length);
+
+      setCpmBackwardOrder([...order].reverse());
+      setCpmBackwardIndex([...order].reverse().length);
+
+      setCpmPhase("backward");
+      showNotification(
+        "CPM completo: Forward (TE) + Backward (TL) calculados.",
+        "success",
+      );
+    };
+
+    const disabledPrev =
+      (cpmBackwardIndex ?? 0) === 0 && (cpmForwardIndex ?? 0) === 0;
 
     const showNotification = (message, type = "info") => {
       setNotification({ message, type });
@@ -521,20 +1063,41 @@ export const Graph = forwardRef(
 
         {herramienta === 5 && (
           <CpmControls
+            disabledPrev={disabledPrev}
             origen={cpmOrigenLabel}
             destino={cpmDestinoLabel}
             step={cpmStep}
             pickTarget={cpmPickTarget}
             onClear={() => {
+              // limpiar valores CPM en nodos
+              setNodos((prev) =>
+                prev.map((n) => ({
+                  ...n,
+                  cpm: { ...(n.cpm ?? {}), bl: "", br: "" },
+                })),
+              );
+
+              // reset selección
               setCpmOrigenId(null);
               setCpmDestinoId(null);
+
+              // reset fases/steps
+              setCpmPhase("forward");
               setCpmStep(0);
-              setCpmPickTarget("origen");
+              setCpmPickTarget("origen"); // opcional
+
+              // reset orden/indices
+              setCpmForwardOrder(null);
+              setCpmForwardIndex(0);
+              setCpmBackwardOrder(null);
+              setCpmBackwardIndex(0);
+
+              // si todavía tienes este state viejo:
+              setCpmForwardState(null);
             }}
             onPrev={cpmPrev}
             onNext={cpmNext}
             onFinish={cpmFinish}
-            disabledPrev={cpmStep === 0}
             disabledNext={cpmOrigenId == null || cpmDestinoId == null}
             disabledFinish={cpmOrigenId == null || cpmDestinoId == null}
           />
