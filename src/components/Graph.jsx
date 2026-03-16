@@ -114,8 +114,6 @@ export const Graph = forwardRef(
 
     const fileInputRef = useRef(null);
 
-    const [cpmOrigen, setCpmOrigen] = useState(null);
-    const [cpmDestino, setCpmDestino] = useState(null);
     const [cpmOrigenId, setCpmOrigenId] = useState(null);
     const [cpmDestinoId, setCpmDestinoId] = useState(null);
     const [cpmStep, setCpmStep] = useState(0);
@@ -136,7 +134,7 @@ export const Graph = forwardRef(
 
       // si aún no hay destino, set destino
       if (cpmDestinoId == null) {
-        setCpmDestinoId(nodeId);
+        setCpmDestinoId(id);
         return;
       }
 
@@ -147,9 +145,7 @@ export const Graph = forwardRef(
 
     const cpmPrev = () => setCpmStep((s) => Math.max(0, s - 1));
     const cpmNext = () => setCpmStep((s) => s + 1);
-    const cpmFinish = () => {
-      setCpmRunning(false);
-    };
+    const cpmFinish = () => {};
 
     const showNotification = (message, type = "info") => {
       setNotification({ message, type });
@@ -530,8 +526,9 @@ export const Graph = forwardRef(
             step={cpmStep}
             pickTarget={cpmPickTarget}
             onClear={() => {
-              setCpmOrigen(null);
-              setCpmDestino(null);
+              setCpmOrigenId(null);
+              setCpmDestinoId(null);
+              setCpmStep(0);
               setCpmPickTarget("origen");
             }}
             onPrev={cpmPrev}
