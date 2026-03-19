@@ -38,13 +38,17 @@ export function HomePage() {
         <BottomSection>
           <InfoCard>
             <InfoItem>
-              <Label>Estudiante</Label>
+              <Label>EstudianteS</Label>
               <Value>Luis Daniel Rojas Caceres</Value>
+              <Value>Oziel Rodman Ramos Torrez</Value>
+              <Value>Jorge Manuel Calizaya Tito</Value>
+              <Value>Frederick Aguirre </Value>
+              <Value>Diana Tatiana Pattzy Gomez </Value>
             </InfoItem>
-            <InfoItem>
+            {/* <InfoItem>
               <Label>CI</Label>
               <Value>6991789</Value>
-            </InfoItem>
+            </InfoItem> */}
           </InfoCard>
 
           <Description>
@@ -90,7 +94,11 @@ const BackgroundGlow = styled.div`
   height: 80vw;
   max-width: 800px;
   max-height: 800px;
-  background: radial-gradient(circle, rgba(88, 166, 255, 0.1) 0%, transparent 60%);
+  background: radial-gradient(
+    circle,
+    rgba(88, 166, 255, 0.1) 0%,
+    transparent 60%
+  );
   filter: blur(80px);
   z-index: 0;
   pointer-events: none;
@@ -225,7 +233,11 @@ const Description = styled.p`
   color: var(--text-secondary);
   text-align: center;
   padding: 32px;
-  background: linear-gradient(180deg, rgba(88, 166, 255, 0.05) 0%, transparent 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(88, 166, 255, 0.05) 0%,
+    transparent 100%
+  );
   border-radius: 24px;
   border-top: 1px solid rgba(88, 166, 255, 0.15);
   box-shadow: inset 0 2px 10px rgba(255, 255, 255, 0.02);
