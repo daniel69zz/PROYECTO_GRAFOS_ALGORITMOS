@@ -111,6 +111,8 @@ export function CpmPage() {
   const [cpmPickTarget, setCpmPickTarget] = useState("origen");
 
   const [notification, setNotification] = useState(null);
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [cpmResult, setCpmResult] = useState(null); // { duracion, modo }
 
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
@@ -277,6 +279,13 @@ export function CpmPage() {
         "Backward terminado (no hay más nodos por resolver).",
         "success",
       );
+      // Mostrar modal de resultado si ya hay TE en el destino
+      const destNode = nodos.find((n) => n.id === cpmDestinoId);
+      const duracion = getTE(destNode);
+      if (duracion != null) {
+        setCpmResult({ duracion, modo: cpmMode });
+        setShowResultModal(true);
+      }
       return;
     }
 
@@ -490,6 +499,10 @@ export function CpmPage() {
       "CPM completo: Forward (TE) + Backward (TL) calculados.",
       "success",
     );
+
+    // Mostrar modal de resultado
+    setCpmResult({ duracion: teDest, modo: cpmMode });
+    setShowResultModal(true);
   };
 
   const disabledPrev =
@@ -706,6 +719,25 @@ export function CpmPage() {
               </ModalContent>
             </ModalOverlay>
           )}
+
+          {showResultModal && cpmResult && (
+            <ModalOverlay>
+              <ResultModalContent>
+                <ResultIcon>{cpmResult.modo === "maximizar" ? "🏆" : "⚡"}</ResultIcon>
+                <ResultTitle>
+                  {cpmResult.modo === "maximizar" ? "Ruta Crítica" : "Ruta Mínima"}
+                </ResultTitle>
+                <ResultLabel>Duración total</ResultLabel>
+                <ResultValue>{cpmResult.duracion}</ResultValue>
+                <ResultSub>
+                  {cpmResult.modo === "maximizar"
+                    ? `Máxima duración desde ${cpmOrigenLabel} → ${cpmDestinoLabel}`
+                    : `Mínima duración desde ${cpmOrigenLabel} → ${cpmDestinoLabel}`}
+                </ResultSub>
+                <ResultCloseBtn onClick={() => setShowResultModal(false)}>Cerrar</ResultCloseBtn>
+              </ResultModalContent>
+            </ModalOverlay>
+          )}
         </CanvasArea>
 
         <CpmControls
@@ -730,6 +762,8 @@ export function CpmPage() {
             setCpmForwardIndex(0);
             setCpmBackwardOrder(null);
             setCpmBackwardIndex(0);
+            setShowResultModal(false);
+            setCpmResult(null);
             setShowConfigModal(true); // Vuelve a abrir el modal
           }}
           onPrev={cpmPrev}
@@ -961,5 +995,87 @@ const Button = styled.button`
 
   &:active {
     transform: translateY(0);
+  }
+`;
+
+const ResultModalContent = styled.div`
+  background: var(--glass-bg, rgba(15, 20, 28, 0.92));
+  backdrop-filter: var(--glass-blur, blur(20px));
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
+  padding: 28px 32px;
+  border-radius: 20px;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(79, 195, 247, 0.15);
+  color: #fff;
+  animation: slideInResult 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  @keyframes slideInResult {
+    from {
+      opacity: 0;
+      transform: translateY(-20px) scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+`;
+
+const ResultIcon = styled.div`
+  font-size: 2.4rem;
+  line-height: 1;
+`;
+
+const ResultTitle = styled.h3`
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-color, #4fc3f7);
+  letter-spacing: 0.02em;
+`;
+
+const ResultLabel = styled.p`
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+`;
+
+const ResultValue = styled.div`
+  font-size: 3rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+  text-shadow: 0 0 24px rgba(79, 195, 247, 0.5);
+`;
+
+const ResultSub = styled.p`
+  margin: 0;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+`;
+
+const ResultCloseBtn = styled.button`
+  margin-top: 6px;
+  background: rgba(79, 195, 247, 0.15);
+  border: 1px solid rgba(79, 195, 247, 0.35);
+  color: var(--accent-color, #4fc3f7);
+  padding: 8px 28px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(79, 195, 247, 0.28);
+    border-color: rgba(79, 195, 247, 0.6);
   }
 `;
