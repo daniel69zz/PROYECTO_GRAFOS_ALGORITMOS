@@ -6,6 +6,7 @@ import { GrGraphQl } from "react-icons/gr";
 import { IoMdHelpCircle } from "react-icons/io";
 import { HiMenuAlt3 } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
+import { TbLayoutGrid } from "react-icons/tb";
 import logo_ucb from "/logo_ucb.png";
 
 const navItems = [

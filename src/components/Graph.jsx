@@ -10,6 +10,7 @@ import { Nodo } from "./Nodo";
 import { Arista } from "./Arista";
 import { EditMenu } from "./EditMenu";
 import { DragMatrix } from "./DragMatrix";
+import { DragAsignacion } from "./DragAsignacion";
 import { Notification } from "./Notification";
 import { useNavigate } from "react-router-dom";
 
@@ -406,9 +407,11 @@ export const Graph = forwardRef(
     );
 
     useEffect(() => {
-      if (herramienta === 4 && tieneAristasNoDirigidas) {
+      if ((herramienta === 4 || herramienta === 6) && tieneAristasNoDirigidas) {
         showNotification(
-          "No se puede mostrar la matriz para grafos con aristas no dirigidas.\n\nLa matriz de adyacencia está diseñada solo para grafos dirigidos.",
+          herramienta === 6
+            ? "No se puede usar asignación con aristas no dirigidas.\n\nEl algoritmo de asignación requiere un grafo completamente dirigido."
+            : "No se puede mostrar la matriz para grafos con aristas no dirigidas.\n\nLa matriz de adyacencia está diseñada solo para grafos dirigidos.",
           "warning",
         );
         setHerramienta(1);
@@ -444,6 +447,13 @@ export const Graph = forwardRef(
           {herramienta === 4 && !tieneAristasNoDirigidas && (
             <DragMatrix
               title="Matriz Ponderada Dirigida"
+              nodos={nodos}
+              aristas={aristas}
+              onClose={() => setHerramienta(1)}
+            />
+          )}
+          {herramienta === 6 && !tieneAristasNoDirigidas && (
+            <DragAsignacion
               nodos={nodos}
               aristas={aristas}
               onClose={() => setHerramienta(1)}

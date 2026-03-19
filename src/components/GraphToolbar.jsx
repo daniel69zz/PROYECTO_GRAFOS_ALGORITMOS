@@ -3,7 +3,7 @@ import { LuMousePointer2 } from "react-icons/lu";
 import { FaEdit } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 import { AiOutlineLeft } from "react-icons/ai";
-import { TbMatrix } from "react-icons/tb";
+import { TbMatrix, TbLayoutGrid } from "react-icons/tb";
 import { BiExport, BiImport } from "react-icons/bi";
 import { TbRouteSquare2 } from "react-icons/tb";
 
@@ -16,6 +16,7 @@ const toolbarLinks = [
 const toolbarOptions = [
   { label: "Matriz", Icon: TbMatrix, op: 4 },
   { label: "CPM", Icon: TbRouteSquare2, op: 5 },
+  { label: "Asignación", Icon: TbLayoutGrid, op: 6 },
 ];
 
 const fileOptions = [
