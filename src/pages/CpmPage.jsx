@@ -88,7 +88,9 @@ export function CpmPage() {
 
   // Load the graph from location state
   // Keep a clean snapshot (no CPM data) to return to the graph editor
-  const originalNodos = (location.state?.nodos ?? []).map(({ cpm, ...rest }) => rest);
+  const originalNodos = (location.state?.nodos ?? []).map(
+    ({ cpm, ...rest }) => rest,
+  );
   const originalAristas = location.state?.aristas ?? [];
 
   const [nodos, setNodos] = useState(location.state?.nodos || []);
@@ -547,7 +549,13 @@ export function CpmPage() {
         />
       )}
       <Header>
-        <BackButton onClick={() => navigate("/graph", { state: { nodos: originalNodos, aristas: originalAristas } })}>
+        <BackButton
+          onClick={() =>
+            navigate("/graph", {
+              state: { nodos: originalNodos, aristas: originalAristas },
+            })
+          }
+        >
           <TbArrowBackUp /> Volver al Grafo
         </BackButton>
         <Title>Aplicar CPM</Title>
@@ -610,16 +618,31 @@ export function CpmPage() {
           {showConfigModal && (
             <ModalOverlay>
               <ModalContent>
-                <h2>Configuración CPM</h2>
+                <h2>Configuración Algoritmo Jonhson</h2>
 
                 {nodos.length === 0 ? (
                   <>
-                    <p style={{ color: "#ff8a80", fontSize: "0.95rem", lineHeight: "1.5" }}>
-                      No se encontró ningún grafo válido. Por favor, vuelve al editor y asegúrate de tener nodos creados antes de aplicar CPM.
+                    <p
+                      style={{
+                        color: "#ff8a80",
+                        fontSize: "0.95rem",
+                        lineHeight: "1.5",
+                      }}
+                    >
+                      No se encontró ningún grafo válido. Por favor, vuelve al
+                      editor y asegúrate de tener nodos creados antes de aplicar
+                      CPM.
                     </p>
                     <ModalActions style={{ justifyContent: "flex-end" }}>
                       <Button
-                        onClick={() => navigate("/graph", { state: { nodos: originalNodos, aristas: originalAristas } })}
+                        onClick={() =>
+                          navigate("/graph", {
+                            state: {
+                              nodos: originalNodos,
+                              aristas: originalAristas,
+                            },
+                          })
+                        }
                         style={{ background: "#4caf50" }}
                       >
                         Cancelar
@@ -649,7 +672,9 @@ export function CpmPage() {
                       <label>Nodo Destino</label>
                       <Select
                         value={cpmDestinoId || ""}
-                        onChange={(e) => setCpmDestinoId(Number(e.target.value))}
+                        onChange={(e) =>
+                          setCpmDestinoId(Number(e.target.value))
+                        }
                       >
                         <option value="" disabled>
                           Seleccione un destino
@@ -690,7 +715,14 @@ export function CpmPage() {
 
                     <ModalActions style={{ justifyContent: "space-between" }}>
                       <Button
-                        onClick={() => navigate("/graph", { state: { nodos: originalNodos, aristas: originalAristas } })}
+                        onClick={() =>
+                          navigate("/graph", {
+                            state: {
+                              nodos: originalNodos,
+                              aristas: originalAristas,
+                            },
+                          })
+                        }
                         style={{
                           background: "transparent",
                           border: "1px solid rgba(255, 255, 255, 0.2)",
@@ -723,9 +755,13 @@ export function CpmPage() {
           {showResultModal && cpmResult && (
             <ModalOverlay>
               <ResultModalContent>
-                <ResultIcon>{cpmResult.modo === "maximizar" ? "🏆" : "⚡"}</ResultIcon>
+                <ResultIcon>
+                  {cpmResult.modo === "maximizar" ? "🏆" : "⚡"}
+                </ResultIcon>
                 <ResultTitle>
-                  {cpmResult.modo === "maximizar" ? "Ruta Crítica" : "Ruta Mínima"}
+                  {cpmResult.modo === "maximizar"
+                    ? "Ruta Crítica"
+                    : "Ruta Mínima"}
                 </ResultTitle>
                 <ResultLabel>Duración total</ResultLabel>
                 <ResultValue>{cpmResult.duracion}</ResultValue>
@@ -734,7 +770,9 @@ export function CpmPage() {
                     ? `Máxima duración desde ${cpmOrigenLabel} → ${cpmDestinoLabel}`
                     : `Mínima duración desde ${cpmOrigenLabel} → ${cpmDestinoLabel}`}
                 </ResultSub>
-                <ResultCloseBtn onClick={() => setShowResultModal(false)}>Cerrar</ResultCloseBtn>
+                <ResultCloseBtn onClick={() => setShowResultModal(false)}>
+                  Cerrar
+                </ResultCloseBtn>
               </ResultModalContent>
             </ModalOverlay>
           )}
@@ -1009,7 +1047,9 @@ const ResultModalContent = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(79, 195, 247, 0.15);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(79, 195, 247, 0.15);
   color: #fff;
   animation: slideInResult 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 

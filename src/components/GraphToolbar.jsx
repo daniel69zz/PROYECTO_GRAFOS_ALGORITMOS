@@ -15,7 +15,7 @@ const toolbarLinks = [
 
 const toolbarOptions = [
   { label: "Matriz", Icon: TbMatrix, op: 4 },
-  { label: "CPM", Icon: TbRouteSquare2, op: 5 },
+  { label: "Algoritmo de Johnson", Icon: TbRouteSquare2, op: 5 },
 ];
 
 const fileOptions = [
@@ -41,8 +41,6 @@ export function GraphToolbar({
       onImportar?.();
     }
   };
-
-
 
   return (
     <Container $isOpen={isOpen} data-toolbar="true">
