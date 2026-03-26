@@ -165,6 +165,47 @@ export function HelpPage() {
           </FeatureList>
         </ToolSection>
 
+        <Divider />
+
+        <ToolSection>
+          <ToolHeader>
+            <ToolNumber>5</ToolNumber>
+            <ToolTitle>CPM / Algoritmo de Johnson</ToolTitle>
+          </ToolHeader>
+          <ToolDescription>
+            Calcula la ruta crítica (maximizar) o la ruta más corta (minimizar) paso a paso.
+          </ToolDescription>
+          <FeatureList>
+            <Feature>
+              <FeatureIcon>⚙️</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Configuración</FeatureName>
+                <FeatureDesc>
+                  Selecciona nodo origen, destino y el objetivo (Maximizar o Minimizar).
+                </FeatureDesc>
+              </FeatureContent>
+            </Feature>
+            <Feature>
+              <FeatureIcon>🎞️</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Ejecución paso a paso</FeatureName>
+                <FeatureDesc>
+                  Usa los controles ⟵ / ⟶ para navegar por los cálculos de TE (Forward) y TL (Backward).
+                </FeatureDesc>
+              </FeatureContent>
+            </Feature>
+            <Feature>
+              <FeatureIcon>🏁</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Resultado final</FeatureName>
+                <FeatureDesc>
+                  Presiona ✓ para obtener la duración total y visualizar los resultados en el grafo.
+                </FeatureDesc>
+              </FeatureContent>
+            </Feature>
+          </FeatureList>
+        </ToolSection>
+
         <TipBox>
           <TipIcon>💡</TipIcon>
           <TipText>
