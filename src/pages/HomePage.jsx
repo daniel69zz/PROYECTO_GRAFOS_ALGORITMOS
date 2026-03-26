@@ -44,6 +44,7 @@ export function HomePage() {
               <Value>Jorge Manuel Calizaya Tito</Value>
               <Value>Frederick Aguirre </Value>
               <Value>Diana Tatiana Pattzy Gomez </Value>
+              <Value>Daniel Boris Rueda</Value>
             </InfoItem>
             {/* <InfoItem>
               <Label>CI</Label>
