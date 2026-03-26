@@ -41,7 +41,6 @@ export function HomePage() {
               <Label>EstudianteS</Label>
               <Value>Luis Daniel Rojas Caceres</Value>
               <Value>Oziel Rodman Ramos Torrez</Value>
-              <Value>Jorge Manuel Calizaya Tito</Value>
               <Value>Frederick Aguirre </Value>
               <Value>Diana Tatiana Pattzy Gomez </Value>
               <Value>Daniel Boris Rueda</Value>
