@@ -10,6 +10,7 @@ import { resolverAsignacion, padMatrizCuadrada } from "../utils/hungaro";
 import {
   FiPlay, FiChevronDown, FiChevronUp, FiArrowRight, FiGrid
 } from "react-icons/fi";
+import { TbArrowBackUp } from "react-icons/tb";
 
 const DIVIDER_X = 500; // Línea divisoria visual y lógica (izquierda=Origen, derecha=Destino)
 
@@ -85,6 +86,12 @@ export function AsignacionPage() {
   const [nodos, setNodos] = useState(() => location.state?.nodos || []);
   const [aristas, setAristas] = useState(() => location.state?.aristas || []);
   const [nodo_seleccionado, setNodo_seleccionado] = useState(null);
+
+  // Snapshot original para volver
+  const originalNodos = (location.state?.nodos ?? []).map(
+    ({ cpm, ...rest }) => rest,
+  );
+  const originalAristas = location.state?.aristas ?? [];
   
   // Toolbar states
   const [herramienta, setHerramienta] = useState(1); // 1: Mover, 2: Editar, 3: Eliminar
@@ -387,7 +394,21 @@ export function AsignacionPage() {
   const liveDestinos = nodos.filter(n => n.x >= DIVIDER_X).sort((a,b) => a.y - b.y);
 
   return (
-    <Container>
+    <PageWrapper>
+      <Header>
+        <BackButton
+          onClick={() =>
+            navigate("/graph", {
+              state: { nodos: originalNodos, aristas: originalAristas },
+            })
+          }
+        >
+          <TbArrowBackUp /> Volver al Grafo
+        </BackButton>
+        <Title>Algoritmo de Asignación</Title>
+      </Header>
+
+      <Container>
       {notification && <Notification message={notification.message} type={notification.type} onClose={() => setNotification(null)} />}
       
       <GraphToolbar
@@ -617,16 +638,64 @@ export function AsignacionPage() {
         </SidePanel>
       </ContentWrapper>
     </Container>
+    </PageWrapper>
   );
 }
 
 /* ================================================
    STYLED COMPONENTS
    ================================================ */
+const PageWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--bg-color);
+`;
+
+const Header = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 10px 24px;
+  background-color: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--glass-border);
+  gap: 16px;
+  z-index: 100;
+`;
+
+const BackButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: var(--text-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  svg {
+    font-size: 20px;
+  }
+`;
+
+const Title = styled.h1`
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+`;
+
 const Container = styled.div`
   display: flex;
-  width: 100vw;
-  height: calc(100vh - 64px); /* assuming navbar is 64px */
+  width: 100%;
+  height: calc(100vh - 110px); /* Ajustado para el nuevo Header */
   overflow: hidden;
   position: relative;
   background-color: var(--bg-color);
