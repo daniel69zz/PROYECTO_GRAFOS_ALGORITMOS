@@ -12,6 +12,7 @@ import { EditMenu } from "./EditMenu";
 import { DragMatrix } from "./DragMatrix";
 
 import { Notification } from "./Notification";
+import { ExportModal } from "./ExportModal";
 import { useNavigate } from "react-router-dom";
 
 import { exportar_grafo, importar_grafo } from "../utils/exp_imp_grafo";
@@ -137,6 +138,8 @@ export const Graph = forwardRef(
 
     const [editMenu, setEditMenu] = useState(null);
     const [notification, setNotification] = useState(null);
+    const [exportModal, setExportModal] = useState(false);
+    const [suggestedName, setSuggestedName] = useState("");
     const nextId = useRef(1);
     const isFirstClearRender = useRef(true);
 
@@ -151,10 +154,17 @@ export const Graph = forwardRef(
     };
 
     const handleExportar = () => {
+      const nombreSugerido = `grafo_${new Date().toLocaleDateString().replace(/\//g, "-")}`;
+      setSuggestedName(nombreSugerido);
+      setExportModal(true);
+    };
+
+    const confirmExport = (nombreArchivo) => {
       try {
-        exportar_grafo(nodos, aristas, nextId.current);
+        const nombreFinal = nombreArchivo.trim() || suggestedName;
+        exportar_grafo(nodos, aristas, nextId.current, nombreFinal);
         showNotification("Grafo exportado correctamente", "success");
-        console.log("Grafo exportado correctamente");
+        setExportModal(false);
       } catch (e) {
         console.error("Error al exportar:", e);
         showNotification(`Error al exportar el grafo:\n${e.message}`, "error");
@@ -440,6 +450,14 @@ export const Graph = forwardRef(
             message={notification.message}
             type={notification.type}
             onClose={closeNotification}
+          />
+        )}
+
+        {exportModal && (
+          <ExportModal
+            defaultName={suggestedName}
+            onConfirm={confirmExport}
+            onCancel={() => setExportModal(false)}
           />
         )}
 

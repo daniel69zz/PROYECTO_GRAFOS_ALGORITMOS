@@ -1,4 +1,4 @@
-export const exportar_grafo = (nodos, aristas, nextId) => {
+export const exportar_grafo = (nodos, aristas, nextId, nombreArchivo = `grafo_${Date.now()}`) => {
   const grafo = {
     version: "1.1",
     timestamp: new Date().toISOString(),
@@ -26,7 +26,12 @@ export const exportar_grafo = (nodos, aristas, nextId) => {
 
   const link = document.createElement("a");
   link.href = url_temp;
-  link.download = `grafo_${Date.now()}.json`;
+  
+  const finalName = nombreArchivo.toLowerCase().endsWith(".json") 
+    ? nombreArchivo 
+    : `${nombreArchivo}.json`;
+    
+  link.download = finalName;
 
   document.body.appendChild(link);
   link.click();
