@@ -170,7 +170,7 @@ export function HelpPage() {
         <ToolSection>
           <ToolHeader>
             <ToolNumber>5</ToolNumber>
-            <ToolTitle>CPM / Algoritmo de Johnson</ToolTitle>
+            <ToolTitle>Algoritmo de Johnson</ToolTitle>
           </ToolHeader>
           <ToolDescription>
             Calcula la ruta crítica (maximizar) o la ruta más corta (minimizar) paso a paso.
