@@ -10,7 +10,7 @@ import { Nodo } from "./Nodo";
 import { Arista } from "./Arista";
 import { EditMenu } from "./EditMenu";
 import { DragMatrix } from "./DragMatrix";
-import { DragAsignacion } from "./DragAsignacion";
+
 import { Notification } from "./Notification";
 import { useNavigate } from "react-router-dom";
 
@@ -407,6 +407,13 @@ export const Graph = forwardRef(
     );
 
     useEffect(() => {
+      if (herramienta === 6 && !tieneAristasNoDirigidas) {
+        navigate("/asignacion", { state: { nodos, aristas } });
+        setHerramienta(1);
+      }
+    }, [herramienta, tieneAristasNoDirigidas, nodos, aristas, navigate, setHerramienta]);
+
+    useEffect(() => {
       if ((herramienta === 4 || herramienta === 6) && tieneAristasNoDirigidas) {
         showNotification(
           herramienta === 6
@@ -452,13 +459,7 @@ export const Graph = forwardRef(
               onClose={() => setHerramienta(1)}
             />
           )}
-          {herramienta === 6 && !tieneAristasNoDirigidas && (
-            <DragAsignacion
-              nodos={nodos}
-              aristas={aristas}
-              onClose={() => setHerramienta(1)}
-            />
-          )}
+
           <Canvas $offsetX={offset.x} $offsetY={offset.y}>
             <SvgCanvas>
               <defs>

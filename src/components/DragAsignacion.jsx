@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useMemo } from "react";
 import styled, { css, keyframes } from "styled-components";
 import { grafoAMatrizAsignacion } from "../utils/grafoAMatrizAsignacion";
-import { resolverAsignacion } from "../utils/hungaro";
+import { resolverAsignacion, padMatrizCuadrada } from "../utils/hungaro";
 import {
   FiPlay,
   FiChevronDown,
@@ -19,7 +19,7 @@ export function DragAsignacion({ nodos, aristas, onClose }) {
   const [resultado, setResultado] = useState(null);
   const [mostrarPasos, setMostrarPasos] = useState(false);
 
-  // Convertir grafo → matriz
+  // Convertir grafo → matriz (puede ser rectangular)
   const conversion = useMemo(
     () => grafoAMatrizAsignacion(nodos, aristas),
     [nodos, aristas]
@@ -53,8 +53,40 @@ export function DragAsignacion({ nodos, aristas, onClose }) {
   const handleResolver = () => {
     if (!conversion.valida) return;
     try {
-      const res = resolverAsignacion(conversion.matriz, modo);
-      setResultado(res);
+      const m = conversion.nombresOrigenes.length;
+      const n = conversion.nombresDestinos.length;
+      let matrizParaResolver = conversion.matriz;
+      let padding = null;
+
+      // Si la matriz no es cuadrada, padding con variables artificiales
+      if (m !== n) {
+        const padResult = padMatrizCuadrada(conversion.matriz);
+        matrizParaResolver = padResult.matrizCuadrada;
+        padding = padResult;
+      }
+
+      const res = resolverAsignacion(matrizParaResolver, modo);
+
+      // Filtrar asignaciones ficticias
+      const asignacionesReales = res.asignaciones.filter((a) => {
+        if (padding) {
+          if (padding.filasFicticias.includes(a.fila)) return false;
+          if (padding.columnasFicticias.includes(a.columna)) return false;
+        }
+        return true;
+      });
+
+      const costoReal = asignacionesReales.reduce(
+        (sum, a) => sum + conversion.matriz[a.fila][a.columna],
+        0
+      );
+
+      setResultado({
+        ...res,
+        asignacionesReales,
+        costoReal,
+        padding,
+      });
     } catch (err) {
       console.error("Error al resolver asignación:", err);
     }
@@ -62,8 +94,14 @@ export function DragAsignacion({ nodos, aristas, onClose }) {
 
   const esCeldaAsignada = (i, j) => {
     if (!resultado) return false;
-    return resultado.asignaciones.some((a) => a.fila === i && a.columna === j);
+    return resultado.asignacionesReales.some(
+      (a) => a.fila === i && a.columna === j
+    );
   };
+
+  const esRectangular =
+    conversion.valida &&
+    conversion.nombresOrigenes.length !== conversion.nombresDestinos.length;
 
   return (
     <WindowWrapper $top={pos.y} $left={pos.x}>
@@ -84,19 +122,33 @@ export function DragAsignacion({ nodos, aristas, onClose }) {
               <span>Grafo no válido para asignación</span>
             </ErrorHeader>
             <ErrorMessage>{conversion.error}</ErrorMessage>
-            {conversion.aristasFaltantes &&
-              conversion.aristasFaltantes.length > 0 && (
-                <ErrorHint>
-                  Agrega las aristas faltantes en el editor y vuelve a abrir
-                  este panel.
-                </ErrorHint>
-              )}
+            <ErrorHint>
+              Agrega aristas dirigidas entre los nodos de origen y destino.
+            </ErrorHint>
           </ErrorPanel>
         )}
 
         {/* ===== CONTENIDO VÁLIDO ===== */}
         {conversion.valida && (
           <>
+            {/* Info rectangular */}
+            {esRectangular && (
+              <InfoBox>
+                ℹ️ Matriz {conversion.nombresOrigenes.length}×
+                {conversion.nombresDestinos.length} — se completará a{" "}
+                {Math.max(
+                  conversion.nombresOrigenes.length,
+                  conversion.nombresDestinos.length
+                )}
+                ×
+                {Math.max(
+                  conversion.nombresOrigenes.length,
+                  conversion.nombresDestinos.length
+                )}{" "}
+                con variables artificiales (costo 0).
+              </InfoBox>
+            )}
+
             {/* Selector de modo */}
             <ModoSection>
               <ModoLabel>Objetivo:</ModoLabel>
@@ -125,15 +177,15 @@ export function DragAsignacion({ nodos, aristas, onClose }) {
             {/* Matriz del grafo */}
             <MatrizSection>
               <SectionTitle>
-                Matriz de Costos ({conversion.nombresNodos.length}×
-                {conversion.nombresNodos.length})
+                Matriz de Costos ({conversion.nombresOrigenes.length}×
+                {conversion.nombresDestinos.length})
               </SectionTitle>
               <MatrizScroll>
                 <MatrizTable>
                   <thead>
                     <tr>
-                      <MatrizCorner />
-                      {conversion.nombresNodos.map((nombre, j) => (
+                      <MatrizCorner>Orig \ Dest</MatrizCorner>
+                      {conversion.nombresDestinos.map((nombre, j) => (
                         <MatrizColHeader key={j}>{nombre}</MatrizColHeader>
                       ))}
                     </tr>
@@ -142,13 +194,12 @@ export function DragAsignacion({ nodos, aristas, onClose }) {
                     {conversion.matriz.map((fila, i) => (
                       <tr key={i}>
                         <MatrizRowHeader>
-                          {conversion.nombresNodos[i]}
+                          {conversion.nombresOrigenes[i]}
                         </MatrizRowHeader>
                         {fila.map((val, j) => (
                           <MatrizCelda
                             key={j}
                             $asignada={esCeldaAsignada(i, j)}
-                            $diagonal={i === j}
                           >
                             {val}
                           </MatrizCelda>
@@ -171,23 +222,30 @@ export function DragAsignacion({ nodos, aristas, onClose }) {
               <ResultSection>
                 <CostoBox>
                   <CostoLabel>Costo Total Óptimo</CostoLabel>
-                  <CostoValor>{resultado.costoTotal}</CostoValor>
+                  <CostoValor>{resultado.costoReal}</CostoValor>
                 </CostoBox>
 
+                {resultado.padding && (
+                  <PaddingNote>
+                    ⚠️ Se usaron variables artificiales. Las asignaciones
+                    ficticias se excluyen.
+                  </PaddingNote>
+                )}
+
                 <AsignList>
-                  {resultado.asignaciones.map((a, idx) => (
+                  {resultado.asignacionesReales.map((a, idx) => (
                     <AsignItem
                       key={idx}
                       style={{ animationDelay: `${idx * 0.08}s` }}
                     >
                       <Badge>
-                        {conversion.nombresNodos[a.fila]}
+                        {conversion.nombresOrigenes[a.fila]}
                       </Badge>
                       <FiArrowRight
                         style={{ color: "#4f46e5", flexShrink: 0 }}
                       />
                       <Badge $dest>
-                        {conversion.nombresNodos[a.columna]}
+                        {conversion.nombresDestinos[a.columna]}
                       </Badge>
                       <CostTag>Costo: {a.costo}</CostTag>
                     </AsignItem>
@@ -401,6 +459,18 @@ const ErrorHint = styled.p`
   margin: 0;
 `;
 
+/* --- Info Box --- */
+const InfoBox = styled.div`
+  background: #eff6ff;
+  border: 1px solid #93c5fd;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #1e40af;
+  font-weight: 500;
+  line-height: 1.5;
+`;
+
 /* --- Modo Section --- */
 
 const ModoSection = styled.div`
@@ -483,6 +553,9 @@ const MatrizCorner = styled.th`
   border-bottom: 2px solid #e2e8f0;
   border-right: 2px solid #e2e8f0;
   min-width: 80px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
 `;
 
 const MatrizColHeader = styled.th`
@@ -511,13 +584,8 @@ const MatrizCelda = styled.td`
   text-align: center;
   font-size: 14px;
   font-weight: ${(p) => (p.$asignada ? "800" : "500")};
-  color: ${(p) => (p.$asignada ? "#166534" : p.$diagonal ? "#94a3b8" : "#1e293b")};
-  background: ${(p) =>
-    p.$asignada
-      ? "#dcfce7"
-      : p.$diagonal
-        ? "#f1f5f9"
-        : "#fff"};
+  color: ${(p) => (p.$asignada ? "#166534" : "#1e293b")};
+  background: ${(p) => (p.$asignada ? "#dcfce7" : "#fff")};
   border: 1px solid ${(p) => (p.$asignada ? "#86efac" : "#e2e8f0")};
   transition: all 0.3s;
 
@@ -586,6 +654,16 @@ const CostoValor = styled.div`
   font-size: 32px;
   font-weight: 900;
   color: #166534;
+`;
+
+const PaddingNote = styled.div`
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #92400e;
+  font-weight: 500;
 `;
 
 const AsignList = styled.div`

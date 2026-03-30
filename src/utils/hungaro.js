@@ -1,4 +1,48 @@
 /**
+ * Convierte una matriz rectangular m×n en una matriz cuadrada max(m,n)×max(m,n)
+ * añadiendo filas o columnas ficticias ("variables artificiales") con costo 0.
+ *
+ * @param {number[][]} matriz - Matriz rectangular de costos
+ * @returns {{ matrizCuadrada: number[][], filasFicticias: number[], columnasFicticias: number[], tamanoOriginal: {filas: number, columnas: number} }}
+ */
+export function padMatrizCuadrada(matriz) {
+  const filas = matriz.length;
+  const columnas = matriz[0]?.length ?? 0;
+  const n = Math.max(filas, columnas);
+
+  const filasFicticias = [];
+  const columnasFicticias = [];
+
+  // Clonar y extender columnas si faltan
+  const matrizCuadrada = matriz.map((fila) => {
+    const nuevaFila = [...fila];
+    while (nuevaFila.length < n) {
+      nuevaFila.push(0);
+    }
+    return nuevaFila;
+  });
+
+  // Registrar columnas ficticias
+  for (let j = columnas; j < n; j++) {
+    columnasFicticias.push(j);
+  }
+
+  // Agregar filas ficticias si faltan
+  while (matrizCuadrada.length < n) {
+    const idx = matrizCuadrada.length;
+    filasFicticias.push(idx);
+    matrizCuadrada.push(Array(n).fill(0));
+  }
+
+  return {
+    matrizCuadrada,
+    filasFicticias,
+    columnasFicticias,
+    tamanoOriginal: { filas, columnas },
+  };
+}
+
+/**
  * Algoritmo Húngaro (Hungarian Algorithm)
  * Resuelve el problema de asignación para minimización y maximización.
  *
@@ -279,17 +323,20 @@ function aumentar(fila, matriz, n, asignFilaACol, asignColAFila, visitado) {
 }
 
 /**
- * Valida que la matriz sea cuadrada, sin celdas vacías, y con números válidos.
+ * Valida la matriz de costos. Acepta matrices rectangulares (m×n).
+ * Solo verifica valores numéricos válidos y no negativos.
  */
 export function validarMatriz(m) {
   if (!Array.isArray(m) || m.length === 0) return { valida: false, error: "La matriz está vacía." };
 
-  const n = m.length;
-  for (let i = 0; i < n; i++) {
-    if (!Array.isArray(m[i]) || m[i].length !== n) {
-      return { valida: false, error: `La fila ${i + 1} no tiene ${n} columnas. La matriz debe ser cuadrada.` };
+  const numCols = m[0]?.length ?? 0;
+  if (numCols === 0) return { valida: false, error: "La matriz no tiene columnas." };
+
+  for (let i = 0; i < m.length; i++) {
+    if (!Array.isArray(m[i]) || m[i].length !== numCols) {
+      return { valida: false, error: `La fila ${i + 1} no tiene ${numCols} columnas. Todas las filas deben tener la misma cantidad de columnas.` };
     }
-    for (let j = 0; j < n; j++) {
+    for (let j = 0; j < numCols; j++) {
       const val = m[i][j];
       if (val === null || val === undefined || val === "" || isNaN(Number(val))) {
         return { valida: false, error: `La celda (${i + 1}, ${j + 1}) no tiene un valor numérico válido.` };

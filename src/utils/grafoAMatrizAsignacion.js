@@ -1,27 +1,24 @@
 /**
- * Convierte un grafo (nodos + aristas) en una matriz de costos n×n
+ * Convierte un grafo (nodos + aristas) en una matriz de costos
  * para el algoritmo de asignación.
  *
- * Reglas:
- * - La matriz es n×n donde n = cantidad de nodos
- * - Cada celda [i][j] = peso de la arista del nodo i al nodo j
- * - Peso 0 es un valor VÁLIDO
- * - Conexión inexistente → ERROR (no se usa 0 como placeholder)
- * - Solo aristas dirigidas son aceptadas
+ * Nuevo modelo: clasifica los nodos en Orígenes y Destinos
+ * según las aristas dirigidas. La matriz resultante puede ser rectangular.
+ * Si no es cuadrada, se indica para que el caller añada variables artificiales.
  *
  * @param {Array} nodos - Array de nodos del grafo: [{ id, label, x, y, ... }]
  * @param {Array} aristas - Array de aristas: [{ from, to, weight, tipo }]
- * @returns {{ valida: boolean, error: string|null, matriz: number[][]|null, nombresNodos: string[]|null, aristasFaltantes: Array|null }}
+ * @returns {{ valida: boolean, error: string|null, matriz: number[][]|null, nombresOrigenes: string[]|null, nombresDestinos: string[]|null }}
  */
 export function grafoAMatrizAsignacion(nodos, aristas) {
-  // --- Validación 1: Al menos 2 nodos ---
-  if (!nodos || nodos.length < 2) {
+  // --- Validación 1: Al menos 1 arista ---
+  if (!aristas || aristas.length < 1) {
     return {
       valida: false,
-      error: "Se necesitan al menos 2 nodos para crear una matriz de asignación.",
+      error: "Se necesita al menos 1 arista dirigida para crear una matriz de asignación.",
       matriz: null,
-      nombresNodos: null,
-      aristasFaltantes: null,
+      nombresOrigenes: null,
+      nombresDestinos: null,
     };
   }
 
@@ -30,22 +27,50 @@ export function grafoAMatrizAsignacion(nodos, aristas) {
   if (noDirigidas.length > 0) {
     return {
       valida: false,
-      error: `El grafo tiene ${noDirigidas.length} arista(s) no dirigida(s). El algoritmo de asignación requiere un grafo completamente dirigido.`,
+      error: `El grafo tiene ${noDirigidas.length} arista(s) no dirigida(s). El algoritmo de asignación requiere aristas dirigidas.`,
       matriz: null,
-      nombresNodos: null,
-      aristasFaltantes: null,
+      nombresOrigenes: null,
+      nombresDestinos: null,
     };
   }
 
-  const n = nodos.length;
-  const idToIndex = new Map();
-  const nombresNodos = [];
+  // Mapear nodos por ID para búsqueda rápida
+  const nodoMap = new Map();
+  for (const nodo of nodos) {
+    nodoMap.set(nodo.id, nodo);
+  }
 
-  // Mapear nodos a índices
-  nodos.forEach((nodo, idx) => {
-    idToIndex.set(nodo.id, idx);
-    nombresNodos.push(nodo.label || `Nodo ${nodo.id}`);
+  // Clasificar nodos: los que aparecen como "from" son orígenes,
+  // los que aparecen como "to" son destinos
+  const origenIds = new Set();
+  const destinoIds = new Set();
+  for (const ar of aristas) {
+    origenIds.add(ar.from);
+    destinoIds.add(ar.to);
+  }
+
+  // Convertir a arrays ordenados
+  const origenes = [...origenIds].map((id) => {
+    const nodo = nodoMap.get(id);
+    return { id, label: nodo?.label || `Nodo ${id}` };
   });
+  const destinos = [...destinoIds].map((id) => {
+    const nodo = nodoMap.get(id);
+    return { id, label: nodo?.label || `Nodo ${id}` };
+  });
+
+  if (origenes.length < 1 || destinos.length < 1) {
+    return {
+      valida: false,
+      error: "Se necesita al menos 1 origen y 1 destino.",
+      matriz: null,
+      nombresOrigenes: null,
+      nombresDestinos: null,
+    };
+  }
+
+  const m = origenes.length;
+  const n = destinos.length;
 
   // Crear mapa de aristas para búsqueda rápida
   const aristaMap = new Map();
@@ -54,75 +79,29 @@ export function grafoAMatrizAsignacion(nodos, aristas) {
     aristaMap.set(key, ar);
   }
 
-  // --- Validación 3: Verificar que TODAS las conexiones i→j existen (i ≠ j) ---
-  const aristasFaltantes = [];
-  for (let i = 0; i < n; i++) {
+  // Construir la matriz m×n
+  const nombresOrigenes = origenes.map((o) => o.label);
+  const nombresDestinos = destinos.map((d) => d.label);
+  const matriz = Array.from({ length: m }, () => Array(n).fill(0));
+
+  for (let i = 0; i < m; i++) {
     for (let j = 0; j < n; j++) {
-      if (i === j) continue; // Lazos no son necesarios para asignación
-      const fromId = nodos[i].id;
-      const toId = nodos[j].id;
-      const key = `${fromId}->${toId}`;
-      if (!aristaMap.has(key)) {
-        aristasFaltantes.push({
-          from: nombresNodos[i],
-          to: nombresNodos[j],
-          fromId,
-          toId,
-        });
+      const key = `${origenes[i].id}->${destinos[j].id}`;
+      const ar = aristaMap.get(key);
+      if (ar) {
+        const peso = Number(ar.weight);
+        if (peso < 0) {
+          return {
+            valida: false,
+            error: `La arista ${nombresOrigenes[i]} → ${nombresDestinos[j]} tiene peso negativo (${peso}). El algoritmo Húngaro requiere valores ≥ 0.`,
+            matriz: null,
+            nombresOrigenes,
+            nombresDestinos,
+          };
+        }
+        matriz[i][j] = peso || 0;
       }
-    }
-  }
-
-  if (aristasFaltantes.length > 0) {
-    const maxMostrar = 5;
-    const ejemplos = aristasFaltantes
-      .slice(0, maxMostrar)
-      .map((f) => `  • ${f.from} → ${f.to}`)
-      .join("\n");
-    const restante =
-      aristasFaltantes.length > maxMostrar
-        ? `\n  ... y ${aristasFaltantes.length - maxMostrar} más`
-        : "";
-
-    return {
-      valida: false,
-      error: `El grafo no es completo. Faltan ${aristasFaltantes.length} conexión(es):\n${ejemplos}${restante}\n\nPara asignación se requiere que cada nodo tenga una arista dirigida hacia todos los demás.`,
-      matriz: null,
-      nombresNodos,
-      aristasFaltantes,
-    };
-  }
-
-  // --- Construir la matriz n×n ---
-  const matriz = Array.from({ length: n }, () => Array(n).fill(0));
-
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j < n; j++) {
-      if (i === j) {
-        // Diagonal: usar lazo si existe, sino 0
-        const key = `${nodos[i].id}->${nodos[j].id}`;
-        const ar = aristaMap.get(key);
-        matriz[i][j] = ar ? Number(ar.weight) || 0 : 0;
-      } else {
-        const key = `${nodos[i].id}->${nodos[j].id}`;
-        const ar = aristaMap.get(key);
-        matriz[i][j] = Number(ar.weight) || 0;
-      }
-    }
-  }
-
-  // --- Validación 4: No deben haber valores negativos ---
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j < n; j++) {
-      if (matriz[i][j] < 0) {
-        return {
-          valida: false,
-          error: `La arista ${nombresNodos[i]} → ${nombresNodos[j]} tiene peso negativo (${matriz[i][j]}). El algoritmo Húngaro requiere valores ≥ 0.`,
-          matriz: null,
-          nombresNodos,
-          aristasFaltantes: null,
-        };
-      }
+      // Si no existe la arista, queda en 0
     }
   }
 
@@ -130,7 +109,7 @@ export function grafoAMatrizAsignacion(nodos, aristas) {
     valida: true,
     error: null,
     matriz,
-    nombresNodos,
-    aristasFaltantes: null,
+    nombresOrigenes,
+    nombresDestinos,
   };
 }
