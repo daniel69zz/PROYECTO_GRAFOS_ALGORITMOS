@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Graph } from "../components/Graph";
 import { GraphToolbar } from "../components/GraphToolbar";
-import { TbRouteSquare2 } from "react-icons/tb";
+import { TbRouteSquare2, TbLayoutGrid } from "react-icons/tb";
 import styled from "styled-components";
 
 export function GraphPage() {
@@ -53,6 +53,13 @@ export function GraphPage() {
           >
             <TbRouteSquare2 />
             <span>Algoritmo de Johnson</span>
+          </AlgoritmoButton>
+          <AlgoritmoButton
+            onClick={() => setHerramienta(6)}
+            title="Algoritmo de Asignación"
+          >
+            <TbLayoutGrid />
+            <span>Algoritmo de Asignación</span>
           </AlgoritmoButton>
         </AlgoritmosHeader>
         <Graph
