@@ -6,6 +6,7 @@ import { AlgorithmsPage } from "../pages/AlgorithmsPage";
 import { HelpPage } from "../pages/HelpPage";
 import { CpmPage } from "../pages/CpmPage";
 import { AsignacionPage } from "../pages/AsignacionPage";
+import { ContactPage } from "../pages/ContactPage";
 
 export function MyRoutes() {
   return (
@@ -15,6 +16,7 @@ export function MyRoutes() {
         <Route path="/graph" element={<GraphPage />} />
         <Route path="/algorithm" element={<AlgorithmsPage />} />
         <Route path="/ayuda" element={<HelpPage />} />
+        <Route path="/contacto" element={<ContactPage />} />
         <Route path="/cpm" element={<CpmPage />} />
         <Route path="/asignacion" element={<AsignacionPage />} />
       </Route>

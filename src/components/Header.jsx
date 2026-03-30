@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
-import { FaHome, FaReadme } from "react-icons/fa";
+import { FaHome, FaReadme, FaUserCircle } from "react-icons/fa";
 import { GrGraphQl } from "react-icons/gr";
 import { IoMdHelpCircle } from "react-icons/io";
 import { HiMenuAlt3 } from "react-icons/hi";
@@ -14,6 +14,7 @@ const navItems = [
   { to: "/algorithm", label: "Algoritmos", Icon: FaReadme },
   { to: "/graph", label: "Grafo", Icon: GrGraphQl },
   { to: "/ayuda", label: "Ayuda", Icon: IoMdHelpCircle },
+  { to: "/contacto", label: "Contacto", Icon: FaUserCircle },
 ];
 
 function Header() {
