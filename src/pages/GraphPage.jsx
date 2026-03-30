@@ -47,12 +47,12 @@ export function GraphPage() {
       <MainContent>
         <AlgoritmosHeader>
           <AlgoritmosTitle>Algoritmos</AlgoritmosTitle>
-          <AlgoritmoButton 
+          <AlgoritmoButton
             onClick={() => setHerramienta(5)}
             title="Algoritmo de Johnson"
           >
             <TbRouteSquare2 />
-            <span>Johnson</span>
+            <span>Algoritmo de Johnson</span>
           </AlgoritmoButton>
         </AlgoritmosHeader>
         <Graph
