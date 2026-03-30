@@ -206,6 +206,47 @@ export function HelpPage() {
           </FeatureList>
         </ToolSection>
 
+        <Divider />
+
+        <ToolSection>
+          <ToolHeader>
+            <ToolNumber>6</ToolNumber>
+            <ToolTitle>Asignación (Algoritmo Húngaro)</ToolTitle>
+          </ToolHeader>
+          <ToolDescription>
+            Encuentra la asignación óptima entre orígenes y destinos (Minimizar o Maximizar).
+          </ToolDescription>
+          <FeatureList>
+            <Feature>
+              <FeatureIcon>🔵🟩</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>División Visual</FeatureName>
+                <FeatureDesc>
+                  Crea nodos a la izquierda para Orígenes (azul) y a la derecha para Destinos (verde).
+                </FeatureDesc>
+              </FeatureContent>
+            </Feature>
+            <Feature>
+              <FeatureIcon>🔗</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Conectar y Asignar Pesos</FeatureName>
+                <FeatureDesc>
+                  Conecta exclusivamente Orígenes con Destinos para formar la matriz de costos.
+                </FeatureDesc>
+              </FeatureContent>
+            </Feature>
+            <Feature>
+              <FeatureIcon>💡</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Variables Artificiales</FeatureName>
+                <FeatureDesc>
+                  El algoritmo balancea automáticamente si la cantidad de orígenes y destinos no es igual.
+                </FeatureDesc>
+              </FeatureContent>
+            </Feature>
+          </FeatureList>
+        </ToolSection>
+
         <TipBox>
           <TipIcon>💡</TipIcon>
           <TipText>

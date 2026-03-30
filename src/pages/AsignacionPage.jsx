@@ -382,6 +382,10 @@ export function AsignacionPage() {
       return { ...ar, isOptimal };
   });
 
+  // ---- MATRIZ EN TIEMPO REAL ----
+  const liveOrigenes = nodos.filter(n => n.x < DIVIDER_X).sort((a,b) => a.y - b.y);
+  const liveDestinos = nodos.filter(n => n.x >= DIVIDER_X).sort((a,b) => a.y - b.y);
+
   return (
     <Container>
       {notification && <Notification message={notification.message} type={notification.type} onClose={() => setNotification(null)} />}
@@ -499,6 +503,41 @@ export function AsignacionPage() {
             <SolveBtn onClick={handleResolver}>
               <FiPlay /> Resolver {modo === "minimizar" ? "(Min)" : "(Max)"}
             </SolveBtn>
+          </PanelSection>
+
+          <PanelDivider />
+          
+          <PanelSection>
+            <PanelTitle><FiGrid style={{ marginRight: 6 }} /> Matriz Actual ({liveOrigenes.length}×{liveDestinos.length})</PanelTitle>
+            {liveOrigenes.length > 0 && liveDestinos.length > 0 ? (
+              <MatrizScroll>
+                <MiniTable>
+                  <thead>
+                    <tr>
+                      <MiniCorner />
+                      {liveDestinos.map(d => <MiniTh key={d.id}>{d.label}</MiniTh>)}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {liveOrigenes.map((o) => (
+                      <tr key={o.id}>
+                        <MiniThRow>{o.label}</MiniThRow>
+                        {liveDestinos.map((d) => {
+                          const ar = aristas.find(a => (a.from === o.id && a.to === d.id) || (a.to === o.id && a.from === d.id));
+                          return (
+                            <MiniTd key={d.id} $zero={!ar}>
+                              {ar ? ar.weight : "-"}
+                            </MiniTd>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </MiniTable>
+              </MatrizScroll>
+            ) : (
+              <InfoBox>Añade Orígenes (izq) y Destinos (der) para ver la matriz.</InfoBox>
+            )}
           </PanelSection>
 
           {resultado && (
@@ -846,9 +885,46 @@ const PasoMatrizScroll = styled.div` overflow-x: auto; margin-top: 6px; `;
 
 const MiniTable = styled.table` border-collapse: collapse; min-width: max-content; `;
 
+const MatrizScroll = styled.div`
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+
+  &::-webkit-scrollbar { height: 4px; }
+  &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 2px; }
+`;
+
+const MiniCorner = styled.th`
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  min-width: 60px;
+`;
+
+const MiniTh = styled.th`
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #4ade80;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  white-space: nowrap;
+`;
+
+const MiniThRow = styled.td`
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #60a5fa;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  white-space: nowrap;
+`;
+
 const MiniTd = styled.td`
   padding: 6px 10px; text-align: center; font-size: 13px; font-weight: ${(p) => (p.$zero ? "800" : "600")};
-  color: ${(p) => (p.$zero ? "#4ade80" : "#cbd5e1")};
-  background: ${(p) => p.$zero ? "rgba(34, 197, 94, 0.15)" : "transparent"};
+  color: ${(p) => (p.$zero ? "rgba(255, 255, 255, 0.3)" : "#cbd5e1")};
+  background: ${(p) => p.$zero ? "transparent" : "rgba(59, 130, 246, 0.1)"};
   border: 1px solid rgba(255, 255, 255, 0.1);
 `;
