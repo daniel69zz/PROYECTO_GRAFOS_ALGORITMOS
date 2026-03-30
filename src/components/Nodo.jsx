@@ -88,7 +88,7 @@ const CpmTop = styled.div`
   justify-content: center;
 
   font-weight: 900;
-  font-size: 28px;
+  font-size: 15px;
   line-height: 1;
   color: rgba(255, 255, 255, 0.95);
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
