@@ -15,8 +15,10 @@ const toolbarLinks = [
 
 const toolbarOptions = [
   { label: "Matriz", Icon: TbMatrix, op: 4 },
+
   { label: "CPM", Icon: TbRouteSquare2, op: 5 },
   { label: "Asignación", Icon: TbLayoutGrid, op: 6 },
+
 ];
 
 const fileOptions = [
@@ -42,8 +44,6 @@ export function GraphToolbar({
       onImportar?.();
     }
   };
-
-
 
   return (
     <Container $isOpen={isOpen} data-toolbar="true">
@@ -290,11 +290,11 @@ const ToolButton = styled.button`
 
   &:hover {
     background: ${({ $active, $disabled }) =>
-      $disabled
-        ? "rgba(255, 255, 255, 0.02)"
-        : $active
-          ? "var(--accent-hover)"
-          : "rgba(255, 255, 255, 0.08)"};
+    $disabled
+      ? "rgba(255, 255, 255, 0.02)"
+      : $active
+        ? "var(--accent-hover)"
+        : "rgba(255, 255, 255, 0.08)"};
     color: var(--text-primary);
 
     svg {
@@ -449,7 +449,7 @@ const ToggleButton = styled.button`
   svg {
     font-size: 20px;
     transform: ${({ $isOpen }) =>
-      $isOpen ? "rotate(0deg)" : "rotate(180deg)"};
+    $isOpen ? "rotate(0deg)" : "rotate(180deg)"};
     transition: transform var(--transition-bounce);
   }
 
