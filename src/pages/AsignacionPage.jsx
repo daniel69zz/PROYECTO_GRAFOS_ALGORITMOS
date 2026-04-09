@@ -11,6 +11,8 @@ import {
   FiPlay, FiChevronDown, FiChevronUp, FiArrowRight, FiGrid
 } from "react-icons/fi";
 import { TbArrowBackUp } from "react-icons/tb";
+import { exportar_grafo, importar_grafo } from "../utils/exp_imp_grafo";
+import { ExportModal } from "../components/ExportModal";
 
 const DIVIDER_X = 500; // Línea divisoria visual y lógica (izquierda=Origen, derecha=Destino)
 
@@ -111,6 +113,9 @@ export function AsignacionPage() {
   // UI
   const [editMenu, setEditMenu] = useState(null);
   const [notification, setNotification] = useState(null);
+  const [exportModal, setExportModal] = useState(false);
+  const [suggestedName, setSuggestedName] = useState("");
+  const fileInputRef = useRef(null);
 
   // Resolución
   const [modo, setModo] = useState("minimizar");
@@ -277,6 +282,54 @@ export function AsignacionPage() {
     setOffset({ x: e.clientX - panStart.current.x, y: e.clientY - panStart.current.y });
   };
   const handleMouseUp = () => setIsPanning(false);
+  
+  // ---- IMPORTAR / EXPORTAR ----
+  const handleExportar = () => {
+    const nombreSugerido = `asignacion_${new Date().toLocaleDateString().replace(/\//g, "-")}`;
+    setSuggestedName(nombreSugerido);
+    setExportModal(true);
+  };
+
+  const confirmExport = (nombreArchivo) => {
+    try {
+      const nombreFinal = nombreArchivo.trim() || suggestedName;
+      exportar_grafo(nodos, aristas, nextId.current, nombreFinal);
+      showNotification("Grafo de asignación exportado correctamente", "success");
+      setExportModal(false);
+    } catch (e) {
+      console.error("Error al exportar:", e);
+      showNotification(`Error al exportar:\n${e.message}`, "error");
+    }
+  };
+
+  const handleImportar = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      const grafo_data = await importar_grafo(file);
+      setNodos(grafo_data.nodos);
+      setAristas(grafo_data.aristas);
+      nextId.current = grafo_data.nextId;
+
+      setNodo_seleccionado(null);
+      setWeight_input(null);
+      setWeight_value("1");
+      setEditMenu(null);
+      setOffset({ x: 0, y: 0 });
+      setResultado(null);
+
+      showNotification("Grafo importado correctamente", "success");
+    } catch (e) {
+      console.error("Error al importar:", e);
+      showNotification(`Error al importar:\n${e.message}`, "error");
+    }
+    event.target.value = "";
+  };
+
+  const abrirSelectorArchivo = () => {
+    fileInputRef.current?.click();
+  };
 
   // ---- ALGORITMO ----
   const handleResolver = () => {
@@ -417,8 +470,26 @@ export function AsignacionPage() {
         herramienta={herramienta}
         setHerramienta={setHerramienta}
         onClear={handleClear}
+        onExportar={handleExportar}
+        onImportar={abrirSelectorArchivo}
         tieneAristasNoDirigidas={tieneAristasNoDirigidas}
       />
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json"
+        style={{ display: "none" }}
+        onChange={handleImportar}
+      />
+
+      {exportModal && (
+        <ExportModal
+          defaultName={suggestedName}
+          onConfirm={confirmExport}
+          onCancel={() => setExportModal(false)}
+        />
+      )}
       
       <ContentWrapper>
         {/* PIZARRA */}
@@ -437,7 +508,7 @@ export function AsignacionPage() {
                   <polygon points="0 0, 10 3, 0 6" fill="black" />
                 </marker>
                 <marker id="arrowhead-optimal" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                  <polygon points="0 0, 10 3, 0 6" fill="#22c55e" />
+                  <polygon points="0 0, 10 3, 0 6" fill="#ef4444" />
                 </marker>
               </defs>
               
@@ -454,8 +525,9 @@ export function AsignacionPage() {
                   existeContraria={existeAristaContraria(aristas, ar.from, ar.to)}
                   herramienta={herramienta}
                   onAristaClick={handleAristaClick}
-                  customStroke={ar.isOptimal ? "#22c55e" : null}
+                  customStroke={ar.isOptimal ? "#ef4444" : null}
                   customStrokeWidth={ar.isOptimal ? 4 : null}
+                  customMarkerEnd={ar.isOptimal ? "url(#arrowhead-optimal)" : null}
                 />
               ))}
             </SvgCanvas>
@@ -540,13 +612,14 @@ export function AsignacionPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {liveOrigenes.map((o) => (
+                    {liveOrigenes.map((o, oIdx) => (
                       <tr key={o.id}>
                         <MiniThRow>{o.label}</MiniThRow>
-                        {liveDestinos.map((d) => {
+                        {liveDestinos.map((d, dIdx) => {
                           const ar = aristas.find(a => (a.from === o.id && a.to === d.id) || (a.to === o.id && a.from === d.id));
+                          const isOpt = resultado?.asignacionesReales.some(a => a.fila === oIdx && a.columna === dIdx);
                           return (
-                            <MiniTd key={d.id} $zero={!ar}>
+                            <MiniTd key={d.id} $zero={!ar} $isOptimal={isOpt}>
                               {ar ? ar.weight : "-"}
                             </MiniTd>
                           );
@@ -582,7 +655,7 @@ export function AsignacionPage() {
                   {resultado.asignacionesReales.map((a, idx) => (
                     <AsignItem key={idx}>
                       <Badge $type="origen">{resultado.origenes[a.fila]?.label}</Badge>
-                      <FiArrowRight style={{ flexShrink: 0, color: "#22c55e" }} />
+                      <FiArrowRight style={{ flexShrink: 0, color: "#ef4444" }} />
                       <Badge $type="destino">{resultado.destinos[a.columna]?.label}</Badge>
                       <CostTag>{resultado.matrizOriginal[a.fila][a.columna]}</CostTag>
                     </AsignItem>
@@ -616,11 +689,15 @@ export function AsignacionPage() {
                                 <tbody>
                                   {paso.matriz.map((fila, i) => (
                                     <tr key={i}>
-                                      {fila.map((val, j) => (
-                                        <MiniTd key={j} $zero={val === 0}>
-                                          {val === 999999 || val === -999999 ? "∞" : val}
-                                        </MiniTd>
-                                      ))}
+                                      {fila.map((val, j) => {
+                                        // Highlight if it's an optimal assignment (including ficticious ones if they match the step matrix)
+                                        const isOpt = resultado?.asignaciones.some(a => a.fila === i && a.columna === j);
+                                        return (
+                                          <MiniTd key={j} $zero={val === 0} $isOptimal={isOpt}>
+                                            {val === 999999 || val === -999999 ? "∞" : val}
+                                          </MiniTd>
+                                        );
+                                      })}
                                     </tr>
                                   ))}
                                 </tbody>
@@ -992,8 +1069,10 @@ const MiniThRow = styled.td`
 `;
 
 const MiniTd = styled.td`
-  padding: 6px 10px; text-align: center; font-size: 13px; font-weight: ${(p) => (p.$zero ? "800" : "600")};
+  padding: 6px 10px; text-align: center; font-size: 13px; font-weight: ${(p) => (p.$zero || p.$isOptimal ? "800" : "600")};
   color: ${(p) => (p.$zero ? "rgba(255, 255, 255, 0.3)" : "#cbd5e1")};
-  background: ${(p) => p.$zero ? "transparent" : "rgba(59, 130, 246, 0.1)"};
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: ${(p) => p.$isOptimal ? "rgba(239, 68, 68, 0.2)" : (p.$zero ? "transparent" : "rgba(59, 130, 246, 0.1)")};
+  border: 1px solid ${(p) => p.$isOptimal ? "#ef4444" : "rgba(255, 255, 255, 0.1)"};
+  box-shadow: ${(p) => p.$isOptimal ? "inset 0 0 8px rgba(239, 68, 68, 0.2)" : "none"};
+  transition: all 0.3s ease;
 `;

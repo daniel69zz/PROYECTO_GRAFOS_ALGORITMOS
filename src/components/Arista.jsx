@@ -4,6 +4,9 @@ export function Arista({
   existeContraria,
   herramienta,
   onAristaClick,
+  customStroke,
+  customStrokeWidth,
+  customMarkerEnd,
 }) {
   const nodo_a = nodos.find((n) => n.id === ar.from);
   const nodo_b = nodos.find((n) => n.id === ar.to);
@@ -30,6 +33,10 @@ export function Arista({
     if (Object.is(slack, -0)) slack = 0;
   }
   const isCritical = slack === 0;
+
+  const strokeColor = customStroke || (isCritical ? "#ff1744" : "black");
+  const strokeWidth = customStrokeWidth || "3";
+  const markerEnd = customMarkerEnd || (esDirigida ? "url(#arrowhead)" : undefined);
 
   const clickStyle = {
     stroke: "transparent",
@@ -87,10 +94,10 @@ export function Arista({
       <g>
         <path
           d={pathD}
-          stroke={isCritical ? "#ff1744" : "black"}
-          strokeWidth="3"
+          stroke={customStroke || (isCritical ? "#ff1744" : "black")}
+          strokeWidth={customStrokeWidth || "3"}
           fill="none"
-          markerEnd={esDirigida ? "url(#arrowhead)" : undefined}
+          markerEnd={customMarkerEnd || (esDirigida ? "url(#arrowhead)" : undefined)}
         />
         <path d={pathD} style={clickStyle} onClick={handleClick} />
 
@@ -159,10 +166,10 @@ export function Arista({
       <g>
         <path
           d={pathD}
-          stroke={isCritical ? "#ff1744" : "black"}
-          strokeWidth="3"
+          stroke={customStroke || (isCritical ? "#ff1744" : "black")}
+          strokeWidth={customStrokeWidth || "3"}
           fill="none"
-          markerEnd={esDirigida ? "url(#arrowhead)" : undefined}
+          markerEnd={customMarkerEnd || (esDirigida ? "url(#arrowhead)" : undefined)}
         />
         <path d={pathD} style={clickStyle} onClick={handleClick} />
 
@@ -205,9 +212,9 @@ export function Arista({
         y1={y1}
         x2={x2}
         y2={y2}
-        stroke={isCritical ? "#ff1744" : "black"}
-        strokeWidth="3"
-        markerEnd={esDirigida ? "url(#arrowhead)" : undefined}
+        stroke={customStroke || (isCritical ? "#ff1744" : "black")}
+        strokeWidth={customStrokeWidth || "3"}
+        markerEnd={customMarkerEnd || (esDirigida ? "url(#arrowhead)" : undefined)}
       />
       <line
         x1={x1}
