@@ -34,6 +34,10 @@ export function Arista({
   }
   const isCritical = slack === 0;
 
+  const strokeColor = customStroke || (isCritical ? "#ff1744" : "black");
+  const strokeWidth = customStrokeWidth || "3";
+  const markerEnd = customMarkerEnd || (esDirigida ? "url(#arrowhead)" : undefined);
+
   const clickStyle = {
     stroke: "transparent",
     strokeWidth: 20,
@@ -90,10 +94,10 @@ export function Arista({
       <g>
         <path
           d={pathD}
-          stroke={isCritical ? "#ff1744" : "black"}
-          strokeWidth="3"
+          stroke={strokeColor}
+          strokeWidth={strokeWidth}
           fill="none"
-          markerEnd={esDirigida ? "url(#arrowhead)" : undefined}
+          markerEnd={markerEnd}
         />
         <path d={pathD} style={clickStyle} onClick={handleClick} />
 
@@ -162,10 +166,10 @@ export function Arista({
       <g>
         <path
           d={pathD}
-          stroke={isCritical ? "#ff1744" : "black"}
-          strokeWidth="3"
+          stroke={strokeColor}
+          strokeWidth={strokeWidth}
           fill="none"
-          markerEnd={esDirigida ? "url(#arrowhead)" : undefined}
+          markerEnd={markerEnd}
         />
         <path d={pathD} style={clickStyle} onClick={handleClick} />
 
@@ -208,9 +212,9 @@ export function Arista({
         y1={y1}
         x2={x2}
         y2={y2}
-        stroke={isCritical ? "#ff1744" : "black"}
-        strokeWidth="3"
-        markerEnd={esDirigida ? "url(#arrowhead)" : undefined}
+        stroke={strokeColor}
+        strokeWidth={strokeWidth}
+        markerEnd={markerEnd}
       />
       <line
         x1={x1}
