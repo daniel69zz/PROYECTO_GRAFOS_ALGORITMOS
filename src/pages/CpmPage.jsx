@@ -583,22 +583,49 @@ export function CpmPage() {
                 >
                   <polygon points="0 0, 10 3, 0 6" fill="black" />
                 </marker>
+                <marker id="arrowhead-optimal" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                  <polygon points="0 0, 10 3, 0 6" fill="#22c55e" />
+                </marker>
               </defs>
 
-              {aristas.map((ar, index) => (
-                <Arista
-                  key={index}
-                  ar={ar}
-                  nodos={nodos}
-                  existeContraria={existeAristaContraria(
-                    aristas,
-                    ar.from,
-                    ar.to,
-                  )}
-                  herramienta={5} // Herramienta 5 siempre que representa al CPM
-                  onAristaClick={() => {}} // no editable
-                />
-              ))}
+              {aristas.map((ar, index) => {
+                let isCritical = false;
+                if (cpmResult) {
+                  const u = nodos.find(n => n.id === ar.from);
+                  const v = nodos.find(n => n.id === ar.to);
+                  if (u && v) {
+                    const teU = getTE(u);
+                    const tlU = getTL(u);
+                    const teV = getTE(v);
+                    const tlV = getTL(v);
+                    if (teU != null && tlU != null && teV != null && tlV != null) {
+                      if (teU === tlU && teV === tlV) {
+                        const weight = Number(ar.weight) || 0;
+                        if (teU + weight === teV) {
+                          isCritical = true;
+                        }
+                      }
+                    }
+                  }
+                }
+
+                return (
+                  <Arista
+                    key={index}
+                    ar={{ ...ar, isOptimal: isCritical }}
+                    nodos={nodos}
+                    existeContraria={existeAristaContraria(
+                      aristas,
+                      ar.from,
+                      ar.to,
+                    )}
+                    herramienta={5} // Herramienta 5 siempre que representa al CPM
+                    onAristaClick={() => {}} // no editable
+                    customStroke={isCritical ? "#22c55e" : null}
+                    customStrokeWidth={isCritical ? 4 : null}
+                  />
+                );
+              })}
             </SvgCanvas>
 
             {nodos.map((node) => (

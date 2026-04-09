@@ -6,6 +6,8 @@ import { Nodo } from "../components/Nodo";
 import { Arista } from "../components/Arista";
 import { EditMenu } from "../components/EditMenu";
 import { Notification } from "../components/Notification";
+import { ExportModal } from "../components/ExportModal";
+import { exportar_grafo, importar_grafo } from "../utils/exp_imp_grafo";
 import { resolverAsignacion, padMatrizCuadrada } from "../utils/hungaro";
 import {
   FiPlay, FiChevronDown, FiChevronUp, FiArrowRight, FiGrid
@@ -139,6 +141,53 @@ export function AsignacionPage() {
   }, [herramienta, navigate, nodos, aristas, tieneAristasNoDirigidas]);
 
   const showNotification = (message, type = "info") => setNotification({ message, type });
+
+  // ---- EXPORT / IMPORT ----
+  const [exportModal, setExportModal] = useState(false);
+  const [suggestedName, setSuggestedName] = useState("");
+  const fileInputRef = useRef(null);
+
+  const handleExportar = () => {
+    const nombreSugerido = `asignacion_${new Date().toLocaleDateString().replace(/\//g, "-")}`;
+    setSuggestedName(nombreSugerido);
+    setExportModal(true);
+  };
+
+  const confirmExport = (nombreArchivo) => {
+    try {
+      const nombreFinal = nombreArchivo.trim() || suggestedName;
+      exportar_grafo(nodos, aristas, nextId.current, nombreFinal);
+      showNotification("Grafo exportado correctamente", "success");
+      setExportModal(false);
+    } catch (e) {
+      console.error("Error al exportar:", e);
+      showNotification(`Error al exportar el grafo:\n${e.message}`, "error");
+    }
+  };
+
+  const handleImportar = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      const grafo_data = await importar_grafo(file);
+      setNodos(grafo_data.nodos);
+      setAristas(grafo_data.aristas);
+      nextId.current = grafo_data.nextId;
+      setNodo_seleccionado(null);
+      setWeight_input(null);
+      setWeight_value("1");
+      setEditMenu(null);
+      setOffset({ x: 0, y: 0 });
+      setResultado(null);
+
+      showNotification("Grafo importado correctamente", "success");
+    } catch (e) {
+      console.error("Error al importar:", e);
+      showNotification(`Grafo NO IMPORTADO\n${e.message}`, "error");
+    }
+    event.target.value = "";
+  };
 
   // ---- CREACIÓN Y MANEJO DE NODOS ----
   const handleDoubleClick = (e) => {
@@ -462,8 +511,23 @@ export function AsignacionPage() {
       </Header>
 
       <Container>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json"
+        style={{ display: "none" }}
+        onChange={handleImportar}
+      />
       {notification && <Notification message={notification.message} type={notification.type} onClose={() => setNotification(null)} />}
       
+      {exportModal && (
+        <ExportModal
+          defaultName={suggestedName}
+          onConfirm={confirmExport}
+          onCancel={() => setExportModal(false)}
+        />
+      )}
+
       <GraphToolbar
         isOpen={isToolbarOpen}
         setIsOpen={setIsToolbarOpen}
@@ -473,6 +537,8 @@ export function AsignacionPage() {
         onExportar={handleExportar}
         onImportar={abrirSelectorArchivo}
         tieneAristasNoDirigidas={tieneAristasNoDirigidas}
+        onExportar={handleExportar}
+        onImportar={() => fileInputRef.current?.click()}
       />
 
       <input
@@ -619,7 +685,7 @@ export function AsignacionPage() {
                           const ar = aristas.find(a => (a.from === o.id && a.to === d.id) || (a.to === o.id && a.from === d.id));
                           const isOpt = resultado?.asignacionesReales.some(a => a.fila === oIdx && a.columna === dIdx);
                           return (
-                            <MiniTd key={d.id} $zero={!ar} $isOptimal={isOpt}>
+                            <MiniTd key={d.id} $zero={!ar}>
                               {ar ? ar.weight : "-"}
                             </MiniTd>
                           );
@@ -1069,10 +1135,8 @@ const MiniThRow = styled.td`
 `;
 
 const MiniTd = styled.td`
-  padding: 6px 10px; text-align: center; font-size: 13px; font-weight: ${(p) => (p.$zero || p.$isOptimal ? "800" : "600")};
+  padding: 6px 10px; text-align: center; font-size: 13px; font-weight: ${(p) => (p.$zero ? "800" : "600")};
   color: ${(p) => (p.$zero ? "rgba(255, 255, 255, 0.3)" : "#cbd5e1")};
-  background: ${(p) => p.$isOptimal ? "rgba(239, 68, 68, 0.2)" : (p.$zero ? "transparent" : "rgba(59, 130, 246, 0.1)")};
-  border: 1px solid ${(p) => p.$isOptimal ? "#ef4444" : "rgba(255, 255, 255, 0.1)"};
-  box-shadow: ${(p) => p.$isOptimal ? "inset 0 0 8px rgba(239, 68, 68, 0.2)" : "none"};
-  transition: all 0.3s ease;
+  background: ${(p) => p.$zero ? "transparent" : "rgba(59, 130, 246, 0.1)"};
+  border: 1px solid rgba(255, 255, 255, 0.1);
 `;
