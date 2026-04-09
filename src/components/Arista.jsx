@@ -4,6 +4,8 @@ export function Arista({
   existeContraria,
   herramienta,
   onAristaClick,
+  customStroke,
+  customStrokeWidth,
 }) {
   const nodo_a = nodos.find((n) => n.id === ar.from);
   const nodo_b = nodos.find((n) => n.id === ar.to);
@@ -30,6 +32,10 @@ export function Arista({
     if (Object.is(slack, -0)) slack = 0;
   }
   const isCritical = slack === 0;
+
+  const strokeColor = customStroke || (isCritical ? "#22c55e" : "black");
+  const strokeWidthVal = customStrokeWidth || (isCritical ? 4 : 3);
+  const isArrowOptimal = strokeColor === "#22c55e";
 
   const clickStyle = {
     stroke: "transparent",
@@ -59,7 +65,7 @@ export function Arista({
         dominantBaseline="middle"
         fontSize="14"
         fontWeight="900"
-        fill={isCritical ? "#ff1744" : "black"}
+        fill={strokeColor}
         stroke="white"
         strokeWidth="3"
         paintOrder="stroke"
@@ -87,10 +93,10 @@ export function Arista({
       <g>
         <path
           d={pathD}
-          stroke={isCritical ? "#ff1744" : "black"}
-          strokeWidth="3"
+          stroke={strokeColor}
+          strokeWidth={strokeWidthVal}
           fill="none"
-          markerEnd={esDirigida ? "url(#arrowhead)" : undefined}
+          markerEnd={esDirigida ? (isArrowOptimal ? "url(#arrowhead-optimal)" : "url(#arrowhead)") : undefined}
         />
         <path d={pathD} style={clickStyle} onClick={handleClick} />
 
@@ -159,10 +165,10 @@ export function Arista({
       <g>
         <path
           d={pathD}
-          stroke={isCritical ? "#ff1744" : "black"}
-          strokeWidth="3"
+          stroke={strokeColor}
+          strokeWidth={strokeWidthVal}
           fill="none"
-          markerEnd={esDirigida ? "url(#arrowhead)" : undefined}
+          markerEnd={esDirigida ? (isArrowOptimal ? "url(#arrowhead-optimal)" : "url(#arrowhead)") : undefined}
         />
         <path d={pathD} style={clickStyle} onClick={handleClick} />
 
@@ -205,9 +211,9 @@ export function Arista({
         y1={y1}
         x2={x2}
         y2={y2}
-        stroke={isCritical ? "#ff1744" : "black"}
-        strokeWidth="3"
-        markerEnd={esDirigida ? "url(#arrowhead)" : undefined}
+        stroke={strokeColor}
+        strokeWidth={strokeWidthVal}
+        markerEnd={esDirigida ? (isArrowOptimal ? "url(#arrowhead-optimal)" : "url(#arrowhead)") : undefined}
       />
       <line
         x1={x1}
