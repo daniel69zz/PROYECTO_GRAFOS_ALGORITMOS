@@ -1,17 +1,6 @@
-/**
- * Convierte un grafo (nodos + aristas) en una matriz de costos
- * para el algoritmo de asignación.
- *
- * Nuevo modelo: clasifica los nodos en Orígenes y Destinos
- * según las aristas dirigidas. La matriz resultante puede ser rectangular.
- * Si no es cuadrada, se indica para que el caller añada variables artificiales.
- *
- * @param {Array} nodos - Array de nodos del grafo: [{ id, label, x, y, ... }]
- * @param {Array} aristas - Array de aristas: [{ from, to, weight, tipo }]
- * @returns {{ valida: boolean, error: string|null, matriz: number[][]|null, nombresOrigenes: string[]|null, nombresDestinos: string[]|null }}
- */
+
 export function grafoAMatrizAsignacion(nodos, aristas) {
-  // --- Validación 1: Al menos 1 arista ---
+
   if (!aristas || aristas.length < 1) {
     return {
       valida: false,
@@ -22,7 +11,7 @@ export function grafoAMatrizAsignacion(nodos, aristas) {
     };
   }
 
-  // --- Validación 2: Todas las aristas deben ser dirigidas ---
+
   const noDirigidas = aristas.filter((ar) => ar.tipo === "no_dirigida");
   if (noDirigidas.length > 0) {
     return {
@@ -34,14 +23,14 @@ export function grafoAMatrizAsignacion(nodos, aristas) {
     };
   }
 
-  // Mapear nodos por ID para búsqueda rápida
+
   const nodoMap = new Map();
   for (const nodo of nodos) {
     nodoMap.set(nodo.id, nodo);
   }
 
-  // Clasificar nodos: los que aparecen como "from" son orígenes,
-  // los que aparecen como "to" son destinos
+
+
   const origenIds = new Set();
   const destinoIds = new Set();
   for (const ar of aristas) {
@@ -49,7 +38,7 @@ export function grafoAMatrizAsignacion(nodos, aristas) {
     destinoIds.add(ar.to);
   }
 
-  // Convertir a arrays ordenados
+
   const origenes = [...origenIds].map((id) => {
     const nodo = nodoMap.get(id);
     return { id, label: nodo?.label || `Nodo ${id}` };
@@ -72,14 +61,14 @@ export function grafoAMatrizAsignacion(nodos, aristas) {
   const m = origenes.length;
   const n = destinos.length;
 
-  // Crear mapa de aristas para búsqueda rápida
+
   const aristaMap = new Map();
   for (const ar of aristas) {
     const key = `${ar.from}->${ar.to}`;
     aristaMap.set(key, ar);
   }
 
-  // Construir la matriz m×n
+
   const nombresOrigenes = origenes.map((o) => o.label);
   const nombresDestinos = destinos.map((d) => d.label);
   const matriz = Array.from({ length: m }, () => Array(n).fill(0));
@@ -101,7 +90,7 @@ export function grafoAMatrizAsignacion(nodos, aristas) {
         }
         matriz[i][j] = peso || 0;
       }
-      // Si no existe la arista, queda en 0
+
     }
   }
 

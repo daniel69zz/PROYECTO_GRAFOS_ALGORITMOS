@@ -5,7 +5,7 @@ import { Nodo } from "../components/Nodo";
 import { Arista } from "../components/Arista";
 import { Notification } from "../components/Notification";
 import { CpmControls } from "../components/CpmControls";
-import { TbArrowBackUp } from "react-icons/tb"; // Usa icon o boton estandar
+import { TbArrowBackUp } from "react-icons/tb";
 
 const clearTEOnNodes = (nodos, id) =>
   nodos.map((n) =>
@@ -86,8 +86,8 @@ export function CpmPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Load the graph from location state
-  // Keep a clean snapshot (no CPM data) to return to the graph editor
+
+
   const originalNodos = (location.state?.nodos ?? []).map(
     ({ cpm, ...rest }) => rest,
   );
@@ -104,7 +104,7 @@ export function CpmPage() {
   const [cpmBackwardIndex, setCpmBackwardIndex] = useState(0);
 
   const [showConfigModal, setShowConfigModal] = useState(true);
-  const [cpmMode, setCpmMode] = useState("maximizar"); // "maximizar" | "minimizar"
+  const [cpmMode, setCpmMode] = useState("maximizar");
 
   const [cpmOrigenId, setCpmOrigenId] = useState(null);
   const [cpmDestinoId, setCpmDestinoId] = useState(null);
@@ -114,19 +114,19 @@ export function CpmPage() {
 
   const [notification, setNotification] = useState(null);
   const [showResultModal, setShowResultModal] = useState(false);
-  const [cpmResult, setCpmResult] = useState(null); // { duracion, modo }
+  const [cpmResult, setCpmResult] = useState(null);
 
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const panStart = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
-    // Si no hay nodos, o alguien entró por URL directo sin `state`
+
     if (!location.state?.nodos || location.state.nodos.length === 0) {
       showNotification("No se recibió ningún grafo para aplicar CPM.", "error");
     }
 
-    // Al entrar, limpiar los TEs/TLs pasados por si venian calculados
+
     if (location.state?.nodos) {
       setNodos((prev) =>
         prev.map((n) => ({
@@ -281,7 +281,7 @@ export function CpmPage() {
         "Backward terminado (no hay más nodos por resolver).",
         "success",
       );
-      // Mostrar modal de resultado si ya hay TE en el destino
+
       const destNode = nodos.find((n) => n.id === cpmDestinoId);
       const duracion = getTE(destNode);
       if (duracion != null) {
@@ -502,7 +502,7 @@ export function CpmPage() {
       "success",
     );
 
-    // Mostrar modal de resultado
+
     setCpmResult({ duracion: teDest, modo: cpmMode });
     setShowResultModal(true);
   };
@@ -510,10 +510,10 @@ export function CpmPage() {
   const disabledPrev =
     (cpmBackwardIndex ?? 0) === 0 && (cpmForwardIndex ?? 0) === 0;
 
-  // Visual/Canvas Interactions
+
   const handleNodeClick = (id, e) => {
-    // Si el modal está abierto, ignorar clicks en el canvas manuales (opcional).
-    // Lo dejamos para que si lo cierran, sigan pudiendo.
+
+
     handleCpmPickNode(id);
   };
 
@@ -619,8 +619,8 @@ export function CpmPage() {
                       ar.from,
                       ar.to,
                     )}
-                    herramienta={5} // Herramienta 5 siempre que representa al CPM
-                    onAristaClick={() => {}} // no editable
+                    herramienta={5}
+                    onAristaClick={() => {}}
                     customStroke={isCritical ? "#22c55e" : null}
                     customStrokeWidth={isCritical ? 4 : null}
                   />
@@ -636,8 +636,8 @@ export function CpmPage() {
                 seleccionado={
                   node.id === cpmOrigenId || node.id === cpmDestinoId
                 }
-                onDrag={() => {}} // no se mueven
-                herramienta={5} // CPM read-only node style
+                onDrag={() => {}}
+                herramienta={5}
               />
             ))}
           </Canvas>
@@ -829,7 +829,7 @@ export function CpmPage() {
             setCpmBackwardIndex(0);
             setShowResultModal(false);
             setCpmResult(null);
-            setShowConfigModal(true); // Vuelve a abrir el modal
+            setShowConfigModal(true);
           }}
           onPrev={cpmPrev}
           onNext={cpmNext}

@@ -1,10 +1,8 @@
  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
 
- /* ========================================
-   DESIGN SYSTEM (CSS VARIABLES)
-   ======================================== */
+
  :root {
-   /* Colors - Premium Velvet Blue & Slate Theme */
+
    --bg-color: #0d1117;
    --bg-card: rgba(22, 27, 34, 0.6);
    --bg-card-hover: rgba(33, 38, 45, 0.8);
@@ -14,30 +12,28 @@
    --accent-hover: #79c0ff;
    --accent-glow: rgba(88, 166, 255, 0.3);
 
-   /* Green/Success Accent */
+
    --success-color: #238636;
    --success-hover: #2ea043;
 
-   /* Borders & Shadows */
+
    --border-color: rgba(240, 246, 252, 0.1);
    --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
 
-   /* Glassmorphism */
+
    --glass-bg: rgba(13, 17, 23, 0.7);
    --glass-border: rgba(255, 255, 255, 0.08);
    --glass-blur: blur(12px);
 
-   /* Transitions */
+
    --transition-fast: 0.15s ease-in-out;
    --transition-normal: 0.3s ease;
    --transition-bounce: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
  }
 
- /* ========================================
-   RESET Y BASE
-   ======================================== */
+
 
  *,
  *::before,
@@ -77,9 +73,7 @@
    flex-direction: column;
  }
 
- /* ========================================
-   SCROLLBAR PERSONALIZADO
-   ======================================== */
+
 
  ::-webkit-scrollbar {
    width: 10px;
@@ -105,9 +99,7 @@
    scrollbar-color: #30363d var(--bg-color);
  }
 
- /* ========================================
-   SELECTION
-   ======================================== */
+
 
  ::selection {
    background-color: var(--accent-color);

@@ -1,10 +1,4 @@
-/**
- * Convierte una matriz rectangular m×n en una matriz cuadrada max(m,n)×max(m,n)
- * añadiendo filas o columnas ficticias ("variables artificiales") con costo 0.
- *
- * @param {number[][]} matriz - Matriz rectangular de costos
- * @returns {{ matrizCuadrada: number[][], filasFicticias: number[], columnasFicticias: number[], tamanoOriginal: {filas: number, columnas: number} }}
- */
+
 export function padMatrizCuadrada(matriz) {
   const filas = matriz.length;
   const columnas = matriz[0]?.length ?? 0;
@@ -13,7 +7,7 @@ export function padMatrizCuadrada(matriz) {
   const filasFicticias = [];
   const columnasFicticias = [];
 
-  // Clonar y extender columnas si faltan
+
   const matrizCuadrada = matriz.map((fila) => {
     const nuevaFila = [...fila];
     while (nuevaFila.length < n) {
@@ -22,12 +16,12 @@ export function padMatrizCuadrada(matriz) {
     return nuevaFila;
   });
 
-  // Registrar columnas ficticias
+
   for (let j = columnas; j < n; j++) {
     columnasFicticias.push(j);
   }
 
-  // Agregar filas ficticias si faltan
+
   while (matrizCuadrada.length < n) {
     const idx = matrizCuadrada.length;
     filasFicticias.push(idx);
@@ -42,22 +36,15 @@ export function padMatrizCuadrada(matriz) {
   };
 }
 
-/**
- * Algoritmo Húngaro (Hungarian Algorithm)
- * Resuelve el problema de asignación para minimización y maximización.
- *
- * @param {number[][]} matrizOriginal - Matriz de costos n×n
- * @param {"minimizar"|"maximizar"} modo - Objetivo de optimización
- * @returns {{ asignaciones, costoTotal, pasos, matrizResultado }}
- */
+
 export function resolverAsignacion(matrizOriginal, modo = "minimizar") {
   const n = matrizOriginal.length;
   const pasos = [];
 
-  // Clonar la matriz original
+
   let matriz = matrizOriginal.map((f) => [...f]);
 
-  // --- Para MAXIMIZACIÓN: convertir a minimización ---
+
   if (modo === "maximizar") {
     const maxVal = Math.max(...matriz.flat());
     matriz = matriz.map((fila) => fila.map((v) => maxVal - v));
@@ -68,7 +55,7 @@ export function resolverAsignacion(matrizOriginal, modo = "minimizar") {
     });
   }
 
-  // --- PASO 1: Restar mínimo de cada fila ---
+
   for (let i = 0; i < n; i++) {
     const minFila = Math.min(...matriz[i]);
     for (let j = 0; j < n; j++) {
@@ -82,7 +69,7 @@ export function resolverAsignacion(matrizOriginal, modo = "minimizar") {
     matriz: matriz.map((f) => [...f]),
   });
 
-  // --- PASO 2: Restar mínimo de cada columna ---
+
   for (let j = 0; j < n; j++) {
     let minCol = Infinity;
     for (let i = 0; i < n; i++) {
@@ -99,25 +86,25 @@ export function resolverAsignacion(matrizOriginal, modo = "minimizar") {
     matriz: matriz.map((f) => [...f]),
   });
 
-  // --- PASO 3–5: Cubrir ceros con líneas mínimas y ajustar ---
+
   let iteracion = 0;
   const MAX_ITER = 100;
 
   while (iteracion < MAX_ITER) {
     iteracion++;
 
-    // Intentar asignación óptima
+
     const asignacion = encontrarAsignacionOptima(matriz, n);
 
     if (asignacion.length === n) {
-      // ¡Asignación completa encontrada!
+
       pasos.push({
         titulo: `Paso 3: Asignación óptima encontrada (iteración ${iteracion})`,
         descripcion: `Se encontró una asignación completa de ${n} elementos con ${n} ceros independientes.`,
         matriz: matriz.map((f) => [...f]),
       });
 
-      // Calcular costo con la matriz ORIGINAL
+
       const asignaciones = asignacion.map(({ fila, columna }) => ({
         fila,
         columna,
@@ -126,13 +113,13 @@ export function resolverAsignacion(matrizOriginal, modo = "minimizar") {
 
       const costoTotal = asignaciones.reduce((sum, a) => sum + a.costo, 0);
 
-      // Matriz resultado con marcas
+
       const matrizResultado = matrizOriginal.map((f) => [...f]);
 
       return { asignaciones, costoTotal, pasos, matrizResultado };
     }
 
-    // Cubrir ceros con líneas mínimas
+
     const { filasCubiertas, columnasCubiertas } = cubrirCeros(matriz, n);
     const totalLineas = filasCubiertas.size + columnasCubiertas.size;
 
@@ -143,7 +130,7 @@ export function resolverAsignacion(matrizOriginal, modo = "minimizar") {
     });
 
     if (totalLineas >= n) {
-      // Debería haberse encontrado asignación, forzar salida
+
       const asignacionForzada = encontrarAsignacionOptima(matriz, n);
       const asignaciones = asignacionForzada.map(({ fila, columna }) => ({
         fila,
@@ -155,7 +142,7 @@ export function resolverAsignacion(matrizOriginal, modo = "minimizar") {
       return { asignaciones, costoTotal, pasos, matrizResultado };
     }
 
-    // Encontrar el mínimo no cubierto
+
     let minNoCubierto = Infinity;
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
@@ -165,7 +152,7 @@ export function resolverAsignacion(matrizOriginal, modo = "minimizar") {
       }
     }
 
-    // Ajustar la matriz
+
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
         if (!filasCubiertas.has(i) && !columnasCubiertas.has(j)) {
@@ -183,7 +170,7 @@ export function resolverAsignacion(matrizOriginal, modo = "minimizar") {
     });
   }
 
-  // Fallback: devolver la mejor asignación encontrada
+
   const asignacionFinal = encontrarAsignacionOptima(matriz, n);
   const asignaciones = asignacionFinal.map(({ fila, columna }) => ({
     fila,
@@ -195,10 +182,7 @@ export function resolverAsignacion(matrizOriginal, modo = "minimizar") {
   return { asignaciones, costoTotal, pasos, matrizResultado };
 }
 
-/**
- * Encuentra una asignación óptima (máximo matching de ceros independientes).
- * Usa búsqueda con backtracking.
- */
+
 function encontrarAsignacionOptima(matriz, n) {
   const mejorAsignacion = { valor: [] };
 
@@ -210,7 +194,7 @@ function encontrarAsignacionOptima(matriz, n) {
       return;
     }
 
-    // Intentar asignar un cero en esta fila
+
     let asignado = false;
     for (let j = 0; j < n; j++) {
       if (matriz[fila][j] === 0 && !columnaUsada.has(j)) {
@@ -223,7 +207,7 @@ function encontrarAsignacionOptima(matriz, n) {
       }
     }
 
-    // También intentar no asignar en esta fila (por si hay mejor matching más adelante)
+
     backtrack(fila + 1, columnaUsada, asignActual);
   }
 
@@ -231,14 +215,11 @@ function encontrarAsignacionOptima(matriz, n) {
   return mejorAsignacion.valor;
 }
 
-/**
- * Cubre todos los ceros con el mínimo número de líneas (filas y columnas).
- * Usa el método de König.
- */
+
 function cubrirCeros(matriz, n) {
-  // Paso 1: Encontrar un matching máximo de ceros
-  const asignFilaACol = new Array(n).fill(-1); // fila → columna asignada
-  const asignColAFila = new Array(n).fill(-1); // columna → fila asignada
+
+  const asignFilaACol = new Array(n).fill(-1);
+  const asignColAFila = new Array(n).fill(-1);
 
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < n; j++) {
@@ -249,7 +230,7 @@ function cubrirCeros(matriz, n) {
     }
   }
 
-  // Mejorar matching con caminos alternantes (Hopcroft-Karp simplificado)
+
   let mejorado = true;
   while (mejorado) {
     mejorado = false;
@@ -263,7 +244,7 @@ function cubrirCeros(matriz, n) {
     }
   }
 
-  // Paso 2: Encontrar cobertura mínima con König
+
   const filasNoAsignadas = new Set();
   for (let i = 0; i < n; i++) {
     if (asignFilaACol[i] === -1) filasNoAsignadas.add(i);
@@ -276,7 +257,7 @@ function cubrirCeros(matriz, n) {
   while (cambio) {
     cambio = false;
 
-    // Marcar columnas con ceros en filas marcadas (no asignados al matching)
+
     for (const i of filasMarcadas) {
       for (let j = 0; j < n; j++) {
         if (matriz[i][j] === 0 && !columnasMarcadas.has(j)) {
@@ -286,7 +267,7 @@ function cubrirCeros(matriz, n) {
       }
     }
 
-    // Marcar filas asignadas a columnas marcadas
+
     for (const j of columnasMarcadas) {
       const fila = asignColAFila[j];
       if (fila !== -1 && !filasMarcadas.has(fila)) {
@@ -296,7 +277,7 @@ function cubrirCeros(matriz, n) {
     }
   }
 
-  // Líneas = filas NO marcadas + columnas marcadas
+
   const filasCubiertas = new Set();
   for (let i = 0; i < n; i++) {
     if (!filasMarcadas.has(i)) filasCubiertas.add(i);
@@ -305,9 +286,7 @@ function cubrirCeros(matriz, n) {
   return { filasCubiertas, columnasCubiertas: columnasMarcadas };
 }
 
-/**
- * Intenta encontrar un camino aumentante desde la fila dada.
- */
+
 function aumentar(fila, matriz, n, asignFilaACol, asignColAFila, visitado) {
   for (let j = 0; j < n; j++) {
     if (matriz[fila][j] === 0 && !visitado.has(j)) {
@@ -322,10 +301,7 @@ function aumentar(fila, matriz, n, asignFilaACol, asignColAFila, visitado) {
   return false;
 }
 
-/**
- * Valida la matriz de costos. Acepta matrices rectangulares (m×n).
- * Solo verifica valores numéricos válidos y no negativos.
- */
+
 export function validarMatriz(m) {
   if (!Array.isArray(m) || m.length === 0) return { valida: false, error: "La matriz está vacía." };
 

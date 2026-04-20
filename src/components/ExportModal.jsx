@@ -17,7 +17,7 @@ export function ExportModal({ onConfirm, onCancel, defaultName }) {
   }, [filename, onConfirm, onCancel]);
 
   useEffect(() => {
-    // Foco inicial y seleccionar texto
+
     if (inputRef.current) {
       inputRef.current.focus();
       inputRef.current.select();

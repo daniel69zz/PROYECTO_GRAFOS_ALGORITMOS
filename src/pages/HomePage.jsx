@@ -15,7 +15,7 @@ export function HomePage() {
       if (i > fullTitle.length) {
         clearInterval(timer);
       }
-    }, 70); // Typing speed
+    }, 70);
     return () => clearInterval(timer);
   }, []);
 
@@ -44,11 +44,9 @@ export function HomePage() {
               <Value>Frederick Aguirre </Value>
               <Value>Diana Tatiana Pattzy Gomez </Value>
               <Value>Daniel Boris Rueda</Value>
+              <Value>Jorge Calizaya</Value>
             </InfoItem>
-            {/* <InfoItem>
-              <Label>CI</Label>
-              <Value>6991789</Value>
-            </InfoItem> */}
+            {}
           </InfoCard>
 
           <Description>
@@ -62,7 +60,6 @@ export function HomePage() {
   );
 }
 
-// --- ANIMATIONS ---
 const blink = keyframes`
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
@@ -73,7 +70,6 @@ const float = keyframes`
   50% { transform: translateY(-15px) rotate(2deg); }
 `;
 
-// --- STYLED COMPONENTS ---
 const Container = styled.div`
   min-height: calc(100vh - 64px);
   display: flex;
@@ -152,7 +148,7 @@ const Title = styled.h1`
   background: linear-gradient(to right, #ffffff 0%, #c2dcfc 50%, #58a6ff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  min-height: clamp(36px, 7vw, 72px); /* Prevents layout jump while typing */
+  min-height: clamp(36px, 7vw, 72px);
   display: flex;
   align-items: center;
   justify-content: center;

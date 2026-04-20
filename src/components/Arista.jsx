@@ -15,7 +15,7 @@ export function Arista({
 
   const esDirigida = ar.tipo === "dirigida" || ar.tipo === undefined;
 
-  // ---- CPM slack (holgura) por arista: TL[to] - TE[from] - w ----
+
   const numOrNull = (x) => {
     if (x === "" || x == null) return null;
     const n = Number(x);
@@ -29,7 +29,7 @@ export function Arista({
   let slack = null;
   if (teFrom != null && tlTo != null) {
     slack = tlTo - teFrom - w;
-    // evitar -0
+
     if (Object.is(slack, -0)) slack = 0;
   }
   const isCritical = slack === 0;
@@ -61,7 +61,7 @@ export function Arista({
     return (
       <text
         x={x}
-        y={y - 20} // "encima" del peso
+        y={y - 20}
         textAnchor="middle"
         dominantBaseline="middle"
         fontSize="14"
@@ -76,7 +76,7 @@ export function Arista({
     );
   };
 
-  // ── CASO 1: LOOP ──
+
   if (ar.from === ar.to) {
     const loopRadius = 35;
     const cx = nodo_a.x;
@@ -101,7 +101,7 @@ export function Arista({
         />
         <path d={pathD} style={clickStyle} onClick={handleClick} />
 
-        {/* holgura encima del peso */}
+        {}
         {renderSlack(pesoX, pesoY)}
 
         <rect
@@ -140,7 +140,7 @@ export function Arista({
   const x2 = nodo_b.x - ux * EDGE_OFFSET;
   const y2 = nodo_b.y - uy * EDGE_OFFSET;
 
-  // ── CASO 2: BIDIRECCIONAL ──
+
   if (existeContraria) {
     const CURVE_OFFSET = 75;
     const midX = (x1 + x2) / 2;
@@ -173,7 +173,7 @@ export function Arista({
         />
         <path d={pathD} style={clickStyle} onClick={handleClick} />
 
-        {/* holgura encima del peso */}
+        {}
         {renderSlack(pesoX, pesoY)}
 
         <rect
@@ -201,7 +201,7 @@ export function Arista({
     );
   }
 
-  // ── CASO 3: UNIDIRECCIONAL ──
+
   const midX = (x1 + x2) / 2;
   const midY = (y1 + y2) / 2;
 
@@ -225,7 +225,7 @@ export function Arista({
         onClick={handleClick}
       />
 
-      {/* holgura encima del peso */}
+      {}
       {renderSlack(midX, midY)}
 
       <rect

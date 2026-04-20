@@ -115,7 +115,7 @@ export function EditMenu({ tipo, datos, posicion, onGuardar, onCerrar }) {
 
 const MenuContainer = styled.div`
   position: ${({ $x, $y }) => {
-    // Si está muy cerca de los bordes en móvil, usar fixed
+
     if (window.innerWidth <= 768) {
       return "fixed";
     }
@@ -145,8 +145,8 @@ const MenuContainer = styled.div`
   }
 
   @media (max-width: 768px) {
-    /* Remover el transform que centraba en móviles */
-    /* Si está cerca de los bordes, mantener la posición calculada */
+
+
   }
 
   @media (max-width: 480px) {

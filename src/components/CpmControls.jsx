@@ -3,7 +3,7 @@ import styled from "styled-components";
 export function CpmControls({
   origen,
   destino,
-  pickTarget, // "origen" | "destino"
+  pickTarget,
   onClear,
   onPrev,
   onNext,

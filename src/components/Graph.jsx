@@ -30,24 +30,24 @@ const calcularPosicionMenu = (
   const menuWidth = 240;
   const menuHeight = tipo === "nodo" ? 320 : 220;
   const padding = 16;
-  const nodoRadius = 40; // Radio del nodo
+  const nodoRadius = 40;
 
-  // Posición absoluta del nodo en viewport
+
   const nodoViewportX = nodoX + offsetX;
   const nodoViewportY = nodoY + offsetY;
 
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
 
-  let menuX = nodoViewportX + nodoRadius + 10; // A la derecha del nodo
-  let menuY = nodoViewportY - menuHeight / 2; // Centrado verticalmente
+  let menuX = nodoViewportX + nodoRadius + 10;
+  let menuY = nodoViewportY - menuHeight / 2;
 
-  // Si no cabe a la derecha, ponerlo a la izquierda
+
   if (menuX + menuWidth + padding > viewportWidth) {
     menuX = nodoViewportX - nodoRadius - menuWidth - 10;
   }
 
-  // Si aún no cabe a la izquierda, forzar dentro del viewport
+
   if (menuX < padding) {
     menuX = padding;
   }
@@ -55,7 +55,7 @@ const calcularPosicionMenu = (
     menuX = viewportWidth - menuWidth - padding;
   }
 
-  // Ajustar verticalmente
+
   if (menuY < padding) {
     menuY = padding;
   }
@@ -74,10 +74,10 @@ const calcularPosicionMenuArista = (clickX, clickY, tipo = "arista") => {
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
 
-  let menuX = clickX + 20; // Offset desde el click
+  let menuX = clickX + 20;
   let menuY = clickY - menuHeight / 2;
 
-  // Ajustar horizontalmente
+
   if (menuX + menuWidth + padding > viewportWidth) {
     menuX = clickX - menuWidth - 20;
   }
@@ -85,7 +85,7 @@ const calcularPosicionMenuArista = (clickX, clickY, tipo = "arista") => {
     menuX = padding;
   }
 
-  // Ajustar verticalmente
+
   if (menuY < padding) {
     menuY = padding;
   }
@@ -183,7 +183,7 @@ export const Graph = forwardRef(
         setAristas(grafo_data.aristas);
         nextId.current = grafo_data.nextId;
 
-        // Persist immediately so sessionStorage is up-to-date before any navigation
+
         try {
           sessionStorage.setItem("graph_nodos", JSON.stringify(grafo_data.nodos));
           sessionStorage.setItem("graph_aristas", JSON.stringify(grafo_data.aristas));

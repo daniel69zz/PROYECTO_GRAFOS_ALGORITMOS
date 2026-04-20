@@ -264,7 +264,7 @@ const Container = styled.div`
   min-height: calc(100vh - 64px);
   padding: 80px 24px;
   background-color: #050810;
-  background-image: 
+  background-image:
     radial-gradient(circle at 80% 20%, rgba(88, 166, 255, 0.08), transparent 40%),
     radial-gradient(circle at 20% 80%, rgba(88, 166, 255, 0.12), transparent 40%);
   position: relative;

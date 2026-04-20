@@ -37,7 +37,7 @@ export function MatrizPonderadaDir({ nodos, aristas }) {
 
   return (
     <Container>
-      {/* ── Tabla ── */}
+      {}
       <TableWrapper>
         <table>
           <thead>
@@ -108,7 +108,7 @@ export function MatrizPonderadaDir({ nodos, aristas }) {
         </table>
       </TableWrapper>
 
-      {/* ── Stats ── */}
+      {}
       <StatsGrid>
         <StatCard $color="#4f46e5">
           <StatTop>
@@ -146,7 +146,7 @@ export function MatrizPonderadaDir({ nodos, aristas }) {
   );
 }
 
-// ── Styled Components ─────────────────────────────────────────────────────────
+
 
 const Container = styled.div`
   display: flex;
@@ -267,7 +267,7 @@ const SumTd = styled.td`
   color: ${({ $highlight }) => ($highlight ? "#92400e" : "#64748b")};
   transition: background 0.15s;
 
-  /* badge cuando es máximo */
+
   ${({ $highlight }) =>
     $highlight &&
     `
@@ -283,7 +283,7 @@ const SumTd = styled.td`
   `}
 `;
 
-// ── Stats ─────────────────────────────────────────────────────────────────────
+
 
 const StatsGrid = styled.div`
   display: grid;

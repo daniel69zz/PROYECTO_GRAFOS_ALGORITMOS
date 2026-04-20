@@ -8,6 +8,7 @@ const teamMembers = [
   { name: "Frederick Aguirre", email: "frederick.aguirre@ucb.edu.bo" },
   { name: "Diana Tatiana Pattzy Gomez", email: "diana.pattzy@ucb.edu.bo" },
   { name: "Daniel Boris Rueda", email: "daniel.rueda@ucb.edu.bo" },
+  { name: "Jorge Calizaya", email: "jorge.calizaya@ucb.edu.bo" },
 ];
 
 export function ContactPage() {
@@ -92,12 +93,14 @@ const Card = styled.div`
   transition: all 0.3s ease;
   animation: ${fadeIn} 0.8s ease-out backwards;
   animation-delay: ${(props) => props.$delay}s;
-  
+
   &:hover {
     transform: translateY(-10px);
     background: rgba(255, 255, 255, 0.05);
     border-color: var(--accent-color);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(88, 166, 255, 0.1);
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, 0.4),
+      0 0 20px rgba(88, 166, 255, 0.1);
   }
 `;
 
@@ -137,8 +140,8 @@ const Role = styled.span`
   letter-spacing: 0.1em;
 `;
 
-const Email = styled.a.attrs(props => ({
-  href: `mailto:${props.children}`
+const Email = styled.a.attrs((props) => ({
+  href: `mailto:${props.children}`,
 }))`
   font-size: 0.85rem;
   color: var(--text-secondary);

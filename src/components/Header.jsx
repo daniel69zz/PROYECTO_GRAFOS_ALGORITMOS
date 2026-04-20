@@ -86,7 +86,7 @@ const LogoSection = styled.div`
   align-items: center;
   gap: 12px;
   cursor: pointer;
-  
+
   img {
     height: 42px;
     width: auto;
@@ -105,7 +105,7 @@ const Brand = styled.span`
   background: linear-gradient(135deg, #fff 0%, #a5c8ff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  
+
   @media (max-width: 480px) {
     display: none;
   }
@@ -145,7 +145,7 @@ const StyledNavLink = styled(NavLink)`
   &:hover {
     color: var(--text-primary);
     background: rgba(255, 255, 255, 0.05);
-    
+
     svg {
       transform: translateY(-2px);
       color: var(--accent-hover);
@@ -156,7 +156,7 @@ const StyledNavLink = styled(NavLink)`
     background: var(--accent-color);
     color: #fff;
     box-shadow: 0 0 15px var(--accent-glow);
-    
+
     svg {
       color: #fff;
     }

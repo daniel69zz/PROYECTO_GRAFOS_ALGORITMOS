@@ -26,11 +26,11 @@ export const exportar_grafo = (nodos, aristas, nextId, nombreArchivo = `grafo_${
 
   const link = document.createElement("a");
   link.href = url_temp;
-  
-  const finalName = nombreArchivo.toLowerCase().endsWith(".json") 
-    ? nombreArchivo 
+
+  const finalName = nombreArchivo.toLowerCase().endsWith(".json")
+    ? nombreArchivo
     : `${nombreArchivo}.json`;
-    
+
   link.download = finalName;
 
   document.body.appendChild(link);

@@ -19,13 +19,13 @@ export function DragAsignacion({ nodos, aristas, onClose }) {
   const [resultado, setResultado] = useState(null);
   const [mostrarPasos, setMostrarPasos] = useState(false);
 
-  // Convertir grafo → matriz (puede ser rectangular)
+
   const conversion = useMemo(
     () => grafoAMatrizAsignacion(nodos, aristas),
     [nodos, aristas]
   );
 
-  // --- Drag handlers ---
+
   const onMouseUp = useCallback(() => {
     dragging.current = false;
     window.removeEventListener("mousemove", onMouseMoveHandler);
@@ -58,7 +58,7 @@ export function DragAsignacion({ nodos, aristas, onClose }) {
       let matrizParaResolver = conversion.matriz;
       let padding = null;
 
-      // Si la matriz no es cuadrada, padding con variables artificiales
+
       if (m !== n) {
         const padResult = padMatrizCuadrada(conversion.matriz);
         matrizParaResolver = padResult.matrizCuadrada;
@@ -67,7 +67,7 @@ export function DragAsignacion({ nodos, aristas, onClose }) {
 
       const res = resolverAsignacion(matrizParaResolver, modo);
 
-      // Filtrar asignaciones ficticias
+
       const asignacionesReales = res.asignaciones.filter((a) => {
         if (padding) {
           if (padding.filasFicticias.includes(a.fila)) return false;
@@ -114,7 +114,7 @@ export function DragAsignacion({ nodos, aristas, onClose }) {
       </TitleBar>
 
       <WindowBody>
-        {/* ===== ERROR DE VALIDACIÓN ===== */}
+        {}
         {!conversion.valida && (
           <ErrorPanel>
             <ErrorHeader>
@@ -128,10 +128,10 @@ export function DragAsignacion({ nodos, aristas, onClose }) {
           </ErrorPanel>
         )}
 
-        {/* ===== CONTENIDO VÁLIDO ===== */}
+        {}
         {conversion.valida && (
           <>
-            {/* Info rectangular */}
+            {}
             {esRectangular && (
               <InfoBox>
                 ℹ️ Matriz {conversion.nombresOrigenes.length}×
@@ -149,7 +149,7 @@ export function DragAsignacion({ nodos, aristas, onClose }) {
               </InfoBox>
             )}
 
-            {/* Selector de modo */}
+            {}
             <ModoSection>
               <ModoLabel>Objetivo:</ModoLabel>
               <ModoGroup>
@@ -174,7 +174,7 @@ export function DragAsignacion({ nodos, aristas, onClose }) {
               </ModoGroup>
             </ModoSection>
 
-            {/* Matriz del grafo */}
+            {}
             <MatrizSection>
               <SectionTitle>
                 Matriz de Costos ({conversion.nombresOrigenes.length}×
@@ -211,13 +211,13 @@ export function DragAsignacion({ nodos, aristas, onClose }) {
               </MatrizScroll>
             </MatrizSection>
 
-            {/* Botón resolver */}
+            {}
             <ResolverBtn onClick={handleResolver}>
               <FiPlay /> Resolver{" "}
               {modo === "minimizar" ? "(Mínimo)" : "(Máximo)"}
             </ResolverBtn>
 
-            {/* Resultados */}
+            {}
             {resultado && (
               <ResultSection>
                 <CostoBox>
@@ -252,7 +252,7 @@ export function DragAsignacion({ nodos, aristas, onClose }) {
                   ))}
                 </AsignList>
 
-                {/* Pasos educativos */}
+                {}
                 {resultado.pasos.length > 0 && (
                   <PasosWrap>
                     <PasosToggle
@@ -307,13 +307,13 @@ export function DragAsignacion({ nodos, aristas, onClose }) {
   );
 }
 
-/* =============== ANIMATIONS =============== */
+
 const slideIn = keyframes`
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 `;
 
-/* =============== STYLED COMPONENTS =============== */
+
 
 const WindowWrapper = styled.div`
   position: absolute;
@@ -416,7 +416,7 @@ const WindowBody = styled.div`
   }
 `;
 
-/* --- Error Panel --- */
+
 
 const ErrorPanel = styled.div`
   background: #fef2f2;
@@ -459,7 +459,7 @@ const ErrorHint = styled.p`
   margin: 0;
 `;
 
-/* --- Info Box --- */
+
 const InfoBox = styled.div`
   background: #eff6ff;
   border: 1px solid #93c5fd;
@@ -471,7 +471,7 @@ const InfoBox = styled.div`
   line-height: 1.5;
 `;
 
-/* --- Modo Section --- */
+
 
 const ModoSection = styled.div`
   display: flex;
@@ -510,7 +510,7 @@ const ModoBtn = styled.button`
   }
 `;
 
-/* --- Matriz Section --- */
+
 
 const SectionTitle = styled.h3`
   font-size: 13px;
@@ -596,7 +596,7 @@ const MatrizCelda = styled.td`
     `}
 `;
 
-/* --- Resolver Button --- */
+
 
 const ResolverBtn = styled.button`
   display: flex;
@@ -624,7 +624,7 @@ const ResolverBtn = styled.button`
   }
 `;
 
-/* --- Result Section --- */
+
 
 const ResultSection = styled.div`
   display: flex;
@@ -716,7 +716,7 @@ const CostTag = styled.span`
   color: #94a3b8;
 `;
 
-/* --- Pasos --- */
+
 
 const PasosWrap = styled.div`
   display: flex;

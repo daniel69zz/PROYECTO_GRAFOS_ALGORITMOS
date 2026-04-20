@@ -71,16 +71,16 @@ export function Nodo({ nodo, seleccionado, onClick, onDrag, herramienta }) {
 }
 const CpmLayer = styled.div`
   position: absolute;
-  inset: 6px; /* separa un poco del borde negro del nodo */
+  inset: 6px;
   border-radius: 50%;
   pointer-events: none;
-  overflow: hidden; /* clave para que las líneas no salgan del círculo */
+  overflow: hidden;
 
   display: flex;
   flex-direction: column;
 `;
 
-/* Mitad superior (donde va el +) */
+
 const CpmTop = styled.div`
   flex: 1;
   display: flex;
@@ -94,23 +94,23 @@ const CpmTop = styled.div`
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
 `;
 
-/* Mitad inferior (2 celdas con separadores) */
+
 const CpmBottom = styled.div`
-  height: 34px; /* ajusta este valor si quieres más espacio para números */
+  height: 34px;
   display: grid;
   grid-template-columns: 1fr 1fr;
 
-  /* línea horizontal que separa arriba/abajo */
+
   border-top: 3px solid rgba(0, 0, 0, 0.85);
 
-  /* para que se parezca a la imagen: fondo claro abajo */
+
   background: rgba(255, 255, 255, 0.92);
 
-  /* texto negro */
+
   color: #000;
 `;
 
-/* celda inferior izquierda */
+
 const CpmBL = styled.span`
   display: flex;
   align-items: center;
@@ -119,11 +119,11 @@ const CpmBL = styled.span`
   font-weight: 900;
   font-size: 18px;
 
-  /* línea vertical (solo abajo) */
+
   border-right: 3px solid rgba(0, 0, 0, 0.85);
 `;
 
-/* celda inferior derecha */
+
 const CpmBR = styled.span`
   display: flex;
   align-items: center;
@@ -135,16 +135,16 @@ const CpmBR = styled.span`
 
 const CpmOverlay = styled.div`
   position: absolute;
-  inset: 8px; /* margen interno dentro del círculo */
+  inset: 8px;
   border-radius: 14px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr auto;
   align-items: center;
   justify-items: center;
-  pointer-events: none; /* no bloquea click/drag */
+  pointer-events: none;
 
-  /* “placa” semitransparente para que siempre se lea */
+
   background: rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(2px);
   border: 1px solid rgba(255, 255, 255, 0.22);
@@ -152,7 +152,7 @@ const CpmOverlay = styled.div`
 `;
 
 const CpmPlus = styled.div`
-  grid-column: 1 / -1; /* ocupa ambas columnas */
+  grid-column: 1 / -1;
   grid-row: 1;
   line-height: 1;
   font-weight: 900;
@@ -162,7 +162,7 @@ const CpmPlus = styled.div`
   color: #ffffff;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
 
-  /* pequeño “badge” detrás del + para que resalte */
+
   padding: 2px 10px 6px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.12);
@@ -175,13 +175,13 @@ const CpmBottomLeft = styled.div`
   justify-self: start;
   align-self: end;
 
-  min-width: 26px; /* espacio mínimo para 2-3 dígitos */
+  min-width: 26px;
   padding: 2px 6px;
   margin: 0 0 2px 2px;
 
   font-size: 12px;
   font-weight: 800;
-  color: #0b1220; /* texto oscuro sobre fondo claro */
+  color: #0b1220;
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(0, 0, 0, 0.25);
   border-radius: 8px;

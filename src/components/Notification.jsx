@@ -57,7 +57,7 @@ export function Notification({
   );
 }
 
-// ── Animations ──
+
 
 const slideIn = keyframes`
   from {
@@ -79,7 +79,7 @@ const progressAnimation = keyframes`
   }
 `;
 
-// ── Styled Components ──
+
 
 const Container = styled.div`
   position: fixed;

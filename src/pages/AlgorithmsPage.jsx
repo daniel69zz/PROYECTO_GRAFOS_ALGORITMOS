@@ -274,7 +274,7 @@ export function AlgorithmsPage() {
 const Container = styled.div`
   min-height: calc(100vh - 64px);
   background-color: #050810;
-  background-image: 
+  background-image:
     radial-gradient(circle at 15% 50%, rgba(88, 166, 255, 0.08), transparent 40%),
     radial-gradient(circle at 85% 30%, rgba(88, 166, 255, 0.12), transparent 40%);
   overflow: auto;
@@ -462,7 +462,7 @@ const FeatureCard = styled.div`
     background: rgba(255, 255, 255, 0.04);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 3px 0 ${(props) => props.$accent};
     border-color: rgba(255, 255, 255, 0.1);
-    
+
     &::before {
       opacity: 1;
     }
@@ -515,7 +515,7 @@ const CharacteristicsList = styled.ul`
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.03);
     transition: transform var(--transition-fast);
-    
+
     &:hover {
       transform: translateX(4px);
       background: rgba(255, 255, 255, 0.03);

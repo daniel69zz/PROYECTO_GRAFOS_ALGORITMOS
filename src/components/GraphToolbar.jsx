@@ -41,12 +41,7 @@ export function GraphToolbar({
 
   return (
     <Container $isOpen={isOpen} data-toolbar="true">
-      {/* <TopSection>
-        <Logo $isOpen={isOpen}>
-          <LogoMark>G</LogoMark>
-          {isOpen && <LogoText>GRAPHX</LogoText>}
-        </Logo>
-      </TopSection> */}
+      {}
 
       <ToolsSection>
         {toolbarLinks.map(({ label, Icon, op }, index) => (
@@ -128,7 +123,7 @@ export function GraphToolbar({
   );
 }
 
-// ── Styled Components ──
+
 
 const Container = styled.aside`
   position: relative;

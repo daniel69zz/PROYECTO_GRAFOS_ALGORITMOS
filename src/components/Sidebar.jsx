@@ -44,7 +44,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
   );
 }
 
-//#region STYLED COMPONENTS
+
 const Container = styled.div`
   border-right: 1px solid var(--glass-border);
   color: var(--text-primary);
@@ -131,7 +131,7 @@ const Container = styled.div`
   .LinkContainer {
     display: block;
     margin: 8px 12px;
-    
+
     .Links {
       display: flex;
       align-items: center;
@@ -153,7 +153,7 @@ const Container = styled.div`
         display: flex;
         align-items: center;
         justify-content: center;
-        
+
         svg {
           font-size: 24px;
           transition: transform 0.2s;
@@ -164,7 +164,7 @@ const Container = styled.div`
         background: rgba(88, 166, 255, 0.15);
         color: var(--accent-hover);
         box-shadow: inset 2px 0 0 var(--accent-color);
-        
+
         .Linkicon svg {
           color: var(--accent-color);
         }
@@ -185,4 +185,4 @@ const Divider = styled.div`
   background: var(--glass-border);
   margin: 16px auto;
 `;
-//#endregion
+
