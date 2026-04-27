@@ -6,6 +6,7 @@ import { AlgorithmsPage } from "../pages/AlgorithmsPage";
 import { HelpPage } from "../pages/HelpPage";
 import { CpmPage } from "../pages/CpmPage";
 import { AsignacionPage } from "../pages/AsignacionPage";
+import { NorthwestPage } from "../pages/NorthwestPage";
 import { ContactPage } from "../pages/ContactPage";
 import { SortsPage } from "../pages/SortsPage";
 
@@ -20,6 +21,7 @@ export function MyRoutes() {
         <Route path="/contacto" element={<ContactPage />} />
         <Route path="/cpm" element={<CpmPage />} />
         <Route path="/asignacion" element={<AsignacionPage />} />
+        <Route path="/northwest" element={<NorthwestPage />} />
         <Route path="/sorts" element={<SortsPage />} />
       </Route>
     </Routes>

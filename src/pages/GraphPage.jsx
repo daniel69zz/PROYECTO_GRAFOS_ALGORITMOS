@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Graph } from "../components/Graph";
 import { GraphToolbar } from "../components/GraphToolbar";
-import { TbRouteSquare2, TbLayoutGrid } from "react-icons/tb";
+import { TbRouteSquare2, TbLayoutGrid, TbCompass } from "react-icons/tb";
 import styled from "styled-components";
 
 export function GraphPage() {
@@ -61,6 +61,14 @@ export function GraphPage() {
             <TbLayoutGrid />
             <span>Algoritmo de Asignación</span>
           </AlgoritmoButton>
+          <AlgoritmoButton
+            $color="northwest"
+            onClick={() => setHerramienta(7)}
+            title="Método Northwest"
+          >
+            <TbCompass />
+            <span>Northwest</span>
+          </AlgoritmoButton>
         </AlgoritmosHeader>
         <Graph
           ref={graphRef}
@@ -116,10 +124,10 @@ const AlgoritmoButton = styled.button`
   align-items: center;
   gap: 8px;
   padding: 6px 14px;
-  background: rgba(88, 166, 255, 0.1);
-  border: 1px solid rgba(88, 166, 255, 0.2);
+  background: ${p => p.$color === "northwest" ? "rgba(245, 158, 11, 0.1)" : "rgba(88, 166, 255, 0.1)"};
+  border: 1px solid ${p => p.$color === "northwest" ? "rgba(245, 158, 11, 0.3)" : "rgba(88, 166, 255, 0.2)"};
   border-radius: 8px;
-  color: var(--accent-color);
+  color: ${p => p.$color === "northwest" ? "#f59e0b" : "var(--accent-color)"};
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -130,10 +138,10 @@ const AlgoritmoButton = styled.button`
   }
 
   &:hover {
-    background: var(--accent-color);
+    background: ${p => p.$color === "northwest" ? "#f59e0b" : "var(--accent-color)"};
     color: white;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px var(--accent-glow);
+    box-shadow: ${p => p.$color === "northwest" ? "0 4px 12px rgba(245,158,11,0.4)" : "0 4px 12px var(--accent-glow)"};
   }
 
   &:active {
