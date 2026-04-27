@@ -6,12 +6,13 @@ import { GrGraphQl } from "react-icons/gr";
 import { IoMdHelpCircle } from "react-icons/io";
 import { HiMenuAlt3 } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
-import { TbLayoutGrid } from "react-icons/tb";
+import { FaSortAmountDownAlt } from "react-icons/fa";
 import logo_ucb from "/logo_ucb.png";
 
 const navItems = [
   { to: "/", label: "Inicio", Icon: FaHome, end: true },
   { to: "/algorithm", label: "Algoritmos", Icon: FaReadme },
+  { to: "/sorts", label: "Sorts", Icon: FaSortAmountDownAlt },
   { to: "/graph", label: "Grafo", Icon: GrGraphQl },
   { to: "/ayuda", label: "Ayuda", Icon: IoMdHelpCircle },
   { to: "/contacto", label: "Contacto", Icon: FaUserCircle },

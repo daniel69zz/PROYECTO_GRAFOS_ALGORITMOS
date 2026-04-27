@@ -1,5 +1,6 @@
 import { GrGraphQl } from "react-icons/gr";
 import { FaHome, FaReadme } from "react-icons/fa";
+import { FaSortAmountDownAlt } from "react-icons/fa";
 
 const linksArray = [
   {
@@ -11,6 +12,11 @@ const linksArray = [
     label: "Algoritmos",
     Icon: FaReadme,
     to: "/algorithm",
+  },
+  {
+    label: "Sorts",
+    Icon: FaSortAmountDownAlt,
+    to: "/sorts",
   },
   {
     label: "Grapho",
