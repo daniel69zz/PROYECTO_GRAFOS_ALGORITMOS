@@ -424,10 +424,19 @@ export const Graph = forwardRef(
     }, [herramienta, tieneAristasNoDirigidas, nodos, aristas, navigate, setHerramienta]);
 
     useEffect(() => {
-      if ((herramienta === 4 || herramienta === 6) && tieneAristasNoDirigidas) {
+      if (herramienta === 7 && !tieneAristasNoDirigidas) {
+        navigate("/northwest", { state: { nodos, aristas } });
+        setHerramienta(1);
+      }
+    }, [herramienta, tieneAristasNoDirigidas, nodos, aristas, navigate, setHerramienta]);
+
+    useEffect(() => {
+      if ((herramienta === 4 || herramienta === 6 || herramienta === 7) && tieneAristasNoDirigidas) {
         showNotification(
           herramienta === 6
             ? "No se puede usar asignación con aristas no dirigidas.\n\nEl algoritmo de asignación requiere un grafo completamente dirigido."
+            : herramienta === 7
+            ? "No se puede usar Northwest con aristas no dirigidas.\n\nEl método Northwest requiere un grafo completamente dirigido."
             : "No se puede mostrar la matriz para grafos con aristas no dirigidas.\n\nLa matriz de adyacencia está diseñada solo para grafos dirigidos.",
           "warning",
         );
