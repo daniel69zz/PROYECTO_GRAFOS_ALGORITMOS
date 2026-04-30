@@ -20,11 +20,11 @@ import { importar_grafo } from "../utils/exp_imp_grafo";
 const DIVIDER_X = 500;
 
 // ── estado inicial ──────────────────────────────────────────────────────────
-const defaultCosts  = [[0,0,0],[0,0,0],[0,0,0]];
-const defaultSupply = [0, 0, 0];
-const defaultDemand = [0, 0, 0];
+const defaultCosts  = [["","",""],["","",""],["","",""]];
+const defaultSupply = ["", "", ""];
+const defaultDemand = ["", "", ""];
 
-function makeMatrix(rows, cols, fill = 0) {
+function makeMatrix(rows, cols, fill = "") {
   return Array.from({ length: rows }, () => Array(cols).fill(fill));
 }
 
@@ -76,6 +76,7 @@ export function NorthwestPage() {
   const [modo,         setModo]         = useState("minimizar");
   const [resultado,    setResultado]    = useState(null);
   const [mostrarPasos, setMostrarPasos] = useState(false);
+  const [mostrarGrafo, setMostrarGrafo] = useState(false);
 
   // ── Canvas (visual) ─────────────────────────────────────────────────────
   const [canvasData,   setCanvasData]   = useState(null); // {nodos,aristas,oIds,dIds}
@@ -101,26 +102,26 @@ export function NorthwestPage() {
   const setCost = (i, j, val) => {
     setCosts(prev => {
       const next = prev.map(r => [...r]);
-      next[i][j] = Number(val) || 0;
+      next[i][j] = val === "" ? "" : Number(val);
       return next;
     });
     setResultado(null);
   };
 
   const setSupplyI = (i, val) => {
-    setSupply(prev => { const n=[...prev]; n[i]=Number(val)||0; return n; });
+    setSupply(prev => { const n=[...prev]; n[i] = val === "" ? "" : Number(val); return n; });
     setResultado(null);
   };
 
   const setDemandJ = (j, val) => {
-    setDemand(prev => { const n=[...prev]; n[j]=Number(val)||0; return n; });
+    setDemand(prev => { const n=[...prev]; n[j] = val === "" ? "" : Number(val); return n; });
     setResultado(null);
   };
 
   // ── Agregar / quitar filas y columnas ───────────────────────────────────
   const agregarFila = () => {
-    setCosts(prev => [...prev, Array(cols).fill(0)]);
-    setSupply(prev => [...prev, 0]);
+    setCosts(prev => [...prev, Array(cols).fill("")]);
+    setSupply(prev => [...prev, ""]);
     setResultado(null);
   };
 
@@ -132,8 +133,8 @@ export function NorthwestPage() {
   };
 
   const agregarColumna = () => {
-    setCosts(prev => prev.map(r => [...r, 0]));
-    setDemand(prev => [...prev, 0]);
+    setCosts(prev => prev.map(r => [...r, ""]));
+    setDemand(prev => [...prev, ""]);
     setResultado(null);
   };
 
@@ -145,9 +146,9 @@ export function NorthwestPage() {
   };
 
   const limpiar = () => {
-    setCosts(makeMatrix(3, 3));
-    setSupply([0,0,0]);
-    setDemand([0,0,0]);
+    setCosts(makeMatrix(3, 3, ""));
+    setSupply(["","",""]);
+    setDemand(["","",""]);
     setResultado(null);
   };
 
@@ -186,32 +187,41 @@ export function NorthwestPage() {
 
   // ── Resolver ─────────────────────────────────────────────────────────────
   const handleResolver = () => {
-    const totalO = supply.reduce((s, v) => s + v, 0);
-    const totalD = demand.reduce((s, v) => s + v, 0);
+    const supplyPad  = supply.map(s => s === "" ? 0 : Number(s));
+    const demandPad  = demand.map(d => d === "" ? 0 : Number(d));
+    const costosPad  = costs.map(r => r.map(c => c === "" ? 0 : Number(c)));
+
+    const totalO = supplyPad.reduce((s, v) => s + v, 0);
+    const totalD = demandPad.reduce((s, v) => s + v, 0);
 
     if (totalO === 0 || totalD === 0)
       return showNotification("Oferta y demanda no pueden ser todas cero.", "error");
 
+    // Reemplazar visualmente vacíos con 0
+    setCosts(costosPad);
+    setSupply(supplyPad);
+    setDemand(demandPad);
+
     // Balancear si hace falta
-    let costosPad  = costs.map(r => [...r]);
-    let supplyPad  = [...supply];
-    let demandPad  = [...demand];
+    let costosPadBalanced  = costosPad.map(r => [...r]);
+    let supplyPadBalanced  = [...supplyPad];
+    let demandPadBalanced  = [...demandPad];
     let ficticio   = null;
 
     if (totalO > totalD) {
       const d = totalO - totalD;
-      demandPad  = [...demandPad, d];
-      costosPad  = costosPad.map(r => [...r, 0]);
+      demandPadBalanced  = [...demandPadBalanced, d];
+      costosPadBalanced  = costosPadBalanced.map(r => [...r, 0]);
       ficticio   = { tipo: "columna", valor: d };
     } else if (totalD > totalO) {
       const d = totalD - totalO;
-      supplyPad  = [...supplyPad, d];
-      costosPad  = [...costosPad, Array(cols).fill(0)];
+      supplyPadBalanced  = [...supplyPadBalanced, d];
+      costosPadBalanced  = [...costosPadBalanced, Array(cols).fill(0)];
       ficticio   = { tipo: "fila", valor: d };
     }
 
     try {
-      const res = resolverNorthwest(costosPad, supplyPad, demandPad, modo);
+      const res = resolverNorthwest(costosPadBalanced, supplyPadBalanced, demandPadBalanced, modo);
 
       // Filtrar ficticios
       const realRows = rows, realCols = cols;
@@ -225,9 +235,9 @@ export function NorthwestPage() {
         asignacionesReales,
         costoReal,
         ficticio,
-        matrizOriginal: costs,
-        supply,
-        demand,
+        matrizOriginal: costosPad,
+        supply: supplyPad,
+        demand: demandPad,
       });
     } catch (err) {
       showNotification(`Error: ${err.message}`, "error");
@@ -259,8 +269,8 @@ export function NorthwestPage() {
   const handleMouseUp = () => setIsPanning(false);
 
   // ── totales ───────────────────────────────────────────────────────────────
-  const totalOferta  = supply.reduce((s, v) => s + (Number(v)||0), 0);
-  const totalDemanda = demand.reduce((s, v) => s + (Number(v)||0), 0);
+  const totalOferta  = supply.reduce((s, v) => s + (v === "" ? 0 : Number(v)), 0);
+  const totalDemanda = demand.reduce((s, v) => s + (v === "" ? 0 : Number(v)), 0);
   const balanceado   = totalOferta === totalDemanda;
 
   return (
@@ -470,57 +480,62 @@ export function NorthwestPage() {
         ══════════════════════════════════════════════════════════════════ */}
         {canvasData && canvasData.nodos.length > 0 && (
           <Section>
-            <SectionTitle>🗺️ Vista de grafo (referencia visual)</SectionTitle>
-            <CanvasCard
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              $isPanning={isPanning}
-            >
-              <CanvasInner $ox={offset.x} $oy={offset.y}>
-                <SvgLayer>
-                  <defs>
-                    <marker id="arr-nw" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                      <polygon points="0 0, 10 3, 0 6" fill={modo === "maximizar" ? "#f59e0b" : "#10b981"} />
-                    </marker>
-                    <marker id="arr-def" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                      <polygon points="0 0, 10 3, 0 6" fill="#64748b" />
-                    </marker>
-                  </defs>
-                  <line x1={DIVIDER_X} y1={-2000} x2={DIVIDER_X} y2={2000}
-                    stroke="#94a3b8" strokeWidth="2" strokeDasharray="8,8" opacity="0.4" />
-                  <text x={DIVIDER_X - 16} y={30} fill="#94a3b8" fontSize="13" fontWeight="bold" textAnchor="end" opacity="0.6">ORÍGENES</text>
-                  <text x={DIVIDER_X + 16} y={30} fill="#94a3b8" fontSize="13" fontWeight="bold" textAnchor="start" opacity="0.6">DESTINOS</text>
+            <GrafoHeader onClick={() => setMostrarGrafo(p => !p)}>
+              <SectionTitle>🗺️ Vista de grafo (referencia visual)</SectionTitle>
+              {mostrarGrafo ? <FiChevronUp /> : <FiChevronDown />}
+            </GrafoHeader>
+            {mostrarGrafo && (
+              <CanvasCard
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+                $isPanning={isPanning}
+              >
+                <CanvasInner $ox={offset.x} $oy={offset.y}>
+                  <SvgLayer>
+                    <defs>
+                      <marker id="arr-nw" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                        <polygon points="0 0, 10 3, 0 6" fill={modo === "maximizar" ? "#f59e0b" : "#10b981"} />
+                      </marker>
+                      <marker id="arr-def" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                        <polygon points="0 0, 10 3, 0 6" fill="#64748b" />
+                      </marker>
+                    </defs>
+                    <line x1={DIVIDER_X} y1={-2000} x2={DIVIDER_X} y2={2000}
+                      stroke="#94a3b8" strokeWidth="2" strokeDasharray="8,8" opacity="0.4" />
+                    <text x={DIVIDER_X - 16} y={30} fill="#94a3b8" fontSize="13" fontWeight="bold" textAnchor="end" opacity="0.6">ORÍGENES</text>
+                    <text x={DIVIDER_X + 16} y={30} fill="#94a3b8" fontSize="13" fontWeight="bold" textAnchor="start" opacity="0.6">DESTINOS</text>
 
-                  {aristasCanvas.map((ar, idx) => (
-                    <Arista
-                      key={idx}
-                      ar={ar}
-                      nodos={canvasData.nodos}
-                      existeContraria={existeAristaContraria(aristasCanvas, ar.from, ar.to)}
+                    {aristasCanvas.map((ar, idx) => (
+                      <Arista
+                        key={idx}
+                        ar={ar}
+                        nodos={canvasData.nodos}
+                        existeContraria={existeAristaContraria(aristasCanvas, ar.from, ar.to)}
+                        herramienta={1}
+                        onAristaClick={() => {}}
+                        customStroke={ar.isOptimal ? (modo === "maximizar" ? "#f59e0b" : "#10b981") : "#94a3b8"}
+                        customStrokeWidth={ar.isOptimal ? 3 : 1}
+                        customMarkerEnd={ar.isOptimal ? "url(#arr-nw)" : "url(#arr-def)"}
+                      />
+                    ))}
+                  </SvgLayer>
+
+                  {canvasData.nodos.map(node => (
+                    <Nodo
+                      key={node.id}
+                      nodo={node}
+                      onClick={() => {}}
+                      seleccionado={false}
+                      onDrag={() => {}}
                       herramienta={1}
-                      onAristaClick={() => {}}
-                      customStroke={ar.isOptimal ? (modo === "maximizar" ? "#f59e0b" : "#10b981") : "#94a3b8"}
-                      customStrokeWidth={ar.isOptimal ? 3 : 1}
-                      customMarkerEnd={ar.isOptimal ? "url(#arr-nw)" : "url(#arr-def)"}
                     />
                   ))}
-                </SvgLayer>
-
-                {canvasData.nodos.map(node => (
-                  <Nodo
-                    key={node.id}
-                    nodo={node}
-                    onClick={() => {}}
-                    seleccionado={false}
-                    onDrag={() => {}}
-                    herramienta={1}
-                  />
-                ))}
-              </CanvasInner>
-              <CanvasHint>Arrastra para mover la vista • Las rutas resaltadas son la solución</CanvasHint>
-            </CanvasCard>
+                </CanvasInner>
+                <CanvasHint>Arrastra para mover la vista • Las rutas resaltadas son la solución</CanvasHint>
+              </CanvasCard>
+            )}
           </Section>
         )}
 
@@ -849,4 +864,11 @@ const CanvasHint = styled.div`
   padding: 5px 14px; border-radius: 20px; font-size: 11px;
   pointer-events: none; white-space: nowrap;
   backdrop-filter: blur(8px);
+`;
+
+const GrafoHeader = styled.div`
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; padding: 4px 0;
+  &:hover { opacity: 0.8; }
+  svg { font-size: 20px; color: #fff; }
 `;
