@@ -277,11 +277,20 @@ export function HelpPage() {
               </FeatureContent>
             </Feature>
             <Feature>
+              <FeatureIcon>📝</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Pasos de Resolución</FeatureName>
+                <FeatureDesc>
+                  Despliega una sección dedicada para ver detalladamente cada paso matemático y matricial que el algoritmo realizó para llegar al resultado.
+                </FeatureDesc>
+              </FeatureContent>
+            </Feature>
+            <Feature>
               <FeatureIcon>🗺️</FeatureIcon>
               <FeatureContent>
                 <FeatureName>Visualización Completa</FeatureName>
                 <FeatureDesc>
-                  Observa el costo total, el paso a paso de las matrices y un grafo visual interactivo que resalta la solución óptima.
+                  Observa el costo total y un grafo visual interactivo que resalta la solución óptima.
                 </FeatureDesc>
               </FeatureContent>
             </Feature>
