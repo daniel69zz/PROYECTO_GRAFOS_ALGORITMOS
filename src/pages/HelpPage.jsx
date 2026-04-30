@@ -247,6 +247,88 @@ export function HelpPage() {
           </FeatureList>
         </ToolSection>
 
+        <Divider />
+
+        <ToolSection>
+          <ToolHeader>
+            <ToolNumber>7</ToolNumber>
+            <ToolTitle>Método Northwest Corner</ToolTitle>
+          </ToolHeader>
+          <ToolDescription>
+            Calcula la asignación inicial para problemas de transporte (Minimizar o Maximizar).
+          </ToolDescription>
+          <FeatureList>
+            <Feature>
+              <FeatureIcon>🔢</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Matriz Dinámica</FeatureName>
+                <FeatureDesc>
+                  Agrega o elimina orígenes (filas) y destinos (columnas). Ingresa los costos, oferta y demanda.
+                </FeatureDesc>
+              </FeatureContent>
+            </Feature>
+            <Feature>
+              <FeatureIcon>⚖️</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Balanceo Automático</FeatureName>
+                <FeatureDesc>
+                  El sistema detecta automáticamente si falta oferta o demanda y agrega nodos ficticios con costo cero al resolver.
+                </FeatureDesc>
+              </FeatureContent>
+            </Feature>
+            <Feature>
+              <FeatureIcon>🗺️</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Visualización Completa</FeatureName>
+                <FeatureDesc>
+                  Observa el costo total, el paso a paso de las matrices y un grafo visual interactivo que resalta la solución óptima.
+                </FeatureDesc>
+              </FeatureContent>
+            </Feature>
+          </FeatureList>
+        </ToolSection>
+
+        <Divider />
+
+        <ToolSection>
+          <ToolHeader>
+            <ToolNumber>8</ToolNumber>
+            <ToolTitle>Algoritmos de Ordenamiento (Sorts)</ToolTitle>
+          </ToolHeader>
+          <ToolDescription>
+            Visualiza cómo funcionan los algoritmos de ordenamiento clásicos paso a paso.
+          </ToolDescription>
+          <FeatureList>
+            <Feature>
+              <FeatureIcon>🎲</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Generador de Arreglos</FeatureName>
+                <FeatureDesc>
+                  Crea arreglos aleatorios eligiendo el tamaño, ingresa tus propios números o importa desde un archivo JSON.
+                </FeatureDesc>
+              </FeatureContent>
+            </Feature>
+            <Feature>
+              <FeatureIcon>⚙️</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Configuración del Algoritmo</FeatureName>
+                <FeatureDesc>
+                  Elige entre diferentes métodos (Selection, Bubble, Insertion, Merge, Quick) y el orden (Ascendente o Descendente).
+                </FeatureDesc>
+              </FeatureContent>
+            </Feature>
+            <Feature>
+              <FeatureIcon>⏯️</FeatureIcon>
+              <FeatureContent>
+                <FeatureName>Controles de Animación</FeatureName>
+                <FeatureDesc>
+                  Utiliza Play, Pausa y Reiniciar para ver el proceso en tiempo real, junto con estadísticas detalladas y un registro de acciones.
+                </FeatureDesc>
+              </FeatureContent>
+            </Feature>
+          </FeatureList>
+        </ToolSection>
+
         <TipBox>
           <TipIcon>💡</TipIcon>
           <TipText>
