@@ -197,11 +197,6 @@ export function NorthwestPage() {
     if (totalO === 0 || totalD === 0)
       return showNotification("Oferta y demanda no pueden ser todas cero.", "error");
 
-    // Reemplazar visualmente vacíos con 0
-    setCosts(costosPad);
-    setSupply(supplyPad);
-    setDemand(demandPad);
-
     // Balancear si hace falta
     let costosPadBalanced  = costosPad.map(r => [...r]);
     let supplyPadBalanced  = [...supplyPad];
@@ -220,24 +215,27 @@ export function NorthwestPage() {
       ficticio   = { tipo: "fila", valor: d };
     }
 
+    // Actualizar visualmente la matriz para que incluya la ficticia
+    setCosts(costosPadBalanced);
+    setSupply(supplyPadBalanced);
+    setDemand(demandPadBalanced);
+
     try {
       const res = resolverNorthwest(costosPadBalanced, supplyPadBalanced, demandPadBalanced, modo);
 
-      // Filtrar ficticios
-      const realRows = rows, realCols = cols;
-      const asignacionesReales = res.asignaciones.filter(
-        a => a.fila < realRows && a.columna < realCols
-      );
-      const costoReal = asignacionesReales.reduce((s, a) => s + a.subtotal, 0);
+      // Como la matriz ahora incluye la fila/columna ficticia visualmente,
+      // mostramos todas las asignaciones.
+      const asignacionesReales = res.asignaciones;
+      const costoReal = res.costoTotal;
 
       setResultado({
         ...res,
         asignacionesReales,
         costoReal,
         ficticio,
-        matrizOriginal: costosPad,
-        supply: supplyPad,
-        demand: demandPad,
+        matrizOriginal: costosPadBalanced,
+        supply: supplyPadBalanced,
+        demand: demandPadBalanced,
       });
     } catch (err) {
       showNotification(`Error: ${err.message}`, "error");
