@@ -1,8 +1,38 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import styled from "styled-components";
+import { FaTree } from "react-icons/fa";
+import { TbRouteSquare2, TbLayoutGrid, TbCompass } from "react-icons/tb";
 import { Graph } from "../components/Graph";
 import { GraphToolbar } from "../components/GraphToolbar";
-import { TbRouteSquare2, TbLayoutGrid, TbCompass } from "react-icons/tb";
-import styled from "styled-components";
+
+const algorithmButtons = [
+  {
+    label: "Algoritmo de Johnson",
+    title: "Algoritmo de Johnson",
+    tool: 5,
+    Icon: TbRouteSquare2,
+  },
+  {
+    label: "Algoritmo de Asignacion",
+    title: "Algoritmo de Asignacion",
+    tool: 6,
+    Icon: TbLayoutGrid,
+  },
+  {
+    label: "Northwest",
+    title: "Metodo Northwest",
+    tool: 7,
+    Icon: TbCompass,
+    color: "northwest",
+  },
+  {
+    label: "Arboles Binarios",
+    title: "Arboles Binarios",
+    tool: 8,
+    Icon: FaTree,
+    color: "tree",
+  },
+];
 
 export function GraphPage() {
   const [herramienta, setHerramienta] = useState(1);
@@ -11,7 +41,7 @@ export function GraphPage() {
 
   const graphRef = useRef(null);
 
-  const handleClear = () => setClearFlag((f) => !f);
+  const handleClear = () => setClearFlag((flag) => !flag);
 
   const handleExportar = () => {
     graphRef.current?.handleExportar();
@@ -21,10 +51,10 @@ export function GraphPage() {
     graphRef.current?.abrirSelectorArchivo();
   };
 
-  const handleKeyDown = useCallback((e) => {
-    if (e.target.tagName === "INPUT") return;
+  const handleKeyDown = useCallback((event) => {
+    if (event.target.tagName === "INPUT") return;
 
-    const num = Number(e.key);
+    const num = Number(event.key);
     if (num >= 1 && num <= 6) setHerramienta(num);
   }, []);
 
@@ -44,32 +74,23 @@ export function GraphPage() {
         onExportar={handleExportar}
         onImportar={handleImportar}
       />
+
       <MainContent>
         <AlgoritmosHeader>
           <AlgoritmosTitle>Algoritmos</AlgoritmosTitle>
-          <AlgoritmoButton
-            onClick={() => setHerramienta(5)}
-            title="Algoritmo de Johnson"
-          >
-            <TbRouteSquare2 />
-            <span>Algoritmo de Johnson</span>
-          </AlgoritmoButton>
-          <AlgoritmoButton
-            onClick={() => setHerramienta(6)}
-            title="Algoritmo de Asignación"
-          >
-            <TbLayoutGrid />
-            <span>Algoritmo de Asignación</span>
-          </AlgoritmoButton>
-          <AlgoritmoButton
-            $color="northwest"
-            onClick={() => setHerramienta(7)}
-            title="Método Northwest"
-          >
-            <TbCompass />
-            <span>Northwest</span>
-          </AlgoritmoButton>
+          {algorithmButtons.map(({ label, title, tool, Icon, color }) => (
+            <AlgoritmoButton
+              key={tool}
+              $color={color}
+              onClick={() => setHerramienta(tool)}
+              title={title}
+            >
+              <Icon />
+              <span>{label}</span>
+            </AlgoritmoButton>
+          ))}
         </AlgoritmosHeader>
+
         <Graph
           ref={graphRef}
           herramienta={herramienta}
@@ -107,6 +128,7 @@ const AlgoritmosHeader = styled.div`
   margin: 8px 16px 0 8px;
   border-radius: 12px;
   box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
 `;
 
 const AlgoritmosTitle = styled.h3`
@@ -119,29 +141,61 @@ const AlgoritmosTitle = styled.h3`
   padding-right: 16px;
 `;
 
+const buttonColorMap = {
+  default: {
+    background: "rgba(88, 166, 255, 0.1)",
+    border: "rgba(88, 166, 255, 0.2)",
+    text: "var(--accent-color)",
+    hoverBackground: "var(--accent-color)",
+    hoverShadow: "0 4px 12px var(--accent-glow)",
+  },
+  northwest: {
+    background: "rgba(245, 158, 11, 0.1)",
+    border: "rgba(245, 158, 11, 0.3)",
+    text: "#f59e0b",
+    hoverBackground: "#f59e0b",
+    hoverShadow: "0 4px 12px rgba(245,158,11,0.4)",
+  },
+  tree: {
+    background: "rgba(16, 185, 129, 0.12)",
+    border: "rgba(16, 185, 129, 0.28)",
+    text: "#34d399",
+    hoverBackground: "#10b981",
+    hoverShadow: "0 4px 12px rgba(16,185,129,0.35)",
+  },
+};
+
 const AlgoritmoButton = styled.button`
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 6px 14px;
-  background: ${p => p.$color === "northwest" ? "rgba(245, 158, 11, 0.1)" : "rgba(88, 166, 255, 0.1)"};
-  border: 1px solid ${p => p.$color === "northwest" ? "rgba(245, 158, 11, 0.3)" : "rgba(88, 166, 255, 0.2)"};
   border-radius: 8px;
-  color: ${p => p.$color === "northwest" ? "#f59e0b" : "var(--accent-color)"};
-  font-size: 0.85rem;
-  font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-fast);
+  border: 1px solid
+    ${({ $color }) => (buttonColorMap[$color] ?? buttonColorMap.default).border};
+  background:
+    ${({ $color }) =>
+      (buttonColorMap[$color] ?? buttonColorMap.default).background};
+  color: ${({ $color }) => (buttonColorMap[$color] ?? buttonColorMap.default).text};
+  font-size: 0.85rem;
+  font-weight: 600;
 
   svg {
     font-size: 1.1rem;
+    flex-shrink: 0;
   }
 
   &:hover {
-    background: ${p => p.$color === "northwest" ? "#f59e0b" : "var(--accent-color)"};
+    background:
+      ${({ $color }) =>
+        (buttonColorMap[$color] ?? buttonColorMap.default).hoverBackground};
     color: white;
     transform: translateY(-1px);
-    box-shadow: ${p => p.$color === "northwest" ? "0 4px 12px rgba(245,158,11,0.4)" : "0 4px 12px var(--accent-glow)"};
+    box-shadow:
+      ${({ $color }) =>
+        (buttonColorMap[$color] ?? buttonColorMap.default).hoverShadow};
   }
 
   &:active {

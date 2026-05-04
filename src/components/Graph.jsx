@@ -128,6 +128,13 @@ export const Graph = forwardRef(
       }
     }, [herramienta, nodos, aristas, navigate, setHerramienta]);
 
+    useEffect(() => {
+      if (herramienta === 8) {
+        navigate("/binary-tree");
+        setHerramienta(1);
+      }
+    }, [herramienta, navigate, setHerramienta]);
+
     const [weight_input, setWeight_input] = useState(null);
     const [weight_value, setWeight_value] = useState("1");
     const inputRef = useRef(null);

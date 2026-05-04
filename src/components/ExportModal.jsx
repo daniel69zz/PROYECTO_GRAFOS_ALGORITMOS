@@ -1,23 +1,31 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { BiExport } from "react-icons/bi";
 
-export function ExportModal({ onConfirm, onCancel, defaultName }) {
+export function ExportModal({
+  onConfirm,
+  onCancel,
+  defaultName,
+  title = "Exportar Grafo",
+  label = "Nombre del archivo",
+  helpText = "El archivo se guardara con extension .json",
+  confirmLabel = "Exportar",
+}) {
   const [filename, setFilename] = useState(defaultName || "");
   const modalRef = useRef(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Enter") onConfirm(filename);
-      if (e.key === "Escape") onCancel();
+    const handleKeyDown = (event) => {
+      if (event.key === "Enter") onConfirm(filename);
+      if (event.key === "Escape") onCancel();
     };
+
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [filename, onConfirm, onCancel]);
 
   useEffect(() => {
-
     if (inputRef.current) {
       inputRef.current.focus();
       inputRef.current.select();
@@ -26,28 +34,28 @@ export function ExportModal({ onConfirm, onCancel, defaultName }) {
 
   return (
     <Overlay onClick={onCancel}>
-      <ModalContainer onClick={(e) => e.stopPropagation()} ref={modalRef}>
+      <ModalContainer onClick={(event) => event.stopPropagation()} ref={modalRef}>
         <ModalHeader>
           <IconWrapper>
             <BiExport />
           </IconWrapper>
-          <Title>Exportar Grafo</Title>
+          <Title>{title}</Title>
         </ModalHeader>
         <ModalBody>
-          <Label>Nombre del archivo</Label>
+          <Label>{label}</Label>
           <Input
             ref={inputRef}
             type="text"
             value={filename}
-            onChange={(e) => setFilename(e.target.value)}
+            onChange={(event) => setFilename(event.target.value)}
             placeholder="Ej: mi_primer_grafo"
           />
-          <HelpText>El archivo se guardará con extensión .json</HelpText>
+          <HelpText>{helpText}</HelpText>
         </ModalBody>
         <ModalFooter>
           <BtnCancelar onClick={onCancel}>Cancelar</BtnCancelar>
           <BtnConfirmar onClick={() => onConfirm(filename)}>
-            Exportar
+            {confirmLabel}
           </BtnConfirmar>
         </ModalFooter>
       </ModalContainer>
@@ -57,10 +65,7 @@ export function ExportModal({ onConfirm, onCancel, defaultName }) {
 
 const Overlay = styled.div`
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(8px);
   display: flex;
@@ -70,8 +75,12 @@ const Overlay = styled.div`
   animation: fadeIn 0.3s ease-out;
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 `;
 
@@ -90,8 +99,14 @@ const ModalContainer = styled.div`
   animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
   @keyframes slideUp {
-    from { transform: translateY(30px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    from {
+      transform: translateY(30px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
 `;
 

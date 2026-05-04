@@ -1,350 +1,351 @@
-import React from "react";
+import { useMemo, useState } from "react";
 import styled from "styled-components";
 
+const HELP_SECTIONS = [
+  {
+    number: 1,
+    category: "Editor de grafos",
+    title: "Crear / Mover + Desplazamiento",
+    description: "Construye el grafo y acomoda el lienzo de trabajo.",
+    features: [
+      {
+        name: "Crear nodos",
+        description: "Haz doble clic sobre un espacio vacio para crear un nodo.",
+      },
+      {
+        name: "Crear aristas",
+        description:
+          "Haz clic en nodo origen, luego nodo destino y define el peso de la conexion.",
+      },
+      {
+        name: "Mover nodos",
+        description: "Arrastra cualquier nodo para reubicarlo visualmente.",
+      },
+      {
+        name: "Desplazar lienzo",
+        description: "Haz clic y arrastra sobre el fondo para mover la vista.",
+      },
+    ],
+  },
+  {
+    number: 2,
+    category: "Editor de grafos",
+    title: "Editar",
+    description: "Modifica elementos existentes del grafo con un clic.",
+    features: [
+      {
+        name: "Editar nodo",
+        description: "Cambia nombre y color del nodo seleccionado.",
+      },
+      {
+        name: "Editar arista",
+        description: "Modifica el peso de una arista existente.",
+      },
+    ],
+  },
+  {
+    number: 3,
+    category: "Editor de grafos",
+    title: "Eliminar",
+    description: "Elimina nodos o aristas puntuales del grafo.",
+    features: [
+      {
+        name: "Eliminar elementos",
+        description: "Haz clic sobre un nodo o una arista para borrarlo.",
+      },
+    ],
+  },
+  {
+    number: 4,
+    category: "Editor de grafos",
+    title: "Matriz Ponderada Dirigida",
+    description: "Genera la representacion matricial del grafo dirigido.",
+    features: [
+      {
+        name: "Matriz de adyacencia",
+        description:
+          "Considera la direccion y el peso de las aristas para construir la matriz.",
+      },
+    ],
+  },
+  {
+    number: 5,
+    category: "Johnson",
+    title: "Algoritmo de Johnson",
+    description:
+      "Calcula ruta critica o ruta minima paso a paso sobre el grafo.",
+    features: [
+      {
+        name: "Configuracion",
+        description:
+          "Selecciona nodo origen, nodo destino y el objetivo: maximizar o minimizar.",
+      },
+      {
+        name: "Ejecucion paso a paso",
+        description:
+          "Usa los controles para avanzar entre los calculos Forward y Backward.",
+      },
+      {
+        name: "Resultado final",
+        description:
+          "Al finalizar puedes ver la duracion total y el camino resaltado.",
+      },
+    ],
+  },
+  {
+    number: 6,
+    category: "Asignacion",
+    title: "Algoritmo de Asignacion",
+    description:
+      "Encuentra la asignacion optima entre origenes y destinos.",
+    features: [
+      {
+        name: "Division visual",
+        description:
+          "Los nodos de la izquierda son origenes y los de la derecha son destinos.",
+      },
+      {
+        name: "Conectar costos",
+        description:
+          "Relaciona origenes con destinos y asigna pesos para formar la matriz de costos.",
+      },
+      {
+        name: "Balanceo",
+        description:
+          "El sistema ajusta automaticamente el problema si faltan filas o columnas equivalentes.",
+      },
+    ],
+  },
+  {
+    number: 7,
+    category: "Northwest",
+    title: "Metodo Northwest Corner",
+    description:
+      "Calcula una asignacion inicial para problemas de transporte.",
+    features: [
+      {
+        name: "Matriz dinamica",
+        description:
+          "Agrega o elimina origenes y destinos, y completa costos, oferta y demanda.",
+      },
+      {
+        name: "Balanceo automatico",
+        description:
+          "Si falta oferta o demanda, el sistema agrega elementos ficticios al resolver.",
+      },
+      {
+        name: "Pasos detallados",
+        description:
+          "Puedes revisar el proceso de resolucion y la solucion resaltada.",
+      },
+    ],
+  },
+  {
+    number: 8,
+    category: "Sorts",
+    title: "Algoritmos de Ordenamiento",
+    description:
+      "Visualiza como funcionan los algoritmos clasicos de ordenamiento.",
+    features: [
+      {
+        name: "Generador de arreglos",
+        description:
+          "Crea arreglos aleatorios, escribe tus propios valores o importa un JSON.",
+      },
+      {
+        name: "Configuracion",
+        description:
+          "Elige algoritmo, orden ascendente o descendente y controla la ejecucion.",
+      },
+      {
+        name: "Animacion",
+        description:
+          "Usa play, pausa y reinicio para seguir el proceso paso a paso.",
+      },
+    ],
+  },
+  {
+    number: 9,
+    category: "Arboles Binarios",
+    title: "Arboles Binarios",
+    description:
+      "Construye un BST, reconstruye arboles y anima los recorridos.",
+    features: [
+      {
+        name: "Construir arbol",
+        description:
+          "Inserta numeros con Enter o con el boton, y evita duplicados automaticamente.",
+      },
+      {
+        name: "Reconstruir",
+        description:
+          "Usa In-Order + Pre-Order o In-Order + Post-Order con validacion completa.",
+      },
+      {
+        name: "Recorridos y utilidades",
+        description:
+          "Anima In-Order, Pre-Order y Post-Order, exporta/importa JSON y genera datos aleatorios.",
+      },
+    ],
+  },
+];
+
+const CATEGORY_OPTIONS = [
+  "Todas",
+  ...new Set(HELP_SECTIONS.map((section) => section.category)),
+];
+
 export function HelpPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("Todas");
+
+  const filteredSections = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+
+    return HELP_SECTIONS.filter((section) => {
+      const categoryMatch =
+        selectedCategory === "Todas" || section.category === selectedCategory;
+
+      if (!categoryMatch) return false;
+
+      if (!query) return true;
+
+      const haystack = [
+        section.category,
+        section.title,
+        section.description,
+        ...section.features.flatMap((feature) => [
+          feature.name,
+          feature.description,
+        ]),
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return haystack.includes(query);
+    });
+  }, [searchTerm, selectedCategory]);
+
   return (
     <Container>
       <Card>
-        <Header>
-          <Title>📖 Guía de Usuario</Title>
+        <Hero>
+          <Title>Guia de Usuario</Title>
           <Subtitle>
-            Aprende a utilizar el <strong>Toolbar</strong> del graficador
-            interactivo
+            Consulta las funciones del proyecto y filtra la ayuda por categoria.
           </Subtitle>
-        </Header>
+        </Hero>
 
-        <Section>
-          <SectionTitle>⌨️ Cómo cambiar de opción</SectionTitle>
-          <Text>Puedes cambiar entre las herramientas de dos maneras:</Text>
+        <IntroSection>
+          <SectionTitle>Como cambiar de opcion</SectionTitle>
+          <Text>
+            Puedes cambiar entre herramientas y algoritmos usando el toolbar,
+            el header del grafo y las rutas principales del proyecto.
+          </Text>
 
           <MethodGrid>
             <MethodCard>
-              <MethodIcon>🖱️</MethodIcon>
-              <MethodTitle>Clic</MethodTitle>
-              <MethodText>Haz clic sobre la opción en el toolbar</MethodText>
+              <MethodTitle>Click directo</MethodTitle>
+              <MethodText>
+                Haz clic sobre la opcion o algoritmo que quieras abrir.
+              </MethodText>
             </MethodCard>
 
             <MethodCard>
-              <MethodIcon>⌨️</MethodIcon>
-              <MethodTitle>Teclas rápidas</MethodTitle>
-              <MethodText>
-                <KeyList>
-                  <KeyItem>
-                    <Key>1</Key> Opción 1
-                  </KeyItem>
-                  <KeyItem>
-                    <Key>2</Key> Opción 2
-                  </KeyItem>
-                  <KeyItem>
-                    <Key>3</Key> Opción 3
-                  </KeyItem>
-                  <KeyItem>
-                    <Key>4</Key> Opción 4
-                  </KeyItem>
-                </KeyList>
-              </MethodText>
+              <MethodTitle>Teclas rapidas</MethodTitle>
+              <KeyList>
+                <KeyItem>
+                  <Key>1</Key> Mover / crear
+                </KeyItem>
+                <KeyItem>
+                  <Key>2</Key> Editar
+                </KeyItem>
+                <KeyItem>
+                  <Key>3</Key> Eliminar
+                </KeyItem>
+                <KeyItem>
+                  <Key>4</Key> Matriz
+                </KeyItem>
+              </KeyList>
             </MethodCard>
           </MethodGrid>
-        </Section>
+        </IntroSection>
 
         <Divider />
 
-        <ToolSection>
-          <ToolHeader>
-            <ToolNumber>1</ToolNumber>
-            <ToolTitle>Crear / Mover + Desplazamiento</ToolTitle>
-          </ToolHeader>
-          <ToolDescription>
-            Construye el grafo y acomoda el lienzo
-          </ToolDescription>
-          <FeatureList>
-            <Feature>
-              <FeatureIcon>➕</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Crear nodos</FeatureName>
-                <FeatureDesc>Doble clic en un espacio vacío</FeatureDesc>
-              </FeatureContent>
-            </Feature>
-            <Feature>
-              <FeatureIcon>🔗</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Crear aristas</FeatureName>
-                <FeatureDesc>
-                  Clic en nodo origen → nodo destino → peso (default: 1)
-                </FeatureDesc>
-              </FeatureContent>
-            </Feature>
-            <Feature>
-              <FeatureIcon>↔️</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Mover nodos</FeatureName>
-                <FeatureDesc>Arrastra un nodo para reubicarlo</FeatureDesc>
-              </FeatureContent>
-            </Feature>
-            <Feature>
-              <FeatureIcon>🖐️</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Desplazar lienzo (pan)</FeatureName>
-                <FeatureDesc>Clic y arrastra en espacio vacío</FeatureDesc>
-              </FeatureContent>
-            </Feature>
-          </FeatureList>
-        </ToolSection>
+        <FilterPanel>
+          <FilterHeader>
+            <div>
+              <SectionLabel>Buscador</SectionLabel>
+              <SectionTitle>Filtrar por categoria</SectionTitle>
+            </div>
+            <ResultCount>
+              {filteredSections.length} resultado
+              {filteredSections.length === 1 ? "" : "s"}
+            </ResultCount>
+          </FilterHeader>
 
-        <Divider />
+          <SearchInput
+            type="text"
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            placeholder="Buscar algoritmo, categoria o funcion"
+          />
 
-        <ToolSection>
-          <ToolHeader>
-            <ToolNumber>2</ToolNumber>
-            <ToolTitle>Editar</ToolTitle>
-          </ToolHeader>
-          <ToolDescription>
-            Modifica elementos existentes con un clic
-          </ToolDescription>
-          <FeatureList>
-            <Feature>
-              <FeatureIcon>🎨</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Editar nodo</FeatureName>
-                <FeatureDesc>Cambia nombre y color</FeatureDesc>
-              </FeatureContent>
-            </Feature>
-            <Feature>
-              <FeatureIcon>⚖️</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Editar arista</FeatureName>
-                <FeatureDesc>Modifica el peso</FeatureDesc>
-              </FeatureContent>
-            </Feature>
-          </FeatureList>
-        </ToolSection>
+          <CategoryRow>
+            {CATEGORY_OPTIONS.map((category) => (
+              <CategoryButton
+                key={category}
+                type="button"
+                $active={selectedCategory === category}
+                onClick={() => setSelectedCategory(category)}
+              >
+                {category}
+              </CategoryButton>
+            ))}
+          </CategoryRow>
+        </FilterPanel>
 
-        <Divider />
+        <SectionsColumn>
+          {filteredSections.length === 0 ? (
+            <EmptyState>
+              <h3>Sin resultados</h3>
+              <p>
+                Prueba otra categoria o ajusta el texto del buscador para
+                encontrar la seccion que necesitas.
+              </p>
+            </EmptyState>
+          ) : (
+            filteredSections.map((section) => (
+              <SectionCard key={section.number}>
+                <ToolHeader>
+                  <ToolNumber>{section.number}</ToolNumber>
+                  <ToolHeading>
+                    <CategoryBadge>{section.category}</CategoryBadge>
+                    <ToolTitle>{section.title}</ToolTitle>
+                    <ToolDescription>{section.description}</ToolDescription>
+                  </ToolHeading>
+                </ToolHeader>
 
-        <ToolSection>
-          <ToolHeader>
-            <ToolNumber>3</ToolNumber>
-            <ToolTitle>Eliminar</ToolTitle>
-          </ToolHeader>
-          <ToolDescription>
-            Elimina elementos específicos del grafo
-          </ToolDescription>
-          <FeatureList>
-            <Feature>
-              <FeatureIcon>🗑️</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Eliminar</FeatureName>
-                <FeatureDesc>
-                  Clic sobre nodo o arista para eliminarlo
-                </FeatureDesc>
-              </FeatureContent>
-            </Feature>
-          </FeatureList>
-        </ToolSection>
-
-        <Divider />
-
-        <ToolSection>
-          <ToolHeader>
-            <ToolNumber>4</ToolNumber>
-            <ToolTitle>Matriz Ponderada Dirigida</ToolTitle>
-          </ToolHeader>
-          <ToolDescription>
-            Genera la representación matricial del grafo
-          </ToolDescription>
-          <FeatureList>
-            <Feature>
-              <FeatureIcon>📊</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Matriz de adyacencia</FeatureName>
-                <FeatureDesc>
-                  Considera dirección y peso de las aristas
-                </FeatureDesc>
-              </FeatureContent>
-            </Feature>
-          </FeatureList>
-        </ToolSection>
-
-        <Divider />
-
-        <ToolSection>
-          <ToolHeader>
-            <ToolNumber>5</ToolNumber>
-            <ToolTitle>Algoritmo de Johnson</ToolTitle>
-          </ToolHeader>
-          <ToolDescription>
-            Calcula la ruta crítica (maximizar) o la ruta más corta (minimizar) paso a paso.
-          </ToolDescription>
-          <FeatureList>
-            <Feature>
-              <FeatureIcon>⚙️</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Configuración</FeatureName>
-                <FeatureDesc>
-                  Selecciona nodo origen, destino y el objetivo (Maximizar o Minimizar).
-                </FeatureDesc>
-              </FeatureContent>
-            </Feature>
-            <Feature>
-              <FeatureIcon>🎞️</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Ejecución paso a paso</FeatureName>
-                <FeatureDesc>
-                  Usa los controles ⟵ / ⟶ para navegar por los cálculos de TE (Forward) y TL (Backward).
-                </FeatureDesc>
-              </FeatureContent>
-            </Feature>
-            <Feature>
-              <FeatureIcon>🏁</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Resultado final</FeatureName>
-                <FeatureDesc>
-                  Presiona ✓ para obtener la duración total y visualizar los resultados en el grafo.
-                </FeatureDesc>
-              </FeatureContent>
-            </Feature>
-          </FeatureList>
-        </ToolSection>
-
-        <Divider />
-
-        <ToolSection>
-          <ToolHeader>
-            <ToolNumber>6</ToolNumber>
-            <ToolTitle>Asignación (Algoritmo Húngaro)</ToolTitle>
-          </ToolHeader>
-          <ToolDescription>
-            Encuentra la asignación óptima entre orígenes y destinos (Minimizar o Maximizar).
-          </ToolDescription>
-          <FeatureList>
-            <Feature>
-              <FeatureIcon>🔵🟩</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>División Visual</FeatureName>
-                <FeatureDesc>
-                  Crea nodos a la izquierda para Orígenes (azul) y a la derecha para Destinos (verde).
-                </FeatureDesc>
-              </FeatureContent>
-            </Feature>
-            <Feature>
-              <FeatureIcon>🔗</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Conectar y Asignar Pesos</FeatureName>
-                <FeatureDesc>
-                  Conecta exclusivamente Orígenes con Destinos para formar la matriz de costos.
-                </FeatureDesc>
-              </FeatureContent>
-            </Feature>
-            <Feature>
-              <FeatureIcon>💡</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Variables Artificiales</FeatureName>
-                <FeatureDesc>
-                  El algoritmo balancea automáticamente si la cantidad de orígenes y destinos no es igual.
-                </FeatureDesc>
-              </FeatureContent>
-            </Feature>
-          </FeatureList>
-        </ToolSection>
-
-        <Divider />
-
-        <ToolSection>
-          <ToolHeader>
-            <ToolNumber>7</ToolNumber>
-            <ToolTitle>Método Northwest Corner</ToolTitle>
-          </ToolHeader>
-          <ToolDescription>
-            Calcula la asignación inicial para problemas de transporte (Minimizar o Maximizar).
-          </ToolDescription>
-          <FeatureList>
-            <Feature>
-              <FeatureIcon>🔢</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Matriz Dinámica</FeatureName>
-                <FeatureDesc>
-                  Agrega o elimina orígenes (filas) y destinos (columnas). Ingresa los costos, oferta y demanda.
-                </FeatureDesc>
-              </FeatureContent>
-            </Feature>
-            <Feature>
-              <FeatureIcon>⚖️</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Balanceo Automático</FeatureName>
-                <FeatureDesc>
-                  El sistema detecta automáticamente si falta oferta o demanda y agrega nodos ficticios con costo cero al resolver.
-                </FeatureDesc>
-              </FeatureContent>
-            </Feature>
-            <Feature>
-              <FeatureIcon>📝</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Pasos de Resolución</FeatureName>
-                <FeatureDesc>
-                  Despliega una sección dedicada para ver detalladamente cada paso matemático y matricial que el algoritmo realizó para llegar al resultado.
-                </FeatureDesc>
-              </FeatureContent>
-            </Feature>
-            <Feature>
-              <FeatureIcon>🗺️</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Visualización Completa</FeatureName>
-                <FeatureDesc>
-                  Observa el costo total y un grafo visual interactivo que resalta la solución óptima.
-                </FeatureDesc>
-              </FeatureContent>
-            </Feature>
-          </FeatureList>
-        </ToolSection>
-
-        <Divider />
-
-        <ToolSection>
-          <ToolHeader>
-            <ToolNumber>8</ToolNumber>
-            <ToolTitle>Algoritmos de Ordenamiento (Sorts)</ToolTitle>
-          </ToolHeader>
-          <ToolDescription>
-            Visualiza cómo funcionan los algoritmos de ordenamiento clásicos paso a paso.
-          </ToolDescription>
-          <FeatureList>
-            <Feature>
-              <FeatureIcon>🎲</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Generador de Arreglos</FeatureName>
-                <FeatureDesc>
-                  Crea arreglos aleatorios eligiendo el tamaño, ingresa tus propios números o importa desde un archivo JSON.
-                </FeatureDesc>
-              </FeatureContent>
-            </Feature>
-            <Feature>
-              <FeatureIcon>⚙️</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Configuración del Algoritmo</FeatureName>
-                <FeatureDesc>
-                  Elige entre diferentes métodos (Selection, Bubble, Insertion, Merge, Quick) y el orden (Ascendente o Descendente).
-                </FeatureDesc>
-              </FeatureContent>
-            </Feature>
-            <Feature>
-              <FeatureIcon>⏯️</FeatureIcon>
-              <FeatureContent>
-                <FeatureName>Controles de Animación</FeatureName>
-                <FeatureDesc>
-                  Utiliza Play, Pausa y Reiniciar para ver el proceso en tiempo real, junto con estadísticas detalladas y un registro de acciones.
-                </FeatureDesc>
-              </FeatureContent>
-            </Feature>
-          </FeatureList>
-        </ToolSection>
+                <FeatureList>
+                  {section.features.map((feature) => (
+                    <Feature key={`${section.number}-${feature.name}`}>
+                      <FeatureContent>
+                        <FeatureName>{feature.name}</FeatureName>
+                        <FeatureDesc>{feature.description}</FeatureDesc>
+                      </FeatureContent>
+                    </Feature>
+                  ))}
+                </FeatureList>
+              </SectionCard>
+            ))
+          )}
+        </SectionsColumn>
 
         <TipBox>
-          <TipIcon>💡</TipIcon>
-          <TipText>
-            <strong>Consejo:</strong> Si una acción no funciona como esperas,
-            verifica la opción seleccionada (presiona 1–4 para cambiar
-            rápidamente)
-          </TipText>
+          <strong>Consejo:</strong> Si una accion no funciona como esperas,
+          revisa la categoria correspondiente en esta pagina y verifica que
+          estes en la vista correcta del proyecto.
         </TipBox>
       </Card>
     </Container>
@@ -353,156 +354,116 @@ export function HelpPage() {
 
 const Container = styled.div`
   min-height: calc(100vh - 64px);
-  padding: 80px 24px;
-  background-color: #050810;
-  background-image:
-    radial-gradient(circle at 80% 20%, rgba(88, 166, 255, 0.08), transparent 40%),
-    radial-gradient(circle at 20% 80%, rgba(88, 166, 255, 0.12), transparent 40%);
-  position: relative;
-  z-index: 1;
+  padding: 64px 24px 80px;
+  background:
+    radial-gradient(circle at 82% 18%, rgba(88, 166, 255, 0.08), transparent 38%),
+    radial-gradient(circle at 16% 84%, rgba(16, 185, 129, 0.08), transparent 34%),
+    #050810;
 
   @media (max-width: 768px) {
-    padding: 40px 16px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 24px 12px;
+    padding: 36px 16px 54px;
   }
 `;
 
 const Card = styled.div`
-  max-width: 1000px;
+  max-width: 1080px;
   margin: 0 auto;
   background: rgba(255, 255, 255, 0.02);
   backdrop-filter: blur(20px);
   border-radius: 24px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  padding: 56px 48px;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  padding: 48px;
   border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: transform var(--transition-bounce), box-shadow var(--transition-normal);
-
-  &:hover {
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  }
 
   @media (max-width: 768px) {
-    padding: 40px 24px;
-    border-radius: 20px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 32px 20px;
+    padding: 28px 20px;
+    border-radius: 18px;
   }
 `;
 
-const Header = styled.header`
+const Hero = styled.header`
   text-align: center;
-  margin-bottom: 40px;
-
-  @media (max-width: 768px) {
-    margin-bottom: 32px;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 34px;
 `;
 
 const Title = styled.h1`
-  font-size: clamp(36px, 6vw, 48px);
+  margin: 0;
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
   font-weight: 900;
-  margin-bottom: 16px;
   letter-spacing: -0.02em;
   background: linear-gradient(180deg, #ffffff 0%, #a5c8ff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 30px rgba(88, 166, 255, 0.2);
 `;
 
 const Subtitle = styled.p`
-  font-size: clamp(16px, 3vw, 20px);
+  margin: 0;
   color: var(--text-secondary);
-  line-height: 1.6;
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  line-height: 1.7;
 `;
 
-const Section = styled.section`
-  margin-bottom: 40px;
+const IntroSection = styled.section`
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+`;
 
-  @media (max-width: 768px) {
-    margin-bottom: 32px;
-  }
+const SectionLabel = styled.span`
+  display: inline-block;
+  color: #7dd3fc;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 `;
 
 const SectionTitle = styled.h2`
-  font-size: clamp(22px, 4vw, 28px);
-  font-weight: 700;
+  margin: 0;
   color: var(--text-primary);
-  margin-bottom: 16px;
+  font-size: clamp(1.25rem, 3vw, 1.8rem);
 `;
 
 const Text = styled.p`
-  font-size: 16px;
-  line-height: 1.8;
+  margin: 0;
   color: var(--text-secondary);
-  margin-bottom: 24px;
-
-  @media (max-width: 480px) {
-    font-size: 15px;
-  }
+  line-height: 1.7;
+  font-size: 1rem;
 `;
 
 const MethodGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
 
-  @media (max-width: 480px) {
+  @media (max-width: 720px) {
     grid-template-columns: 1fr;
-    gap: 16px;
   }
 `;
 
-const MethodCard = styled.div`
-  background: rgba(0, 0, 0, 0.2);
-  padding: 32px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  text-align: center;
-  transition: all var(--transition-bounce);
-  box-shadow: inset 0 2px 0 rgba(88, 166, 255, 0.5);
-
-  &:hover {
-    border-color: rgba(88, 166, 255, 0.4);
-    transform: translateY(-8px);
-    background: rgba(255, 255, 255, 0.04);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 3px 0 #58a6ff;
-  }
-
-  @media (max-width: 480px) {
-    padding: 24px;
-  }
-`;
-
-const MethodIcon = styled.div`
-  font-size: 56px;
-  margin-bottom: 20px;
-  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
-
-  @media (max-width: 480px) {
-    font-size: 48px;
-    margin-bottom: 16px;
-  }
+const MethodCard = styled.article`
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.24);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 `;
 
 const MethodTitle = styled.h3`
-  font-size: 20px;
-  font-weight: 700;
+  margin: 0;
   color: var(--text-primary);
-  margin-bottom: 12px;
-
-  @media (max-width: 480px) {
-    font-size: 18px;
-  }
+  font-size: 1.05rem;
 `;
 
-const MethodText = styled.div`
-  font-size: 15px;
+const MethodText = styled.p`
+  margin: 0;
   color: var(--text-secondary);
   line-height: 1.6;
 `;
@@ -510,207 +471,221 @@ const MethodText = styled.div`
 const KeyList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  text-align: left;
+  gap: 10px;
 `;
 
 const KeyItem = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  color: var(--text-secondary);
 `;
 
 const Key = styled.kbd`
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  min-width: 34px;
+  padding: 5px 10px;
   border-radius: 8px;
-  padding: 6px 12px;
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--accent-hover);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  min-width: 36px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #bae6fd;
+  font-weight: 800;
   text-align: center;
-
-  @media (max-width: 480px) {
-    padding: 4px 10px;
-    font-size: 13px;
-  }
 `;
 
 const Divider = styled.hr`
   border: none;
   height: 1px;
   background: var(--glass-border);
-  margin: 40px 0;
+  margin: 34px 0 28px;
+`;
 
-  @media (max-width: 768px) {
-    margin: 32px 0;
+const FilterPanel = styled.section`
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.03);
+`;
+
+const FilterHeader = styled.div`
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+`;
+
+const ResultCount = styled.span`
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 700;
+`;
+
+const SearchInput = styled.input`
+  width: 100%;
+  min-height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  padding: 0 14px;
+  outline: none;
+
+  &:focus {
+    border-color: rgba(56, 189, 248, 0.45);
   }
 `;
 
-const ToolSection = styled.section`
-  margin-bottom: 40px;
+const CategoryRow = styled.div`
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+`;
 
-  @media (max-width: 768px) {
-    margin-bottom: 32px;
+const CategoryButton = styled.button`
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid
+    ${(props) =>
+      props.$active ? "rgba(56, 189, 248, 0.38)" : "rgba(255, 255, 255, 0.08)"};
+  background: ${(props) =>
+    props.$active ? "rgba(56, 189, 248, 0.14)" : "rgba(255, 255, 255, 0.04)"};
+  color: ${(props) => (props.$active ? "#bae6fd" : "var(--text-secondary)")};
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+`;
+
+const SectionsColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 26px;
+`;
+
+const EmptyState = styled.div`
+  border-radius: 18px;
+  padding: 30px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.03);
+  text-align: center;
+
+  h3 {
+    margin: 0 0 8px;
+    color: var(--text-primary);
   }
+
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+`;
+
+const SectionCard = styled.section`
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.2);
 `;
 
 const ToolHeader = styled.div`
   display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-bottom: 16px;
+  gap: 18px;
+  align-items: flex-start;
 
-  @media (max-width: 480px) {
+  @media (max-width: 520px) {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
   }
 `;
 
 const ToolNumber = styled.div`
-  width: 56px;
-  height: 56px;
+  width: 54px;
+  height: 54px;
   border-radius: 16px;
-  background: var(--accent-color);
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  font-size: 1.45rem;
   font-weight: 900;
   flex-shrink: 0;
-  box-shadow: 0 0 20px var(--accent-glow);
+`;
 
-  @media (max-width: 480px) {
-    width: 48px;
-    height: 48px;
-    font-size: 24px;
-  }
+const ToolHeading = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const CategoryBadge = styled.span`
+  width: fit-content;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(16, 185, 129, 0.24);
+  color: #a7f3d0;
+  font-size: 0.8rem;
+  font-weight: 800;
 `;
 
 const ToolTitle = styled.h3`
-  font-size: clamp(20px, 3.5vw, 26px);
-  font-weight: 700;
+  margin: 0;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
   color: var(--text-primary);
 `;
 
 const ToolDescription = styled.p`
-  font-size: 16px;
+  margin: 0;
   color: var(--text-secondary);
-  margin-bottom: 24px;
-  padding-left: 76px;
-
-  @media (max-width: 480px) {
-    padding-left: 0;
-    font-size: 15px;
-  }
+  line-height: 1.6;
 `;
 
 const FeatureList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
+  margin-top: 18px;
 `;
 
-const Feature = styled.div`
-  display: flex;
-  gap: 20px;
-  padding: 24px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  transition: all var(--transition-bounce);
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.04);
-    transform: translateX(8px);
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  }
-
-  @media (max-width: 480px) {
-    padding: 20px;
-    gap: 16px;
-  }
-`;
-
-const FeatureIcon = styled.div`
-  font-size: 32px;
-  flex-shrink: 0;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-
-  @media (max-width: 480px) {
-    font-size: 28px;
-  }
+const Feature = styled.article`
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.03);
 `;
 
 const FeatureContent = styled.div`
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 `;
 
-const FeatureName = styled.div`
-  font-size: 18px;
-  font-weight: 700;
+const FeatureName = styled.strong`
   color: var(--text-primary);
-  margin-bottom: 6px;
-
-  @media (max-width: 480px) {
-    font-size: 16px;
-  }
+  font-size: 0.98rem;
 `;
 
-const FeatureDesc = styled.div`
-  font-size: 15px;
+const FeatureDesc = styled.p`
+  margin: 0;
   color: var(--text-secondary);
   line-height: 1.6;
-
-  @media (max-width: 480px) {
-    font-size: 14px;
-  }
+  font-size: 0.94rem;
 `;
 
 const TipBox = styled.div`
-  display: flex;
-  gap: 24px;
-  padding: 32px;
-  background: linear-gradient(90deg, rgba(251, 191, 36, 0.1) 0%, rgba(251, 191, 36, 0.02) 100%);
-  border: 1px solid rgba(251, 191, 36, 0.2);
-  border-left: 4px solid #fbbf24;
-  border-radius: 20px;
-  margin-top: 56px;
-
-  @media (max-width: 480px) {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 20px;
-    padding: 24px;
-  }
-`;
-
-const TipIcon = styled.div`
-  font-size: 36px;
-  flex-shrink: 0;
-  filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.4));
-
-  @media (max-width: 480px) {
-    font-size: 32px;
-  }
-`;
-
-const TipText = styled.p`
-  font-size: 16px;
-  line-height: 1.8;
-  color: var(--text-primary);
-
-  strong {
-    color: #fbbf24;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 15px;
-  }
+  margin-top: 28px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  background: rgba(245, 158, 11, 0.1);
+  color: #fde68a;
+  line-height: 1.7;
 `;
