@@ -135,6 +135,20 @@ export const Graph = forwardRef(
       }
     }, [herramienta, navigate, setHerramienta]);
 
+    useEffect(() => {
+      if (herramienta === 9) {
+        navigate("/dijkstra", { state: { nodos, aristas } });
+        setHerramienta(1);
+      }
+    }, [herramienta, nodos, aristas, navigate, setHerramienta]);
+
+    useEffect(() => {
+      if (herramienta === 10) {
+        navigate("/kruskal", { state: { nodos, aristas } });
+        setHerramienta(1);
+      }
+    }, [herramienta, nodos, aristas, navigate, setHerramienta]);
+
     const [weight_input, setWeight_input] = useState(null);
     const [weight_value, setWeight_value] = useState("1");
     const inputRef = useRef(null);

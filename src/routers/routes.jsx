@@ -10,6 +10,8 @@ import { NorthwestPage } from "../pages/NorthwestPage";
 import { ContactPage } from "../pages/ContactPage";
 import { SortsPage } from "../pages/SortsPage";
 import { BinaryTreePage } from "../pages/BinaryTreePage";
+import { DijkstraPage } from "../pages/DijkstraPage";
+import { KruskalPage } from "../pages/KruskalPage";
 
 export function MyRoutes() {
   return (
@@ -25,6 +27,8 @@ export function MyRoutes() {
         <Route path="/northwest" element={<NorthwestPage />} />
         <Route path="/sorts" element={<SortsPage />} />
         <Route path="/binary-tree" element={<BinaryTreePage />} />
+        <Route path="/dijkstra" element={<DijkstraPage />} />
+        <Route path="/kruskal" element={<KruskalPage />} />
       </Route>
     </Routes>
   );

@@ -32,6 +32,20 @@ const algorithmButtons = [
     Icon: FaTree,
     color: "tree",
   },
+  {
+    label: "Dijkstra",
+    title: "Algoritmo de Dijkstra",
+    tool: 9,
+    Icon: TbRouteSquare2,
+    color: "dijkstra",
+  },
+  {
+    label: "Kruskal",
+    title: "Algoritmo de Kruskal",
+    tool: 10,
+    Icon: TbLayoutGrid,
+    color: "kruskal",
+  },
 ];
 
 export function GraphPage() {
@@ -162,6 +176,20 @@ const buttonColorMap = {
     text: "#34d399",
     hoverBackground: "#10b981",
     hoverShadow: "0 4px 12px rgba(16,185,129,0.35)",
+  },
+  dijkstra: {
+    background: "rgba(139, 92, 246, 0.12)",
+    border: "rgba(139, 92, 246, 0.28)",
+    text: "#a78bfa",
+    hoverBackground: "#8b5cf6",
+    hoverShadow: "0 4px 12px rgba(139,92,246,0.35)",
+  },
+  kruskal: {
+    background: "rgba(249, 115, 22, 0.12)",
+    border: "rgba(249, 115, 22, 0.28)",
+    text: "#fb923c",
+    hoverBackground: "#f97316",
+    hoverShadow: "0 4px 12px rgba(249,115,22,0.35)",
   },
 };
 

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useRef } from "react";
 
-export function Nodo({ nodo, seleccionado, onClick, onDrag, herramienta }) {
+export function Nodo({ nodo, seleccionado, onClick, onDrag, herramienta, customStroke, customStrokeWidth }) {
   const isDragging = useRef(false);
   const hasMoved = useRef(false);
 
@@ -53,6 +53,8 @@ export function Nodo({ nodo, seleccionado, onClick, onDrag, herramienta }) {
       $nodo={nodo}
       $seleccionado={seleccionado}
       $herramienta={herramienta}
+      $customStroke={customStroke}
+      $customStrokeWidth={customStrokeWidth}
       onMouseDown={handleMouseDown}
     >
       {herramienta === 5 && (
@@ -222,7 +224,7 @@ const Container = styled.div`
   align-items: center;
   text-align: center;
   font-weight: bold;
-  border: 3px solid black;
+  border: ${(props) => props.$customStrokeWidth || "3"}px solid ${(props) => props.$customStroke || "black"};
   cursor: ${(props) => (props.$herramienta === 1 ? "grab" : "pointer")};
   user-select: none;
   transition: transform 0.1s ease;
