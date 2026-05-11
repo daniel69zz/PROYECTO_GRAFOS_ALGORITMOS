@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Nodo } from "../components/Nodo";
@@ -29,7 +29,15 @@ export function DijkstraPage() {
   const [dijkstraMode, setDijkstraMode] = useState("minimizar");
 
   const [showConfigModal, setShowConfigModal] = useState(true);
-  const [notification, setNotification] = useState(null);
+  const [notification, setNotification] = useState(() => {
+    if (!location.state?.nodos || location.state.nodos.length === 0) {
+      return {
+        message: "No se recibió ningún grafo para aplicar Dijkstra.",
+        type: "error",
+      };
+    }
+    return null;
+  });
 
   const [showResultModal, setShowResultModal] = useState(false);
   const [dijkstraResult, setDijkstraResult] = useState(null); // { distance, path: [nodeIds], edges: [{from, to}] }
@@ -41,12 +49,6 @@ export function DijkstraPage() {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const panStart = useRef({ x: 0, y: 0 });
-
-  useEffect(() => {
-    if (!location.state?.nodos || location.state.nodos.length === 0) {
-      showNotification("No se recibió ningún grafo para aplicar Dijkstra.", "error");
-    }
-  }, [location.state]);
 
   const getLabelById = (id) => nodos.find((n) => n.id === id)?.label ?? "";
   const origenLabel = dijkstraOrigenId != null ? getLabelById(dijkstraOrigenId) : "";
@@ -70,15 +72,45 @@ export function DijkstraPage() {
     }
   };
 
+  const parseWeight = (w) => {
+    const n = Number(w);
+    return Number.isFinite(n) ? n : 1;
+  };
+
   const calculateDijkstra = () => {
     if (dijkstraOrigenId == null || dijkstraDestinoId == null) {
       showNotification("Selecciona primero un nodo origen y un nodo final.", "warning");
       return;
     }
 
-    // Initialize distances
+    if (dijkstraOrigenId === dijkstraDestinoId) {
+      setDijkstraResult({
+        distance: 0,
+        path: [dijkstraOrigenId],
+        edges: [],
+        edgeIds: new Set(),
+        steps: [],
+        mode: dijkstraMode,
+      });
+      setShowResultModal(true);
+      showNotification("Origen y destino son el mismo nodo (distancia 0).", "info");
+      return;
+    }
+
+    const hasNegativeWeights = aristas.some((ar) => {
+      const n = Number(ar.weight);
+      return Number.isFinite(n) && n < 0;
+    });
+    if (hasNegativeWeights) {
+      showNotification(
+        "Atención: hay aristas con peso negativo. Dijkstra puede dar resultados incorrectos.",
+        "warning",
+      );
+    }
+
     const distances = new Map();
-    const previous = new Map(); // to reconstruct path
+    const previous = new Map();
+    const previousEdgeIdx = new Map();
     const unvisited = new Set();
     const adjList = new Map();
 
@@ -88,61 +120,50 @@ export function DijkstraPage() {
     nodos.forEach((n) => {
       distances.set(n.id, initialDistance);
       previous.set(n.id, null);
+      previousEdgeIdx.set(n.id, null);
       unvisited.add(n.id);
       adjList.set(n.id, []);
     });
 
     distances.set(dijkstraOrigenId, 0);
 
-    // Build adjacency list. Handle both directed and undirected based on "tipo".
-    // Wait, the project stores type in `ar.tipo === "dirigida"` or `"no_dirigida"`
-    aristas.forEach((ar) => {
-      const weight = Number(ar.weight) || 1;
-      adjList.get(ar.from).push({ to: ar.to, weight });
+    aristas.forEach((ar, idx) => {
+      if (ar.from === ar.to) return;
+      const weight = parseWeight(ar.weight);
+      adjList.get(ar.from).push({ to: ar.to, weight, idx });
       if (ar.tipo === "no_dirigida") {
-        adjList.get(ar.to).push({ to: ar.from, weight });
+        adjList.get(ar.to).push({ to: ar.from, weight, idx });
       }
     });
 
     while (unvisited.size > 0) {
-      // Find unvisited node with minimum/maximum distance
       let current = null;
       let bestDistance = initialDistance;
 
       unvisited.forEach((nodeId) => {
         const d = distances.get(nodeId);
-        if (isMinimizing) {
-          if (d < bestDistance) {
-            bestDistance = d;
-            current = nodeId;
-          }
-        } else {
-          if (d > bestDistance) {
-            bestDistance = d;
-            current = nodeId;
-          }
+        if (isMinimizing ? d < bestDistance : d > bestDistance) {
+          bestDistance = d;
+          current = nodeId;
         }
       });
 
-      if (current === null) {
-        break; // remaining nodes are unreachable
-      }
-
-      if (current === dijkstraDestinoId) {
-        break; // found the optimal path to destination
-      }
+      if (current === null) break;
+      if (current === dijkstraDestinoId) break;
 
       unvisited.delete(current);
 
       adjList.get(current).forEach((neighbor) => {
-        if (unvisited.has(neighbor.to)) {
-          const alt = distances.get(current) + neighbor.weight;
-          const shouldUpdate = isMinimizing ? alt < distances.get(neighbor.to) : alt > distances.get(neighbor.to);
-          
-          if (shouldUpdate) {
-            distances.set(neighbor.to, alt);
-            previous.set(neighbor.to, current);
-          }
+        if (!unvisited.has(neighbor.to)) return;
+        const alt = distances.get(current) + neighbor.weight;
+        const shouldUpdate = isMinimizing
+          ? alt < distances.get(neighbor.to)
+          : alt > distances.get(neighbor.to);
+
+        if (shouldUpdate) {
+          distances.set(neighbor.to, alt);
+          previous.set(neighbor.to, current);
+          previousEdgeIdx.set(neighbor.to, neighbor.idx);
         }
       });
     }
@@ -154,23 +175,46 @@ export function DijkstraPage() {
       return;
     }
 
-    // Reconstruct path
     const pathNodes = [];
-    const pathEdges = [];
-    let current = dijkstraDestinoId;
+    const steps = [];
+    const edgeIds = new Set();
+    let cursor = dijkstraDestinoId;
 
-    while (current !== null) {
-      pathNodes.unshift(current);
-      const prev = previous.get(current);
-      if (prev !== null) {
-        pathEdges.push({ from: prev, to: current });
+    while (cursor !== null) {
+      pathNodes.unshift(cursor);
+      const prev = previous.get(cursor);
+      const edgeIdx = previousEdgeIdx.get(cursor);
+      if (prev !== null && edgeIdx !== null) {
+        const ar = aristas[edgeIdx];
+        steps.unshift({
+          from: prev,
+          to: cursor,
+          weight: parseWeight(ar.weight),
+          edgeIdx,
+        });
+        edgeIds.add(edgeIdx);
       }
-      current = prev;
+      cursor = prev;
     }
 
-    setDijkstraResult({ distance: finalDistance, path: pathNodes, edges: pathEdges, mode: dijkstraMode });
+    setDijkstraResult({
+      distance: finalDistance,
+      path: pathNodes,
+      edges: steps,
+      edgeIds,
+      steps,
+      mode: dijkstraMode,
+    });
     setShowResultModal(true);
-    showNotification(dijkstraMode === "minimizar" ? "Ruta más corta calculada con éxito." : "Ruta más larga calculada con éxito.", "success");
+
+    if (dijkstraMode === "maximizar") {
+      showNotification(
+        "Ruta máxima calculada. Nota: en grafos con ciclos no se garantiza el óptimo global.",
+        "warning",
+      );
+    } else {
+      showNotification("Ruta más corta calculada con éxito.", "success");
+    }
   };
 
   const handleClear = () => {
@@ -229,7 +273,7 @@ export function DijkstraPage() {
     fileInputRef.current?.click();
   };
 
-  const handleNodeClick = (id, e) => {
+  const handleNodeClick = (id) => {
     handlePickNode(id);
   };
 
@@ -255,12 +299,9 @@ export function DijkstraPage() {
     setIsPanning(false);
   };
 
-  // Helper to check if an edge is part of the optimal path
-  const isOptimalEdge = (from, to, tipo) => {
+  const isOptimalEdgeByIndex = (index) => {
     if (!dijkstraResult) return false;
-    return dijkstraResult.edges.some(
-      (e) => (e.from === from && e.to === to) || (tipo === "no_dirigida" && e.from === to && e.to === from)
-    );
+    return dijkstraResult.edgeIds.has(index);
   };
 
   const isOptimalNode = (id) => {
@@ -339,7 +380,7 @@ export function DijkstraPage() {
               </defs>
 
               {aristas.map((ar, index) => {
-                const optimal = isOptimalEdge(ar.from, ar.to, ar.tipo);
+                const optimal = isOptimalEdgeByIndex(index);
                 return (
                   <Arista
                     key={index}
@@ -350,7 +391,7 @@ export function DijkstraPage() {
                       ar.from,
                       ar.to,
                     )}
-                    herramienta={9} // 9 represents dijkstra tool state conceptually here
+                    herramienta={9}
                     onAristaClick={() => {}}
                     customStroke={optimal ? "#8b5cf6" : null}
                     customStrokeWidth={optimal ? 4 : null}
@@ -363,7 +404,7 @@ export function DijkstraPage() {
               <Nodo
                 key={node.id}
                 nodo={node}
-                onClick={(e) => handleNodeClick(node.id, e)}
+                onClick={() => handleNodeClick(node.id)}
                 seleccionado={
                   node.id === dijkstraOrigenId || node.id === dijkstraDestinoId
                 }
@@ -414,9 +455,11 @@ export function DijkstraPage() {
                     <FormGroup>
                       <label>Nodo Origen</label>
                       <Select
-                        value={dijkstraOrigenId || ""}
+                        value={dijkstraOrigenId ?? ""}
                         onChange={(e) => {
-                          setDijkstraOrigenId(Number(e.target.value));
+                          const v = e.target.value;
+                          if (v === "") return;
+                          setDijkstraOrigenId(Number(v));
                           setPickTarget("destino");
                         }}
                       >
@@ -434,9 +477,11 @@ export function DijkstraPage() {
                     <FormGroup>
                       <label>Nodo Destino</label>
                       <Select
-                        value={dijkstraDestinoId || ""}
+                        value={dijkstraDestinoId ?? ""}
                         onChange={(e) => {
-                          setDijkstraDestinoId(Number(e.target.value));
+                          const v = e.target.value;
+                          if (v === "") return;
+                          setDijkstraDestinoId(Number(v));
                           setPickTarget("origen");
                         }}
                       >
@@ -475,6 +520,12 @@ export function DijkstraPage() {
                           Maximizar (Ruta Más Larga)
                         </label>
                       </RadioGroup>
+                      {dijkstraMode === "maximizar" && (
+                        <WarningBox>
+                          ⚠ El camino más largo es NP-difícil. Dijkstra greedy
+                          puede no encontrar el óptimo global en grafos con ciclos.
+                        </WarningBox>
+                      )}
                     </FormGroup>
 
                     <ModalActions style={{ justifyContent: "space-between" }}>
@@ -520,15 +571,39 @@ export function DijkstraPage() {
             <ModalOverlay>
               <ResultModalContent>
                 <ResultIcon>{dijkstraResult.mode === "minimizar" ? "⚡" : "🏆"}</ResultIcon>
-                <ResultTitle>{dijkstraResult.mode === "minimizar" ? "Ruta Más Corta" : "Ruta Más Larga"}</ResultTitle>
+                <ResultTitle>
+                  {dijkstraResult.mode === "minimizar" ? "Ruta Más Corta" : "Ruta Más Larga"}
+                </ResultTitle>
                 <ResultLabel>Distancia Total</ResultLabel>
                 <ResultValue>{dijkstraResult.distance}</ResultValue>
                 <ResultSub>
                   Desde {origenLabel} → {destinoLabel}
                 </ResultSub>
                 <ResultPath>
-                  Camino: {dijkstraResult.path.map(id => getLabelById(id)).join(" ➔ ")}
+                  {dijkstraResult.path.map(id => getLabelById(id)).join(" ➔ ")}
                 </ResultPath>
+
+                {dijkstraResult.steps && dijkstraResult.steps.length > 0 && (
+                  <StepList>
+                    <StepListTitle>Pasos</StepListTitle>
+                    {dijkstraResult.steps.map((s, i) => (
+                      <StepRow key={i}>
+                        <StepNum>{i + 1}</StepNum>
+                        <StepPair>
+                          {getLabelById(s.from)} → {getLabelById(s.to)}
+                        </StepPair>
+                        <StepWeight>+{s.weight}</StepWeight>
+                      </StepRow>
+                    ))}
+                  </StepList>
+                )}
+
+                {dijkstraResult.mode === "maximizar" && (
+                  <WarningBox>
+                    ⚠ Resultado heurístico: no garantizado óptimo global.
+                  </WarningBox>
+                )}
+
                 <ResultCloseBtn onClick={() => setShowResultModal(false)}>
                   Cerrar
                 </ResultCloseBtn>
@@ -541,9 +616,12 @@ export function DijkstraPage() {
           <DijkstraControls
             origen={origenLabel}
             destino={destinoLabel}
+            mode={dijkstraMode}
+            result={dijkstraResult}
             pickTarget={pickTarget}
             onClear={handleClear}
             onCalculate={calculateDijkstra}
+            onShowResult={() => dijkstraResult && setShowResultModal(true)}
             disabledCalculate={dijkstraOrigenId == null || dijkstraDestinoId == null}
           />
         )}
@@ -868,6 +946,89 @@ const ResultPath = styled.p`
   background: rgba(139, 92, 246, 0.1);
   padding: 8px 12px;
   border-radius: 8px;
+`;
+
+const StepList = styled.div`
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background: rgba(139, 92, 246, 0.06);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.4);
+    border-radius: 3px;
+  }
+`;
+
+const StepListTitle = styled.div`
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 4px;
+`;
+
+const StepRow = styled.div`
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #ddd6fe;
+  padding: 3px 4px;
+  border-radius: 6px;
+
+  &:hover {
+    background: rgba(139, 92, 246, 0.12);
+  }
+`;
+
+const StepNum = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(139, 92, 246, 0.3);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+`;
+
+const StepPair = styled.span`
+  font-weight: 600;
+  color: #fff;
+`;
+
+const StepWeight = styled.span`
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.75);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+`;
+
+const WarningBox = styled.div`
+  background: rgba(252, 211, 77, 0.1);
+  border: 1px solid rgba(252, 211, 77, 0.35);
+  color: #fde68a;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 8px 10px;
+  border-radius: 8px;
+  text-align: center;
+  line-height: 1.35;
 `;
 
 const ResultCloseBtn = styled.button`

@@ -2,10 +2,14 @@ import styled from "styled-components";
 
 export function KruskalControls({
   mode,
+  result,
   onClear,
   onCalculate,
+  onShowResult,
   disabledCalculate = false,
 }) {
+  const hasResult = !!result;
+
   return (
     <Wrap data-toolbar="true">
       <InputsPanel>
@@ -13,12 +17,31 @@ export function KruskalControls({
 
         <Row>
           <Label>Objetivo</Label>
-          <ValueBox>{mode === "minimizar" ? "Ruta Mínima" : "Ruta Máxima"}</ValueBox>
+          <ValueBox>{mode === "minimizar" ? "Árbol Mínimo" : "Árbol Máximo"}</ValueBox>
         </Row>
 
-        <Hint>
-          Calcula el árbol de expansión {mode === "minimizar" ? "mínimo" : "máximo"} para todo el grafo.
-        </Hint>
+        {hasResult ? (
+          <ResultSummary>
+            <SummaryRow>
+              <SummaryLabel>Peso total</SummaryLabel>
+              <SummaryValue>{result.totalWeight}</SummaryValue>
+            </SummaryRow>
+            <SummaryRow>
+              <SummaryLabel>Aristas</SummaryLabel>
+              <SummaryValue>{result.edges.length}</SummaryValue>
+            </SummaryRow>
+            {!result.isSpanningTree && (
+              <Warning>
+                Bosque: {result.components.length} componentes
+              </Warning>
+            )}
+            <MiniBtn onClick={onShowResult}>Ver Detalle</MiniBtn>
+          </ResultSummary>
+        ) : (
+          <Hint>
+            Calcula el árbol de expansión {mode === "minimizar" ? "mínimo" : "máximo"} para todo el grafo.
+          </Hint>
+        )}
 
         <MiniBtn onClick={onClear}>Limpiar / Configurar</MiniBtn>
       </InputsPanel>
@@ -29,7 +52,7 @@ export function KruskalControls({
           disabled={disabledCalculate}
           title={`Calcular Árbol ${mode === "minimizar" ? "Mínimo" : "Máximo"}`}
         >
-          Calcular Árbol
+          {hasResult ? "Recalcular" : "Calcular Árbol"}
         </BtnCalculate>
       </ButtonsPanel>
     </Wrap>
@@ -132,6 +155,43 @@ const Hint = styled.div`
   color: rgba(255, 220, 180, 0.95);
   line-height: 1.3;
   margin-top: 4px;
+`;
+
+const ResultSummary = styled.div`
+  margin-top: 4px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(249, 115, 22, 0.12);
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const SummaryRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+`;
+
+const SummaryLabel = styled.span`
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 600;
+`;
+
+const SummaryValue = styled.span`
+  color: #fff;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+`;
+
+const Warning = styled.div`
+  margin-top: 2px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #fde68a;
+  text-align: center;
 `;
 
 const ButtonsPanel = styled.div`

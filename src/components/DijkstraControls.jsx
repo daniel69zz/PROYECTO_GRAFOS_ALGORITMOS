@@ -3,34 +3,59 @@ import styled from "styled-components";
 export function DijkstraControls({
   origen,
   destino,
+  mode,
+  result,
   pickTarget,
   onClear,
   onCalculate,
+  onShowResult,
   disabledCalculate = false,
 }) {
+  const hasResult = !!result;
+  const modeLabel = mode === "minimizar" ? "Ruta Mínima" : "Ruta Máxima";
+
   return (
     <Wrap data-toolbar="true">
       <InputsPanel>
         <PanelTitle>DIJKSTRA</PanelTitle>
 
         <Row>
+          <Label>Objetivo</Label>
+          <ValueBox>{modeLabel}</ValueBox>
+        </Row>
+
+        <Row>
           <Label>Nodo origen</Label>
-          <ValueBox>{origen ?? "—"}</ValueBox>
+          <ValueBox>{origen || "—"}</ValueBox>
         </Row>
 
         <Row>
           <Label>Nodo final</Label>
-          <ValueBox>{destino ?? "—"}</ValueBox>
+          <ValueBox>{destino || "—"}</ValueBox>
         </Row>
 
-        <Hint>
-          Selecciona:{" "}
-          {pickTarget === "origen" ? (
-            <strong>Origen</strong>
-          ) : (
-            <strong>Final</strong>
-          )}
-        </Hint>
+        {hasResult ? (
+          <ResultSummary>
+            <SummaryRow>
+              <SummaryLabel>Distancia</SummaryLabel>
+              <SummaryValue>{result.distance}</SummaryValue>
+            </SummaryRow>
+            <SummaryRow>
+              <SummaryLabel>Saltos</SummaryLabel>
+              <SummaryValue>{result.steps?.length ?? 0}</SummaryValue>
+            </SummaryRow>
+            <MiniBtn onClick={onShowResult}>Ver Detalle</MiniBtn>
+          </ResultSummary>
+        ) : (
+          <Hint>
+            Selecciona:{" "}
+            {pickTarget === "origen" ? (
+              <strong>Origen</strong>
+            ) : (
+              <strong>Final</strong>
+            )}
+          </Hint>
+        )}
 
         <MiniBtn onClick={onClear}>Limpiar</MiniBtn>
       </InputsPanel>
@@ -39,9 +64,9 @@ export function DijkstraControls({
         <BtnCalculate
           onClick={onCalculate}
           disabled={disabledCalculate}
-          title="Calcular ruta más corta"
+          title={`Calcular ${modeLabel}`}
         >
-          Calcular Ruta
+          {hasResult ? "Recalcular" : "Calcular Ruta"}
         </BtnCalculate>
       </ButtonsPanel>
     </Wrap>
@@ -142,6 +167,35 @@ const Hint = styled.div`
   font-size: 11px;
   font-weight: 700;
   color: rgba(200, 200, 255, 0.95);
+`;
+
+const ResultSummary = styled.div`
+  margin-top: 4px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(139, 92, 246, 0.14);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const SummaryRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+`;
+
+const SummaryLabel = styled.span`
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 600;
+`;
+
+const SummaryValue = styled.span`
+  color: #fff;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
 `;
 
 const ButtonsPanel = styled.div`

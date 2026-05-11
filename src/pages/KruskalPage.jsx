@@ -9,7 +9,7 @@ import { TbArrowBackUp } from "react-icons/tb";
 import { ExportModal } from "../components/ExportModal";
 import { BiExport, BiImport } from "react-icons/bi";
 import { exportar_grafo, importar_grafo } from "../utils/exp_imp_grafo";
-import { buildGraphFromState, kruskal } from "../algorithms/kruskal";
+import { buildGraphFromState, kruskal, computeEdgeSlacks } from "../algorithms/kruskal";
 
 const existeAristaContraria = (aristas, from, to) =>
   aristas.some((ar) => ar.from === to && ar.to === from);
@@ -65,12 +65,15 @@ export function KruskalPage() {
     }
 
     if (!graph.edges.length) {
-      showNotification("No hay aristas para aplicar Kruskal.", "warning");
+      showNotification(
+        "No hay aristas válidas para aplicar Kruskal (los lazos u=v se ignoran).",
+        "warning",
+      );
       return;
     }
 
     const mode = kruskalMode === "minimizar" ? "asc" : "desc";
-    const { mst, totalWeight } = kruskal(graph, mode);
+    const { mst, totalWeight, components, isSpanningTree } = kruskal(graph, mode);
 
     if (!mst.length) {
       setKruskalResult(null);
@@ -82,28 +85,34 @@ export function KruskalPage() {
       return;
     }
 
-    const mstEdges = mst.map(({ u, v, w, sourceEdge }) => ({
+    const mstEdges = mst.map(({ id, u, v, w, order, sourceEdge }) => ({
+      id,
       from: u,
       to: v,
+      weight: w,
       originalWeight: sourceEdge?.weight ?? w,
       tipo: sourceEdge?.tipo,
+      order,
     }));
 
+    const mstEdgeIds = new Set(mstEdges.map((e) => e.id));
     const mstNodes = new Set();
     mst.forEach(({ u, v }) => {
       mstNodes.add(u);
       mstNodes.add(v);
     });
 
-    const expectedEdgeCount = Math.max(graph.nodes.length - 1, 0);
-    const isSpanningTree = mst.length === expectedEdgeCount;
+    const slacks = computeEdgeSlacks(graph, mst, mode);
 
     setKruskalResult({
       totalWeight,
       edges: mstEdges,
+      edgeIds: mstEdgeIds,
       nodes: Array.from(mstNodes),
       mode: kruskalMode,
       isSpanningTree,
+      components,
+      slacks,
     });
 
     setShowResultModal(true);
@@ -117,7 +126,7 @@ export function KruskalPage() {
     }
 
     showNotification(
-      "Se obtuvo un bosque de expansión porque el grafo no está completamente conectado.",
+      `Se obtuvo un bosque con ${components.length} componentes (grafo desconectado).`,
       "warning",
     );
   };
@@ -194,18 +203,17 @@ export function KruskalPage() {
     setIsPanning(false);
   };
 
-  // Helper to check if an edge is part of the MST
-  const isOptimalEdge = (from, to) => {
+  const isOptimalEdgeByIndex = (index) => {
     if (!kruskalResult) return false;
-    return kruskalResult.edges.some(
-      (e) => (e.from === from && e.to === to) || (e.from === to && e.to === from)
-    );
+    return kruskalResult.edgeIds.has(index);
   };
 
   const isOptimalNode = (id) => {
     if (!kruskalResult) return false;
     return kruskalResult.nodes.includes(id);
   };
+
+  const getLabelById = (id) => nodos.find((n) => n.id === id)?.label ?? `#${id}`;
 
   return (
     <PageWrapper>
@@ -278,7 +286,8 @@ export function KruskalPage() {
               </defs>
 
               {aristas.map((ar, index) => {
-                const optimal = isOptimalEdge(ar.from, ar.to);
+                const optimal = isOptimalEdgeByIndex(index);
+                const slack = kruskalResult?.slacks?.get(index);
                 return (
                   <Arista
                     key={index}
@@ -289,11 +298,13 @@ export function KruskalPage() {
                       ar.from,
                       ar.to,
                     )}
-                    herramienta={10} // 10 represents kruskal tool state conceptually here
+                    herramienta={10}
                     onAristaClick={() => {}}
                     customStroke={optimal ? "#fb923c" : null}
                     customStrokeWidth={optimal ? 4 : null}
                     customMarkerEnd={optimal ? "url(#arrowhead-optimal-kruskal)" : null}
+                    customSlack={kruskalResult ? slack : undefined}
+                    customSlackColor={optimal ? "#fb923c" : "#1e40af"}
                   />
                 );
               })}
@@ -411,15 +422,42 @@ export function KruskalPage() {
             <ModalOverlay>
               <ResultModalContent>
                 <ResultIcon>{kruskalResult.mode === "minimizar" ? "⚡" : "🏆"}</ResultIcon>
-                <ResultTitle>Árbol de Expansión {kruskalResult.mode === "minimizar" ? "Mínimo" : "Máximo"}</ResultTitle>
+                <ResultTitle>
+                  Árbol de Expansión {kruskalResult.mode === "minimizar" ? "Mínimo" : "Máximo"}
+                </ResultTitle>
                 <ResultLabel>Peso Total</ResultLabel>
                 <ResultValue>{kruskalResult.totalWeight}</ResultValue>
                 <ResultSub>
                   Aristas incluidas: {kruskalResult.edges.length}
+                  {kruskalResult.isSpanningTree
+                    ? ""
+                    : ` · Bosque con ${kruskalResult.components.length} componentes`}
                 </ResultSub>
+
+                <EdgeList>
+                  <EdgeListTitle>Orden de selección</EdgeListTitle>
+                  {kruskalResult.edges.map((e) => (
+                    <EdgeRow key={e.id}>
+                      <EdgeStep>{e.order}</EdgeStep>
+                      <EdgePair>
+                        {getLabelById(e.from)} — {getLabelById(e.to)}
+                      </EdgePair>
+                      <EdgeWeight>w = {e.weight}</EdgeWeight>
+                    </EdgeRow>
+                  ))}
+                </EdgeList>
+
                 {!kruskalResult.isSpanningTree && (
-                  <ResultSub>Resultado parcial: grafo desconectado.</ResultSub>
+                  <ComponentBox>
+                    {kruskalResult.components.map((comp, i) => (
+                      <ComponentLine key={i}>
+                        <strong>C{i + 1}:</strong>{" "}
+                        {comp.map((id) => getLabelById(id)).join(", ")}
+                      </ComponentLine>
+                    ))}
+                  </ComponentBox>
                 )}
+
                 <ResultCloseBtn onClick={() => setShowResultModal(false)}>
                   Cerrar
                 </ResultCloseBtn>
@@ -431,8 +469,10 @@ export function KruskalPage() {
         {!showConfigModal && (
           <KruskalControls
             mode={kruskalMode}
+            result={kruskalResult}
             onClear={handleClear}
             onCalculate={calculateKruskal}
+            onShowResult={() => kruskalResult && setShowResultModal(true)}
             disabledCalculate={false}
           />
         )}
@@ -725,6 +765,96 @@ const ResultSub = styled.p`
   font-size: 0.82rem;
   color: rgba(255, 255, 255, 0.5);
   text-align: center;
+`;
+
+const EdgeList = styled.div`
+  width: 100%;
+  max-height: 220px;
+  overflow-y: auto;
+  background: rgba(249, 115, 22, 0.06);
+  border: 1px solid rgba(249, 115, 22, 0.2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(249, 115, 22, 0.35);
+    border-radius: 3px;
+  }
+`;
+
+const EdgeListTitle = styled.div`
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 4px;
+`;
+
+const EdgeRow = styled.div`
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #fed7aa;
+  padding: 3px 4px;
+  border-radius: 6px;
+
+  &:hover {
+    background: rgba(249, 115, 22, 0.1);
+  }
+`;
+
+const EdgeStep = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(249, 115, 22, 0.25);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+`;
+
+const EdgePair = styled.span`
+  font-weight: 600;
+  color: #fff;
+`;
+
+const EdgeWeight = styled.span`
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-variant-numeric: tabular-nums;
+`;
+
+const ComponentBox = styled.div`
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const ComponentLine = styled.div`
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.75);
+
+  strong {
+    color: #fb923c;
+  }
 `;
 
 const ResultCloseBtn = styled.button`

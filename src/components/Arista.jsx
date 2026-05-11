@@ -7,6 +7,8 @@ export function Arista({
   customStroke,
   customStrokeWidth,
   customMarkerEnd,
+  customSlack,
+  customSlackColor,
 }) {
   const nodo_a = nodos.find((n) => n.id === ar.from);
   const nodo_b = nodos.find((n) => n.id === ar.to);
@@ -27,16 +29,20 @@ export function Arista({
   const w = Number(ar.weight) || 0;
 
   let slack = null;
-  if (teFrom != null && tlTo != null) {
+  const hasCustomSlack = customSlack !== undefined;
+  if (hasCustomSlack) {
+    slack = customSlack;
+  } else if (teFrom != null && tlTo != null) {
     slack = tlTo - teFrom - w;
 
     if (Object.is(slack, -0)) slack = 0;
   }
-  const isCritical = slack === 0;
+  const isCritical = !hasCustomSlack && slack === 0;
 
   const strokeColor = customStroke || (isCritical ? "#ff1744" : "black");
   const strokeWidth = customStrokeWidth || "3";
   const markerEnd = customMarkerEnd || (esDirigida ? "url(#arrowhead)" : undefined);
+  const slackColor = customSlackColor || strokeColor;
 
   const clickStyle = {
     stroke: "transparent",
@@ -57,7 +63,9 @@ export function Arista({
   };
 
   const renderSlack = (x, y) => {
-    if (slack == null) return null;
+    if (hasCustomSlack && customSlack === undefined) return null;
+    if (!hasCustomSlack && slack == null) return null;
+    const label = slack == null ? "H: —" : "H: " + slack;
     return (
       <text
         x={x}
@@ -66,12 +74,12 @@ export function Arista({
         dominantBaseline="middle"
         fontSize="14"
         fontWeight="900"
-        fill={strokeColor}
+        fill={slackColor}
         stroke="white"
         strokeWidth="3"
         paintOrder="stroke"
       >
-        {"H: " + slack}
+        {label}
       </text>
     );
   };
