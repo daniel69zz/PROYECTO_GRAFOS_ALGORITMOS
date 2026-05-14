@@ -137,6 +137,12 @@ export const Graph = forwardRef(
 
     useEffect(() => {
       if (herramienta === 9) {
+        const malDirigida = aristas.some((ar) => ar.tipo === "no_dirigida");
+        const negativa = aristas.some((ar) => {
+          const n = Number(ar.weight);
+          return Number.isFinite(n) && n < 0;
+        });
+        if (malDirigida || negativa) return;
         navigate("/dijkstra", { state: { nodos, aristas } });
         setHerramienta(1);
       }
@@ -144,6 +150,10 @@ export const Graph = forwardRef(
 
     useEffect(() => {
       if (herramienta === 10) {
+        const malNoDirigida = aristas.some(
+          (ar) => ar.tipo === "dirigida" || ar.tipo === undefined,
+        );
+        if (malNoDirigida) return;
         navigate("/kruskal", { state: { nodos, aristas } });
         setHerramienta(1);
       }
@@ -464,6 +474,43 @@ export const Graph = forwardRef(
         setHerramienta(1);
       }
     }, [herramienta, tieneAristasNoDirigidas, setHerramienta]);
+
+    useEffect(() => {
+      if (herramienta !== 9) return;
+      if (tieneAristasNoDirigidas) {
+        showNotification(
+          "Dijkstra requiere un grafo dirigido.\n\nHay aristas no dirigidas en el grafo.",
+          "warning",
+        );
+        setHerramienta(1);
+        return;
+      }
+      const negativa = aristas.some((ar) => {
+        const n = Number(ar.weight);
+        return Number.isFinite(n) && n < 0;
+      });
+      if (negativa) {
+        showNotification(
+          "Dijkstra no admite pesos negativos.\n\nCorrige las aristas con peso negativo.",
+          "warning",
+        );
+        setHerramienta(1);
+      }
+    }, [herramienta, tieneAristasNoDirigidas, aristas, setHerramienta]);
+
+    useEffect(() => {
+      if (herramienta !== 10) return;
+      const tieneAristasDirigidas = aristas.some(
+        (ar) => ar.tipo === "dirigida" || ar.tipo === undefined,
+      );
+      if (tieneAristasDirigidas) {
+        showNotification(
+          "Kruskal requiere un grafo no dirigido.\n\nHay aristas dirigidas en el grafo.",
+          "warning",
+        );
+        setHerramienta(1);
+      }
+    }, [herramienta, aristas, setHerramienta]);
 
     return (
       <Wrapper>
