@@ -83,6 +83,29 @@ export function DijkstraPage() {
       return;
     }
 
+    const tieneAristaNoDirigida = aristas.some(
+      (ar) => ar.tipo === "no_dirigida",
+    );
+    if (tieneAristaNoDirigida) {
+      showNotification(
+        "Dijkstra requiere un grafo dirigido. Hay aristas no dirigidas en el grafo.",
+        "error",
+      );
+      return;
+    }
+
+    const hasNegativeWeights = aristas.some((ar) => {
+      const n = Number(ar.weight);
+      return Number.isFinite(n) && n < 0;
+    });
+    if (hasNegativeWeights) {
+      showNotification(
+        "Dijkstra no admite pesos negativos. Corrige las aristas con peso negativo.",
+        "error",
+      );
+      return;
+    }
+
     if (dijkstraOrigenId === dijkstraDestinoId) {
       setDijkstraResult({
         distance: 0,
@@ -95,17 +118,6 @@ export function DijkstraPage() {
       setShowResultModal(true);
       showNotification("Origen y destino son el mismo nodo (distancia 0).", "info");
       return;
-    }
-
-    const hasNegativeWeights = aristas.some((ar) => {
-      const n = Number(ar.weight);
-      return Number.isFinite(n) && n < 0;
-    });
-    if (hasNegativeWeights) {
-      showNotification(
-        "Atención: hay aristas con peso negativo. Dijkstra puede dar resultados incorrectos.",
-        "warning",
-      );
     }
 
     const distances = new Map();

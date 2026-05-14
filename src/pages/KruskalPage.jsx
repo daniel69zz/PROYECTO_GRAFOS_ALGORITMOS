@@ -57,6 +57,17 @@ export function KruskalPage() {
   };
 
   const calculateKruskal = () => {
+    const tieneAristaDirigida = aristas.some(
+      (ar) => ar.tipo === "dirigida" || ar.tipo === undefined,
+    );
+    if (tieneAristaDirigida) {
+      showNotification(
+        "Kruskal requiere un grafo no dirigido. Hay aristas dirigidas en el grafo.",
+        "error",
+      );
+      return;
+    }
+
     const graph = buildGraphFromState(nodos, aristas);
 
     if (!graph.nodes.length) {
