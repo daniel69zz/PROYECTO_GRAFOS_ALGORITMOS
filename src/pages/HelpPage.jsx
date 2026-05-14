@@ -94,6 +94,84 @@ const HELP_SECTIONS = [
   },
   {
     number: 6,
+    category: "Dijkstra",
+    title: "Algoritmo de Dijkstra",
+    description:
+      "Encuentra la ruta mas corta (o mas larga) entre dos nodos del grafo.",
+    features: [
+      {
+        name: "Configuracion",
+        description:
+          "Selecciona el nodo origen, el nodo destino y el objetivo: minimizar (ruta mas corta) o maximizar (ruta mas larga).",
+      },
+      {
+        name: "Acceso al algoritmo",
+        description:
+          "Construye el grafo en el editor y entra a la ruta /dijkstra; el grafo actual se carga automaticamente para aplicar el algoritmo.",
+      },
+      {
+        name: "Calculo y resultado",
+        description:
+          "Pulsa Calcular para obtener la distancia total, el camino y los pasos uno a uno. El camino optimo se resalta en color morado sobre el lienzo.",
+      },
+      {
+        name: "Pesos negativos",
+        description:
+          "Dijkstra asume pesos no negativos. Si detecta aristas con peso negativo se muestra una advertencia porque el resultado puede no ser correcto.",
+      },
+      {
+        name: "Modo maximizar",
+        description:
+          "Buscar la ruta mas larga en grafos con ciclos es un problema NP-dificil, por lo que el resultado es heuristico y puede no ser el optimo global.",
+      },
+      {
+        name: "Exportar / Importar",
+        description:
+          "Puedes guardar o cargar un grafo en formato JSON desde los botones del header para reutilizarlo en otras vistas.",
+      },
+    ],
+  },
+  {
+    number: 7,
+    category: "Kruskal",
+    title: "Algoritmo de Kruskal",
+    description:
+      "Construye el arbol de expansion minimo (o maximo) del grafo conectando todos los nodos con el menor costo total.",
+    features: [
+      {
+        name: "Configuracion",
+        description:
+          "Elige el objetivo: minimizar para el arbol de expansion minimo o maximizar para el arbol de expansion maximo.",
+      },
+      {
+        name: "Acceso al algoritmo",
+        description:
+          "Desde el editor del grafo entra a la ruta /kruskal; el grafo actual se transfiere y se trata como no dirigido para construir el arbol.",
+      },
+      {
+        name: "Resultado",
+        description:
+          "Al calcular obtienes el peso total, la lista de aristas seleccionadas y el orden en que fueron agregadas. Las aristas del arbol se resaltan en color naranja.",
+      },
+      {
+        name: "Grafos desconectados",
+        description:
+          "Si el grafo no es conexo, Kruskal devuelve un bosque y se indica cuantas componentes quedaron separadas.",
+      },
+      {
+        name: "Holgura de aristas",
+        description:
+          "Las aristas no incluidas en el arbol muestran su slack: cuanto se podria ahorrar (o ganar) si se cambiara una de las aristas seleccionadas.",
+      },
+      {
+        name: "Exportar / Importar",
+        description:
+          "Guarda o carga grafos en formato JSON desde los botones del header para repetir el analisis con otros casos.",
+      },
+    ],
+  },
+  {
+    number: 8,
     category: "Asignacion",
     title: "Algoritmo de Asignacion",
     description:
@@ -117,7 +195,7 @@ const HELP_SECTIONS = [
     ],
   },
   {
-    number: 7,
+    number: 9,
     category: "Northwest",
     title: "Metodo Northwest Corner",
     description:
@@ -141,7 +219,7 @@ const HELP_SECTIONS = [
     ],
   },
   {
-    number: 8,
+    number: 10,
     category: "Sorts",
     title: "Algoritmos de Ordenamiento",
     description:
@@ -165,7 +243,7 @@ const HELP_SECTIONS = [
     ],
   },
   {
-    number: 9,
+    number: 11,
     category: "Arboles Binarios",
     title: "Arboles Binarios",
     description:
