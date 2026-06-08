@@ -24,12 +24,14 @@ export function SortBoard({ array, activeIndices = [], isFinished = false }) {
           return (
             <BarSlot key={`${index}-${value}`}>
               <ValueLabel $isActive={isActive}>{value}</ValueLabel>
-              <Bar
-                $height={height}
-                $isActive={isActive}
-                $isFinished={isFinished}
-                title={`Indice ${index}: ${value}`}
-              />
+              <BarTrack>
+                <Bar
+                  $height={height}
+                  $isActive={isActive}
+                  $isFinished={isFinished}
+                  title={`Indice ${index}: ${value}`}
+                />
+              </BarTrack>
             </BarSlot>
           );
         })}
@@ -39,8 +41,8 @@ export function SortBoard({ array, activeIndices = [], isFinished = false }) {
 }
 
 const Board = styled.section`
-  min-height: 420px;
-  height: 100%;
+  flex: 1;
+  min-height: 240px;
   border: 1px solid var(--glass-border);
   border-radius: 12px;
   background:
@@ -56,14 +58,18 @@ const Board = styled.section`
 
 const Bars = styled.div`
   width: 100%;
+  height: 100%;
+  min-height: 0;
   display: grid;
   grid-template-columns: repeat(${(props) => props.$count}, minmax(8px, 1fr));
-  align-items: end;
+  grid-template-rows: 100%;
+  align-items: stretch;
   gap: clamp(3px, 0.7vw, 10px);
 `;
 
 const BarSlot = styled.div`
   min-width: 0;
+  min-height: 0;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -75,12 +81,22 @@ const BarSlot = styled.div`
 const ValueLabel = styled.span`
   width: 100%;
   min-height: 22px;
+  flex-shrink: 0;
   color: ${(props) => (props.$isActive ? "#facc15" : "var(--text-primary)")};
   font-size: clamp(10px, 1.2vw, 13px);
   font-weight: 800;
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
+`;
+
+const BarTrack = styled.div`
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 `;
 
 const Bar = styled.div`

@@ -4,8 +4,10 @@ import {
   FaDownload,
   FaPause,
   FaPlay,
+  FaQuestion,
   FaRandom,
   FaRedo,
+  FaTimes,
   FaTrash,
   FaUpload,
 } from "react-icons/fa";
@@ -57,6 +59,7 @@ export function SortsPage() {
   const [hasStarted, setHasStarted] = useState(false);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [message, setMessage] = useState(null);
+  const [showHelp, setShowHelp] = useState(false);
   const fileInputRef = useRef(null);
   const startedAtRef = useRef(null);
   const elapsedBeforeRunRef = useRef(0);
@@ -311,6 +314,9 @@ export function SortsPage() {
           <IconButton onClick={handleReset} disabled={!array.length} title="Reiniciar">
             <FaRedo />
           </IconButton>
+          <HelpButton onClick={() => setShowHelp(true)} title="Ayuda">
+            <FaQuestion />
+          </HelpButton>
         </ControlGroup>
       </Toolbar>
 
@@ -396,6 +402,70 @@ export function SortsPage() {
           />
         )}
       </Workspace>
+
+      {showHelp && (
+        <HelpOverlay onClick={() => setShowHelp(false)}>
+          <HelpModal onClick={(event) => event.stopPropagation()}>
+            <HelpHeader>
+              <h2>
+                <FaQuestion /> Como usar Sorts
+              </h2>
+              <CloseButton onClick={() => setShowHelp(false)} title="Cerrar">
+                <FaTimes />
+              </CloseButton>
+            </HelpHeader>
+
+            <HelpBody>
+              <HelpStep>
+                <strong>1. Crea un arreglo</strong>
+                <p>
+                  Genera uno aleatorio indicando el <em>Tamano</em> (entre {MIN_SIZE} y{" "}
+                  {MAX_SIZE}) y pulsando <em>Generar arreglo</em>, o escribe tus propios
+                  numeros separados por comas en <em>Personalizado</em> y pulsa{" "}
+                  <em>Cargar arreglo</em>. Los valores deben estar entre {MIN_VALUE} y{" "}
+                  {MAX_VALUE}.
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>2. Elige algoritmo y orden</strong>
+                <p>
+                  En la barra superior selecciona el algoritmo de ordenamiento y si quieres
+                  un orden <em>Ascendente</em> o <em>Descendente</em>. Debes elegirlos antes
+                  de iniciar la animacion.
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>3. Controla la animacion</strong>
+                <p>
+                  Usa <FaPlay /> para iniciar o reanudar, <FaPause /> para pausar y{" "}
+                  <FaRedo /> para reiniciar al arreglo original. Las barras resaltadas
+                  muestran los elementos que se estan comparando o intercambiando en cada
+                  paso.
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>4. Revisa las estadisticas</strong>
+                <p>
+                  Mientras se ejecuta veras un panel con el tiempo transcurrido, la cantidad
+                  de pasos y un registro de las operaciones realizadas.
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>5. Importar / exportar</strong>
+                <p>
+                  Puedes <em>Importar JSON</em> con el formato{" "}
+                  <code>{'{ "array": [10, 5, 30] }'}</code>, <em>Exportar JSON</em> el
+                  arreglo actual o <em>Limpiar</em> para empezar de cero.
+                </p>
+              </HelpStep>
+            </HelpBody>
+          </HelpModal>
+        </HelpOverlay>
+      )}
     </Page>
   );
 }
@@ -668,6 +738,137 @@ const IconButton = styled.button`
   &:disabled {
     opacity: 0.45;
     cursor: not-allowed;
+  }
+`;
+
+const HelpButton = styled.button`
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(88, 166, 255, 0.4);
+  border-radius: 8px;
+  background: rgba(88, 166, 255, 0.14);
+  color: #58a6ff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    color: #fff;
+    background: var(--accent-color);
+    transform: translateY(-1px);
+  }
+`;
+
+const HelpOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(2, 4, 10, 0.7);
+  backdrop-filter: blur(4px);
+`;
+
+const HelpModal = styled.div`
+  width: min(640px, 100%);
+  max-height: 85vh;
+  overflow: auto;
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #0d1117 0%, #11161f 100%);
+  box-shadow: var(--shadow-lg, 0 20px 60px rgba(0, 0, 0, 0.5));
+`;
+
+const HelpHeader = styled.div`
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--glass-border);
+  background: rgba(13, 17, 23, 0.92);
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 1.15rem;
+    color: var(--text-primary);
+
+    svg {
+      color: #58a6ff;
+    }
+  }
+`;
+
+const CloseButton = styled.button`
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    color: #fff;
+    background: rgba(239, 68, 68, 0.22);
+    border-color: rgba(239, 68, 68, 0.32);
+  }
+`;
+
+const HelpBody = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+`;
+
+const HelpStep = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  strong {
+    color: var(--text-primary);
+    font-size: 0.98rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
+  svg {
+    vertical-align: -1px;
+    color: #58a6ff;
+  }
+
+  code {
+    padding: 1px 6px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #c9d1d9;
+    font-size: 0.85rem;
+  }
+
+  em {
+    color: var(--text-primary);
+    font-style: normal;
+    font-weight: 700;
   }
 `;
 

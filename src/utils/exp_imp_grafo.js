@@ -105,10 +105,26 @@ export const importar_grafo = (file) => {
           throw new Error("Algunas aristas tienen nodos que no existen");
         }
 
+        // El nextId debe ser SIEMPRE mayor que el id mas alto de los nodos
+        // existentes. Si confiamos solo en el nextId del archivo y este quedo
+        // desactualizado o por debajo del id maximo real, un nodo nuevo podria
+        // reusar un id existente y enlazar aristas a un nodo equivocado.
+        const idMaximoNodos = nodos.reduce((max, nodo) => {
+          const idNumerico = Number(nodo.id);
+          return Number.isFinite(idNumerico) && idNumerico > max
+            ? idNumerico
+            : max;
+        }, 0);
+        const nextIdGuardado = Number(nextId);
+        const nextIdSeguro = Math.max(
+          Number.isFinite(nextIdGuardado) ? nextIdGuardado : 0,
+          idMaximoNodos + 1,
+        );
+
         resolve({
           nodos,
           aristas: aristas_normalizadas,
-          nextId: nextId || Math.max(...nodos.map((nodo) => nodo.id), 0) + 1,
+          nextId: nextIdSeguro,
           metadata: grafo_data.graph.metadata || {},
           version: grafo_data.version,
           timestamp: grafo_data.timestamp,

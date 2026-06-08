@@ -5,7 +5,7 @@ import { Notification } from "../components/Notification";
 import { TbArrowBackUp } from "react-icons/tb";
 import {
   FiPlay, FiChevronDown, FiChevronUp, FiArrowRight,
-  FiPlus, FiMinus, FiUpload
+  FiPlus, FiMinus, FiUpload, FiHelpCircle, FiX
 } from "react-icons/fi";
 import { resolverNorthwest } from "../utils/northwest";
 
@@ -86,6 +86,7 @@ export function NorthwestPage() {
 
   // ── Misc ─────────────────────────────────────────────────────────────────
   const [notification, setNotification] = useState(null);
+  const [showHelp, setShowHelp] = useState(false);
   const fileInputRef = useRef(null);
 
   const showNotification = (msg, type = "info") => setNotification({ message: msg, type });
@@ -279,7 +280,78 @@ export function NorthwestPage() {
           <TbArrowBackUp /> Volver al Grafo
         </BackButton>
         <Title>🧭 Método Northwest Corner</Title>
+        <HelpButton onClick={() => setShowHelp(true)} title="Ayuda">
+          <FiHelpCircle />
+        </HelpButton>
       </Header>
+
+      {showHelp && (
+        <HelpOverlay onClick={() => setShowHelp(false)}>
+          <HelpModal onClick={(e) => e.stopPropagation()}>
+            <HelpHeader>
+              <h2><FiHelpCircle /> Como usar Northwest</h2>
+              <CloseButton onClick={() => setShowHelp(false)} title="Cerrar"><FiX /></CloseButton>
+            </HelpHeader>
+
+            <HelpBody>
+              <HelpStep>
+                <strong>1. Define la matriz de costos</strong>
+                <p>
+                  Cada celda es el costo (o beneficio) de transportar de un <em>Origen</em> a
+                  un <em>Destino</em>. Usa <em>Agregar/Eliminar Fila</em> y{" "}
+                  <em>Agregar/Eliminar Columna</em> para ajustar el tamano de la matriz.
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>2. Ingresa oferta y demanda</strong>
+                <p>
+                  Escribe la <em>Oferta</em> de cada origen (columna derecha) y la{" "}
+                  <em>Demanda</em> de cada destino (fila inferior). Abajo veras las sumas
+                  <em> Σ Oferta</em> y <em>Σ Demanda</em>.
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>3. Balanceo automatico</strong>
+                <p>
+                  Si la oferta total y la demanda total no coinciden, al resolver se agrega
+                  automaticamente un origen o destino <em>ficticio</em> con costo 0 para
+                  balancear el problema.
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>4. Elige el modo y resuelve</strong>
+                <p>
+                  Selecciona <em>Minimizar</em> o <em>Maximizar</em> y pulsa{" "}
+                  <em>Resolver</em>. Las celdas asignadas se resaltan en la matriz con la
+                  cantidad transportada.
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>5. Revisa el resultado y los pasos</strong>
+                <p>
+                  Veras el costo/beneficio total y el detalle de cada asignacion. Pulsa{" "}
+                  <em>Ver pasos de resolucion</em> para seguir el recorrido de la esquina
+                  noroeste paso a paso.
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>6. Vista de grafo e importar</strong>
+                <p>
+                  Despliega <em>Vista de grafo</em> para ver origenes, destinos y las rutas
+                  optimas resaltadas (arrastra para mover la vista). Tambien puedes{" "}
+                  <em>Importar JSON</em> con el formato{" "}
+                  <code>{'{ "costs": [...], "supply": [...], "demand": [...] }'}</code>.
+                </p>
+              </HelpStep>
+            </HelpBody>
+          </HelpModal>
+        </HelpOverlay>
+      )}
 
       {notification && (
         <Notification message={notification.message} type={notification.type} onClose={() => setNotification(null)} />
@@ -567,6 +639,66 @@ const BackButton = styled.button`
 `;
 
 const Title = styled.h1`font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0;`;
+
+const HelpButton = styled.button`
+  margin-left: auto;
+  width: 38px; height: 38px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 8px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid rgba(96,165,250,0.4);
+  background: rgba(96,165,250,0.14);
+  color: #60a5fa; font-size: 19px;
+  &:hover { color: #fff; background: #3b82f6; transform: translateY(-1px); }
+`;
+
+const HelpOverlay = styled.div`
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center; padding: 18px;
+  background: rgba(2,6,16,0.72); backdrop-filter: blur(4px);
+  animation: ${fadeIn} 0.2s ease both;
+`;
+
+const HelpModal = styled.div`
+  width: min(640px, 100%); max-height: 85vh; overflow: auto;
+  border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);
+  background: linear-gradient(180deg,#0c1322 0%,#111a2c 100%);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+`;
+
+const HelpHeader = styled.div`
+  position: sticky; top: 0; display: flex; align-items: center;
+  justify-content: space-between; gap: 12px; padding: 16px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  background: rgba(12,19,34,0.94);
+  h2 {
+    display: flex; align-items: center; gap: 8px; margin: 0;
+    font-size: 16px; font-weight: 800; color: #fff;
+    svg { color: #60a5fa; font-size: 20px; }
+  }
+`;
+
+const CloseButton = styled.button`
+  width: 34px; height: 34px; flex-shrink: 0; border-radius: 10px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.6); cursor: pointer; transition: all 0.2s; font-size: 18px;
+  &:hover { color: #fff; background: rgba(244,63,94,0.22); border-color: rgba(244,63,94,0.4); }
+`;
+
+const HelpBody = styled.div`
+  display: flex; flex-direction: column; gap: 14px; padding: 18px;
+`;
+
+const HelpStep = styled.div`
+  display: flex; flex-direction: column; gap: 4px;
+  strong { color: #fff; font-size: 14px; }
+  p { margin: 0; color: rgba(255,255,255,0.65); font-size: 13px; line-height: 1.55; }
+  code {
+    padding: 1px 6px; border-radius: 5px; background: rgba(255,255,255,0.08);
+    color: #93c5fd; font-size: 12px;
+  }
+  em { color: #fff; font-style: normal; font-weight: 700; }
+`;
 
 const MainScroll = styled.div`
   flex: 1; overflow-y: auto; padding: 28px 32px 48px;

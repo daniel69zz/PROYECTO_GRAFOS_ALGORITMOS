@@ -26,13 +26,6 @@ const algorithmButtons = [
     color: "northwest",
   },
   {
-    label: "Arboles Binarios",
-    title: "Arboles Binarios",
-    tool: 8,
-    Icon: FaTree,
-    color: "tree",
-  },
-  {
     label: "Dijkstra",
     title: "Algoritmo de Dijkstra",
     tool: 9,
@@ -203,10 +196,10 @@ const AlgoritmoButton = styled.button`
   transition: all var(--transition-fast);
   border: 1px solid
     ${({ $color }) => (buttonColorMap[$color] ?? buttonColorMap.default).border};
-  background:
-    ${({ $color }) =>
-      (buttonColorMap[$color] ?? buttonColorMap.default).background};
-  color: ${({ $color }) => (buttonColorMap[$color] ?? buttonColorMap.default).text};
+  background: ${({ $color }) =>
+    (buttonColorMap[$color] ?? buttonColorMap.default).background};
+  color: ${({ $color }) =>
+    (buttonColorMap[$color] ?? buttonColorMap.default).text};
   font-size: 0.85rem;
   font-weight: 600;
 
@@ -216,14 +209,12 @@ const AlgoritmoButton = styled.button`
   }
 
   &:hover {
-    background:
-      ${({ $color }) =>
-        (buttonColorMap[$color] ?? buttonColorMap.default).hoverBackground};
+    background: ${({ $color }) =>
+      (buttonColorMap[$color] ?? buttonColorMap.default).hoverBackground};
     color: white;
     transform: translateY(-1px);
-    box-shadow:
-      ${({ $color }) =>
-        (buttonColorMap[$color] ?? buttonColorMap.default).hoverShadow};
+    box-shadow: ${({ $color }) =>
+      (buttonColorMap[$color] ?? buttonColorMap.default).hoverShadow};
   }
 
   &:active {

@@ -8,6 +8,7 @@ import { DijkstraControls } from "../components/DijkstraControls";
 import { TbArrowBackUp } from "react-icons/tb";
 import { ExportModal } from "../components/ExportModal";
 import { BiExport, BiImport } from "react-icons/bi";
+import { FiHelpCircle, FiX } from "react-icons/fi";
 import { exportar_grafo, importar_grafo } from "../utils/exp_imp_grafo";
 
 const existeAristaContraria = (aristas, from, to) =>
@@ -44,6 +45,7 @@ export function DijkstraPage() {
 
   const [exportModal, setExportModal] = useState(false);
   const [suggestedName, setSuggestedName] = useState("");
+  const [showHelp, setShowHelp] = useState(false);
   const fileInputRef = useRef(null);
 
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -362,7 +364,75 @@ export function DijkstraPage() {
         <HeaderAction onClick={abrirSelectorArchivo} title="Importar">
           <BiImport />
         </HeaderAction>
+        <HeaderAction onClick={() => setShowHelp(true)} title="Ayuda">
+          <FiHelpCircle />
+        </HeaderAction>
       </Header>
+
+      {showHelp && (
+        <HelpOverlay onClick={() => setShowHelp(false)}>
+          <HelpModal onClick={(e) => e.stopPropagation()}>
+            <HelpHeader>
+              <h2><FiHelpCircle /> Como usar Dijkstra</h2>
+              <CloseButton onClick={() => setShowHelp(false)} title="Cerrar"><FiX /></CloseButton>
+            </HelpHeader>
+
+            <HelpBody>
+              <HelpStep>
+                <strong>1. Llega con un grafo dirigido</strong>
+                <p>
+                  Esta vista recibe el grafo que armaste en el editor. Dijkstra requiere
+                  un grafo <em>dirigido</em> y sin pesos <em>negativos</em>; si hay aristas
+                  no dirigidas o negativas se mostrara un aviso al calcular.
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>2. Configura origen y destino</strong>
+                <p>
+                  En el modal inicial elige el <em>Nodo Origen</em> y el{" "}
+                  <em>Nodo Destino</em>. Tambien puedes hacer click directamente sobre los
+                  nodos del lienzo: el primer click fija el origen y el segundo el destino.
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>3. Elige el objetivo</strong>
+                <p>
+                  <em>Minimizar</em> busca la ruta mas corta. <em>Maximizar</em> busca la
+                  mas larga (heuristico: en grafos con ciclos no se garantiza el optimo
+                  global). Pulsa <em>Comenzar</em> para confirmar.
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>4. Calcula la ruta</strong>
+                <p>
+                  Pulsa <em>Calcular</em> en el panel lateral. La ruta optima se resalta en
+                  morado sobre el grafo y se abre un resumen con la distancia total, el
+                  camino y los pasos.
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>5. Navega y reinicia</strong>
+                <p>
+                  Arrastra el fondo para mover la vista. Usa <em>Limpiar</em> para volver a
+                  elegir origen y destino, o <em>Ver resultado</em> para reabrir el resumen.
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>6. Importar / exportar</strong>
+                <p>
+                  Con los iconos del encabezado puedes <em>exportar</em> el grafo actual a
+                  JSON o <em>importar</em> uno guardado para aplicarle Dijkstra.
+                </p>
+              </HelpStep>
+            </HelpBody>
+          </HelpModal>
+        </HelpOverlay>
+      )}
 
       <ContentWrapper>
         <CanvasArea
@@ -705,6 +775,109 @@ const HeaderAction = styled.button`
   &:hover {
     background: rgba(255, 255, 255, 0.15);
     transform: translateY(-2px);
+  }
+`;
+
+const HelpOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+`;
+
+const HelpModal = styled.div`
+  width: min(640px, 100%);
+  max-height: 85vh;
+  overflow: auto;
+  border-radius: 18px;
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  background: linear-gradient(180deg, rgba(17, 20, 30, 0.98), rgba(22, 18, 36, 0.98));
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  color: #fff;
+`;
+
+const HelpHeader = styled.div`
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(17, 20, 30, 0.96);
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #fff;
+
+    svg {
+      color: #a78bfa;
+      font-size: 1.3rem;
+    }
+  }
+`;
+
+const CloseButton = styled.button`
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1.1rem;
+
+  &:hover {
+    color: #fff;
+    background: rgba(244, 63, 94, 0.22);
+    border-color: rgba(244, 63, 94, 0.4);
+  }
+`;
+
+const HelpBody = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+`;
+
+const HelpStep = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  strong {
+    color: #fff;
+    font-size: 0.98rem;
+  }
+
+  p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
+  em {
+    color: #fff;
+    font-style: normal;
+    font-weight: 700;
   }
 `;
 

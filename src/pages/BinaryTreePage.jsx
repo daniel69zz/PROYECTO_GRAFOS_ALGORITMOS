@@ -5,6 +5,8 @@ import {
   FaDice,
   FaDownload,
   FaFolderOpen,
+  FaQuestion,
+  FaTimes,
   FaTrash,
   FaTree,
 } from "react-icons/fa";
@@ -95,6 +97,7 @@ export function BinaryTreePage() {
   const [generatedValues, setGeneratedValues] = useState([]);
   const [showRandomModal, setShowRandomModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const [suggestedName, setSuggestedName] = useState("");
   const [visualState, setVisualState] = useState({
     preset: "rebuild",
@@ -427,10 +430,87 @@ export function BinaryTreePage() {
         />
       )}
 
+      {showHelp && (
+        <HelpOverlay onClick={() => setShowHelp(false)}>
+          <HelpModal onClick={(event) => event.stopPropagation()}>
+            <HelpHeader>
+              <h2>
+                <FaQuestion /> Como usar Arboles Binarios
+              </h2>
+              <CloseButton type="button" onClick={() => setShowHelp(false)} title="Cerrar">
+                <FaTimes />
+              </CloseButton>
+            </HelpHeader>
+
+            <HelpBody>
+              <HelpStep>
+                <strong>1. Elige un modo de trabajo</strong>
+                <p>
+                  En el panel derecho cambia entre <em>Construir Arbol</em> (insertar
+                  valores en un BST) y <em>Reconstruir Arbol</em> (generar el arbol a
+                  partir de sus recorridos).
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>2. Construir un BST</strong>
+                <p>
+                  Escribe un valor o varios separados por comas o espacios (ej.{" "}
+                  <code>10, 5, 15, 3, 7</code>) y pulsa <em>Insertar nodos</em> o Enter.
+                  Los valores repetidos se bloquean. Tambien puedes pulsar{" "}
+                  <em>Aleatorio</em> para generar un arbol al instante.
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>3. Reconstruir un arbol</strong>
+                <p>
+                  Elige el metodo (<em>In-Order + Pre-Order</em> o{" "}
+                  <em>In-Order + Post-Order</em>), escribe ambos recorridos y pulsa{" "}
+                  <em>Reconstruir arbol</em>. Ejemplo: In-Order <code>4, 2, 5, 1, 3</code>{" "}
+                  y Pre-Order <code>4, 5, 2, 3, 1</code>.
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>4. Anima los recorridos</strong>
+                <p>
+                  En el panel de recorridos pulsa <em>In-Order</em>, <em>Pre-Order</em> o{" "}
+                  <em>Post-Order</em> para ver, paso a paso, el orden en que se visitan los
+                  nodos. El nodo activo se resalta en naranja sobre el arbol.
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>5. Navega el canvas</strong>
+                <p>
+                  Usa la rueda del mouse para acercar o alejar y arrastra el fondo para
+                  mover la vista. La leyenda de colores indica raiz, nodos internos, hojas y
+                  el recorrido activo. El boton <em>Reset</em> limpia el arbol.
+                </p>
+              </HelpStep>
+
+              <HelpStep>
+                <strong>6. Importar / exportar</strong>
+                <p>
+                  En el ultimo panel puedes <em>Importar JSON</em> un arbol guardado o{" "}
+                  <em>Exportar JSON</em> el arbol actual para reutilizarlo despues.
+                </p>
+              </HelpStep>
+            </HelpBody>
+          </HelpModal>
+        </HelpOverlay>
+      )}
+
       <Header>
-        <BackButton type="button" onClick={() => navigate("/graph")}>
-          <TbArrowBackUp /> Volver al Grafo
-        </BackButton>
+        <HeaderActions>
+          <BackButton type="button" onClick={() => navigate("/graph")}>
+            <TbArrowBackUp /> Volver al Grafo
+          </BackButton>
+          <HelpButton type="button" onClick={() => setShowHelp(true)} title="Ayuda">
+            <FaQuestion />
+          </HelpButton>
+        </HeaderActions>
 
         <TitleBlock>
           <span>Estructuras de datos visuales</span>
@@ -797,6 +877,141 @@ const BackButton = styled.button`
   &:hover {
     transform: translateY(-1px);
     background: rgba(255, 255, 255, 0.1);
+  }
+`;
+
+const HeaderActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+const HelpButton = styled.button`
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  border: 1px solid rgba(125, 211, 252, 0.4);
+  background: rgba(125, 211, 252, 0.14);
+  color: #7dd3fc;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    color: #fff;
+    background: linear-gradient(135deg, #0ea5e9, #2563eb);
+    transform: translateY(-1px);
+  }
+`;
+
+const HelpOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(2, 6, 16, 0.72);
+  backdrop-filter: blur(4px);
+`;
+
+const HelpModal = styled.div`
+  width: min(640px, 100%);
+  max-height: 85vh;
+  overflow: auto;
+  border-radius: 18px;
+  border: 1px solid var(--glass-border);
+  background: linear-gradient(180deg, #081020 0%, #0c1426 100%);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+`;
+
+const HelpHeader = styled.div`
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--glass-border);
+  background: rgba(8, 16, 32, 0.94);
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 1.12rem;
+    color: var(--text-primary);
+
+    svg {
+      color: #7dd3fc;
+    }
+  }
+`;
+
+const CloseButton = styled.button`
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    color: #fff;
+    background: rgba(239, 68, 68, 0.22);
+    border-color: rgba(239, 68, 68, 0.32);
+  }
+`;
+
+const HelpBody = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+`;
+
+const HelpStep = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  strong {
+    color: var(--text-primary);
+    font-size: 0.98rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
+  code {
+    padding: 1px 6px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #bae6fd;
+    font-size: 0.85rem;
+  }
+
+  em {
+    color: var(--text-primary);
+    font-style: normal;
+    font-weight: 700;
   }
 `;
 
